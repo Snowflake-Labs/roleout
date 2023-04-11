@@ -1,0 +1,168 @@
+project:
+  name: MySnowflakeProjectWithEnvs
+  namingConvention:
+    functionalRole: '{{env}}_{{name}}_ROLE'
+  environments:
+    - name: PROD
+    - name: DEV
+    - name: TEST
+  databases:
+    - name: EXAMPLE
+      schemata:
+        - name: COMMON
+          access:
+            - role: DATA_ANALYST
+              level: Read
+              env: PROD
+            - role: DATA_SCIENTIST
+              level: ReadWrite
+              env: PROD
+            - role: ELT_TOOL
+              level: Full
+              env: PROD
+            - role: DATA_ANALYST
+              level: Read
+              env: TEST
+            - role: DATA_SCIENTIST
+              level: ReadWrite
+              env: TEST
+            - role: ELT_TOOL
+              level: Full
+              env: TEST
+            - role: DATA_ANALYST
+              level: ReadWrite
+              env: DEV
+            - role: DATA_SCIENTIST
+              level: ReadWrite
+              env: DEV
+            - role: ELT_TOOL
+              level: Full
+              env: DEV
+            - role: DEVOPS
+              level: Full
+        - name: RAW
+          options:
+            - env: PROD
+              transient: true
+              managedAccess: false
+              dataRetentionTimeInDays: 10
+            - env: DEV
+              transient: true
+              managedAccess: true
+              dataRetentionTimeInDays: 0
+          access:
+            - role: DATA_ANALYST
+              level: Read
+              env: PROD
+            - role: DATA_SCIENTIST
+              level: Read
+              env: PROD
+            - role: ELT_TOOL
+              level: Full
+              env: PROD
+            - role: DATA_ANALYST
+              level: Read
+              env: TEST
+            - role: DATA_SCIENTIST
+              level: Read
+              env: TEST
+            - role: ELT_TOOL
+              level: Full
+              env: TEST
+            - role: DATA_ANALYST
+              level: ReadWrite
+              env: DEV
+            - role: DATA_SCIENTIST
+              level: ReadWrite
+              env: DEV
+            - role: ELT_TOOL
+              level: Full
+              env: DEV
+            - role: DEVOPS
+              level: Full
+    - name: SANDBOX
+      options:
+        - env: PROD
+          transient: false
+          dataRetentionTimeInDays: 10
+        - env: DEV
+          transient: true
+          dataRetentionTimeInDays: 0
+  schemaObjectGroups:
+    - name: SOME_OBJECTS
+      id: 1
+      tables:
+        - database: EXAMPLE
+          schema: RAW
+          name: MY_TABLE
+          env: PROD
+        - database: EXAMPLE
+          schema: COMMON
+          name: SEED_DATA
+          env: DEV
+      views:
+        - database: EXAMPLE
+          schema: RAW
+          name: MY_VIEW
+        - database: EXAMPLE
+          schema: COMMON
+          name: ANOTHER_VIEW
+      access:
+        - role: DATA_ANALYST
+          level: ReadWrite
+          env: DEV
+        - role: ELT_TOOL
+          level: ReadWrite
+          env: DEV
+        - role: DATA_ANALYST
+          level: Read
+          env: PROD
+        - role: ELT_TOOL
+          level: ReadWrite
+          env: PROD
+  virtualWarehouses:
+    - name: BI
+      options:
+        - env: PROD
+          size: XSMALL
+          minClusterCount: 2
+          maxClusterCount: 10
+          scalingPolicy: ECONOMY
+          autoSuspend: 309
+          autoResume: false
+        - env: DEV
+          size: SMALL
+          minClusterCount: 3
+          maxClusterCount: 9
+          scalingPolicy: ECONOMY
+          autoSuspend: 300
+          autoResume: true
+      access:
+        - role: DATA_ANALYST
+          level: Usage
+        - role: ELT_TOOL
+          level: Usage
+          env: DEV
+        - role: DEVOPS
+          level: Full
+    - name: DSCI
+      access:
+        - role: DATA_SCIENTIST
+          level: Usage
+        - role: DEVOPS
+          level: Full
+    - name: ELT
+      access:
+        - role: ELT_TOOL
+          level: Usage
+        - role: DEVOPS
+          level: Full
+    - name: DEVOPS
+      access:
+        - role: DEVOPS
+          level: Full
+  functionalRoles:
+    - name: DATA_ANALYST
+    - name: DATA_SCIENTIST
+    - name: ELT_TOOL
+    - name: DEVOPS

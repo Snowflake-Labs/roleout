@@ -1,0 +1,79 @@
+project:
+  name: MySnowflakeProject
+  namingConvention:
+    functionalRole: '{{env}}_{{name}}_ROLE'
+  databases:
+    - name: PROD_DB
+      options:
+        dataRetentionTimeInDays: 90
+      schemata:
+        - name: COMMON
+          access:
+            - role: DATA_ANALYST
+              level: Read
+            - role: DATA_SCIENTIST
+              level: ReadWrite
+            - role: ELT_TOOL
+              level: Full
+        - name: RAW
+          options:
+            transient: true
+            managedAccess: false
+            dataRetentionTimeInDays: 10
+          access:
+            - role: DATA_ANALYST
+              level: Read
+            - role: DATA_SCIENTIST
+              level: Read
+            - role: ELT_TOOL
+              level: Full
+    - name: SANDBOX_DB
+      options:
+        transient: true
+        dataRetentionTimeInDays: 0
+  schemaObjectGroups:
+    - name: SOME_OBJECTS
+      id: 1
+      tables:
+        - database: PROD_DB
+          schema: RAW
+          name: MY_TABLE
+        - database: PROD_DB
+          schema: COMMON
+          name: SEED_DATA
+      views:
+        - database: PROD_DB
+          schema: RAW
+          name: MY_VIEW
+        - database: PROD_DB
+          schema: COMMON
+          name: ANOTHER_VIEW
+      access:
+        - role: DATA_ANALYST
+          level: Read
+        - role: ELT_TOOL
+          level: ReadWrite
+  virtualWarehouses:
+    - name: PROD_BI
+      options:
+        size: XSMALL
+        minClusterCount: 2
+        maxClusterCount: 10
+        scalingPolicy: ECONOMY
+        autoSuspend: 309
+        autoResume: false
+      access:
+        - role: DATA_ANALYST
+          level: Usage
+    - name: PROD_DSCI
+      access:
+        - role: DATA_SCIENTIST
+          level: Usage
+    - name: PROD_ELT
+      access:
+        - role: ELT_TOOL
+          level: Usage
+  functionalRoles:
+    - name: DATA_ANALYST
+    - name: DATA_SCIENTIST
+    - name: ELT_TOOL

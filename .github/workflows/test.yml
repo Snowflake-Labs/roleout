@@ -1,0 +1,44 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: npm install
+        run: |
+          npm install
+
+      - name: npm build lib
+        run: |
+          npm run build -w lib
+
+      - name: npm test lib
+        run: |
+          npm run test -w lib
+
+      - name: npm test app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd app
+          npm run package
+          npm run lint
+          npm exec tsc
+          npm test

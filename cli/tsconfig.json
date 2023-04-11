@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "node16",
+    "lib": [
+      "es6",
+      "es2015",
+      "dom"
+    ],
+    "declaration": true,
+    "allowJs": true,
+    "outDir": "./build",
+    "rootDir": "src",
+    "strict": true,
+    "types": [
+      "node"
+    ],
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  }
+}

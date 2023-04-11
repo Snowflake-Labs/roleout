@@ -1,0 +1,1 @@
+export const TERRAFORM_VERSION = '0.55.1'

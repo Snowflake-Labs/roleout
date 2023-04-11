@@ -1,0 +1,37 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest]
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+
+      - name: Install Node and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install and build
+        run: |
+          npm install
+          npm run build -w lib
+          npm run build -w app
+
+      - name: Publish releases
+        env:
+          # This is used for uploading release assets to github
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          cd app
+          npm exec electron-builder -- --publish always --win --mac --linux
