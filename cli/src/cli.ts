@@ -13,6 +13,12 @@ import chalk from 'chalk'
 import {Role} from 'roleout-lib/build/roles/role'
 import {SchemaObjectGrantKinds} from 'roleout-lib/build/grants/schemaObjectGrant'
 import {some} from 'lodash'
+import {VERSION} from 'roleout-lib/build/version'
+import {
+  createSnowflakeConnection,
+  getConnectionOptionsFromEnv,
+  SnowflakeConnector
+} from 'roleout-lib/build/snowflakeConnector'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const exec = util.promisify(require('child_process').exec)
@@ -145,16 +151,25 @@ async function removeLegacyCurrentGrantsState(program: Command, opts: RemoveLega
   }
 }
 
+async function populateFromSnowflakeAccount(program: Command, opts?: any) {
+  const connectionOptions = getConnectionOptionsFromEnv()
+  const connection = await createSnowflakeConnection(connectionOptions)
+  const connector = new SnowflakeConnector(connection)
+  const virtualWarehouses = await connector.getVirtualWarehouses()
+  console.log(virtualWarehouses)
+}
+
 async function main() {
   const program = new Command()
 
   program
     .name('roleout')
     .description('Snowflake Database Modeller')
-    .version('1.8.0')
+    .version(VERSION)
 
   const terraformCmd = program.command('terraform')
   const sqlCmd = program.command('sql')
+  const snowflakeCmd = program.command('snowflake')
 
   sqlCmd.command('deploy')
     .description('Create a plain SQL script')
@@ -178,6 +193,10 @@ async function main() {
     .description('Removes legacy Terraform state for current grants when upgrading from version 1.5.0 or earlier. Must be run in your Terraform directory.')
     .option('-o, --output <files>', 'Write state rm commands to a file instead of running them')
     .action(opts => removeLegacyCurrentGrantsState(program, opts))
+
+  snowflakeCmd.command('populateProject')
+    .description('Read a Snowflake account and populate a project with the databases, schemas, virtual warehouses, and roles from that account')
+    .action(opts => populateFromSnowflakeAccount(program, opts))
 
   await program.parseAsync(process.argv)
 }

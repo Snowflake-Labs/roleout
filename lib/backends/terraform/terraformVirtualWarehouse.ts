@@ -3,7 +3,7 @@ import {
   VirtualWarehouse,
   VirtualWarehouseOptions,
   VirtualWarehouseScalingPolicy,
-  VirtualWarehouseSize
+  VirtualWarehouseSize, VirtualWarehouseType
 } from '../../objects/virtualWarehouse'
 import {TerraformBackend} from '../terraformBackend'
 import compact from 'lodash/compact'
@@ -17,8 +17,11 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
   scalingPolicy: VirtualWarehouseScalingPolicy
   autoSuspend: number
   autoResume: boolean
+  enableQueryAcceleration: boolean
+  queryAccelerationMaxScaleFactor: number
+  type: VirtualWarehouseType
 
-  constructor(name: string, size: VirtualWarehouseSize, minClusterCount: number, maxClusterCount: number, scalingPolicy: VirtualWarehouseScalingPolicy, autoSuspend: number, autoResume: boolean) {
+  constructor(name: string, size: VirtualWarehouseSize, minClusterCount: number, maxClusterCount: number, scalingPolicy: VirtualWarehouseScalingPolicy, autoSuspend: number, autoResume: boolean, enableQueryAcceleration: boolean, queryAccelerationMaxScaleFactor: number, type: VirtualWarehouseType) {
     this.name = name
     this.size = size
     this.minClusterCount = minClusterCount
@@ -26,6 +29,9 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
     this.scalingPolicy = scalingPolicy
     this.autoSuspend = autoSuspend
     this.autoResume = autoResume
+    this.enableQueryAcceleration = enableQueryAcceleration
+    this.queryAccelerationMaxScaleFactor = queryAccelerationMaxScaleFactor
+    this.type = type
   }
 
   resourceType(): string {
@@ -65,7 +71,10 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
       virtualWarehouse.maxClusterCount,
       virtualWarehouse.scalingPolicy,
       virtualWarehouse.autoSuspend,
-      virtualWarehouse.autoResume
+      virtualWarehouse.autoResume,
+      virtualWarehouse.enableQueryAcceleration,
+      virtualWarehouse.queryAccelerationMaxScaleFactor,
+      virtualWarehouse.type
     )
   }
 }

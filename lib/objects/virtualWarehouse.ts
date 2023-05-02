@@ -4,8 +4,10 @@ import {VirtualWarehouseAccessLevel} from '../access/virtualWarehouseAccessLevel
 import {NamingConvention} from '../namingConvention'
 import {FunctionalRole} from '../roles/functionalRole'
 
+export type VirtualWarehouseType = 'STANDARD' | 'SNOWPARK-OPTIMIZED'
+
 export enum VirtualWarehouseSize {
-  XSMALL ='XSMALL',
+  XSMALL = 'XSMALL',
   SMALL = 'SMALL',
   MEDIUM = 'MEDIUM',
   LARGE = 'LARGE',
@@ -17,6 +19,33 @@ export enum VirtualWarehouseSize {
   X6LARGE = 'X6LARGE'
 }
 
+export function parseVirtualWarehouseSize(s: string): VirtualWarehouseSize {
+  switch (s) {
+  case 'X-Small':
+    return VirtualWarehouseSize.XSMALL
+  case 'Small':
+    return VirtualWarehouseSize.SMALL
+  case 'Medium':
+    return VirtualWarehouseSize.MEDIUM
+  case 'Large':
+    return VirtualWarehouseSize.LARGE
+  case 'X-Large':
+    return VirtualWarehouseSize.XLARGE
+  case '2X-Large':
+    return VirtualWarehouseSize.XXLARGE
+  case '3X-Large':
+    return VirtualWarehouseSize.XXXLARGE
+  case '4X-Large':
+    return VirtualWarehouseSize.X4LARGE
+  case '5X-Large':
+    return VirtualWarehouseSize.X5LARGE
+  case '6X-Large':
+    return VirtualWarehouseSize.X6LARGE
+  default:
+    throw new Error(`Invalid virtual warehouse size string '${s}'`)
+  }
+}
+
 export type VirtualWarehouseScalingPolicy = 'STANDARD' | 'ECONOMY'
 
 export interface VirtualWarehouseOptions {
@@ -26,6 +55,9 @@ export interface VirtualWarehouseOptions {
   autoSuspend: number
   autoResume: boolean
   scalingPolicy: VirtualWarehouseScalingPolicy
+  enableQueryAcceleration: boolean
+  queryAccelerationMaxScaleFactor: number
+  type: VirtualWarehouseType
 }
 
 export const defaultVirtualWarehouseOptions: VirtualWarehouseOptions = {
@@ -34,7 +66,10 @@ export const defaultVirtualWarehouseOptions: VirtualWarehouseOptions = {
   maxClusterCount: 1,
   autoSuspend: 10,
   autoResume: true,
-  scalingPolicy: 'STANDARD'
+  scalingPolicy: 'STANDARD',
+  enableQueryAcceleration: false,
+  queryAccelerationMaxScaleFactor: 8,
+  type: 'STANDARD'
 }
 
 export class VirtualWarehouse implements VirtualWarehouseOptions {
@@ -45,6 +80,9 @@ export class VirtualWarehouse implements VirtualWarehouseOptions {
   scalingPolicy: VirtualWarehouseScalingPolicy
   autoSuspend: number
   autoResume: boolean
+  enableQueryAcceleration: boolean
+  queryAccelerationMaxScaleFactor: number
+  type: 'STANDARD' | 'SNOWPARK-OPTIMIZED'
   access: VirtualWarehouseAccess
 
   constructor(name: string, options: VirtualWarehouseOptions = defaultVirtualWarehouseOptions) {
@@ -55,6 +93,9 @@ export class VirtualWarehouse implements VirtualWarehouseOptions {
     this.scalingPolicy = options.scalingPolicy
     this.autoSuspend = options.autoSuspend
     this.autoResume = options.autoResume
+    this.enableQueryAcceleration = options.enableQueryAcceleration
+    this.queryAccelerationMaxScaleFactor = options.queryAccelerationMaxScaleFactor
+    this.type = options.type
     this.access = new Map<FunctionalRole, VirtualWarehouseAccessLevel>()
   }
 

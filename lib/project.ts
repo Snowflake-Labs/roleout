@@ -5,7 +5,7 @@ import {
   defaultVirtualWarehouseOptions,
   VirtualWarehouse,
   VirtualWarehouseOptions,
-  VirtualWarehouseSize
+  VirtualWarehouseSize, VirtualWarehouseType
 } from './objects/virtualWarehouse'
 import {FunctionalRole} from './roles/functionalRole'
 import {DataAccessLevel, parseDataAccessLevel} from './access/dataAccessLevel'
@@ -43,6 +43,18 @@ export class Project extends Deployable {
     super(name, {...defaultNamingConvention})
     this.options = defaultProjectOptions
     this.environments = []
+  }
+
+  mergeDatabases(databases: Database[]) {
+
+  }
+
+  mergeVirtualWarehouses(virtualWarehouses: VirtualWarehouse[]) {
+
+  }
+
+  mergeFunctionalRoles(functionalRoles: FunctionalRole[]) {
+
   }
 
   static fromYAML(contents: string): Project {
@@ -478,6 +490,9 @@ export class Project extends Deployable {
       scalingPolicy: optionsMap.get('scalingPolicy') as 'STANDARD' | 'ECONOMY' | undefined ?? defaultVirtualWarehouseOptions.scalingPolicy,
       autoSuspend: optionsMap.get('autoSuspend') as number | undefined ?? defaultVirtualWarehouseOptions.autoSuspend,
       autoResume: optionsMap.get('autoResume') as boolean | undefined ?? defaultVirtualWarehouseOptions.autoResume,
+      enableQueryAcceleration: optionsMap.get('enableQueryAcceleration') as boolean | undefined ?? defaultVirtualWarehouseOptions.enableQueryAcceleration,
+      queryAccelerationMaxScaleFactor: optionsMap.get('queryAccelerationMaxScaleFactor') as number | undefined ?? defaultVirtualWarehouseOptions.queryAccelerationMaxScaleFactor,
+      type: optionsMap.get('type') as VirtualWarehouseType | undefined ?? defaultVirtualWarehouseOptions.type
     }
   }
 
