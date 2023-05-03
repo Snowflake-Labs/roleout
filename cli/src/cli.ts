@@ -24,6 +24,11 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const exec = util.promisify(require('child_process').exec)
 
+// Suppress annoying AWS SDK message from output
+// https://github.com/aws/aws-sdk-js/issues/4354
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('aws-sdk/lib/maintenance_mode_message').suppress = true
+
 type DeployOpts = { config: string, output: string }
 type RemoveLegacyCurrentGrantsStateOpts = { output: string }
 type SnowflakeOpts = { config: string, output: string }
@@ -154,8 +159,11 @@ async function removeLegacyCurrentGrantsState(program: Command, opts: RemoveLega
 }
 
 async function populateFromSnowflakeAccount(program: Command, opts: SnowflakeOpts) {
-  const contents = await fs.readFile(opts.config)
-  const project = await Project.fromYAML(contents.toString('utf8'))
+  let project = new Project('Project from Snowflake Account')
+  if(opts.config) {
+    const contents = await fs.readFile(opts.config)
+    project = await Project.fromYAML(contents.toString('utf8'))
+  }
 
   const connectionOptions = getConnectionOptionsFromEnv()
   const connection = await createSnowflakeConnection(connectionOptions)
@@ -167,11 +175,11 @@ async function populateFromSnowflakeAccount(program: Command, opts: SnowflakeOpt
 
   project.mergeVirtualWarehouses(virtualWarehouses).mergeRoles(roles).mergeDatabases(databases)
 
-  for(const sog of project.schemaObjectGroups) {
-    console.log(YAML.stringify(sog.toRecord()))
-  }
-  //const yaml = project.toYAML()
-  // TODO write yaml
+  const yaml = YAML.stringify(project.toRecord())
+
+  const filename = opts.output
+  await fs.mkdir(path.dirname(filename), {recursive: true})
+  await fs.writeFile(filename, yaml)
 }
 
 async function main() {
@@ -211,7 +219,8 @@ async function main() {
 
   snowflakeCmd.command('populateProject')
     .description('Read a Snowflake account and populate a project with the databases, schemas, virtual warehouses, and roles from that account')
-    .requiredOption('-c, --config <file>')
+    .option('-c, --config <file>')
+    .requiredOption('-o, --output <file>')
     .action(opts => populateFromSnowflakeAccount(program, opts))
 
   await program.parseAsync(process.argv)

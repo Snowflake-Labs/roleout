@@ -4,6 +4,7 @@ import {VirtualWarehouseAccessLevel} from '../access/virtualWarehouseAccessLevel
 import {NamingConvention} from '../namingConvention'
 import {FunctionalRole} from '../roles/functionalRole'
 import {YAMLMap} from 'yaml'
+import {Environment} from '../environment'
 
 export type VirtualWarehouseType = 'STANDARD' | 'SNOWPARK-OPTIMIZED'
 

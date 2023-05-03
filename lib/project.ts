@@ -45,10 +45,24 @@ export class Project extends Deployable {
     this.environments = []
   }
 
+  toRecord() {
+    return {
+      project: {
+        name: this.name,
+        options: this.options,
+        namingConvention: this.namingConvention,
+        databases: this.databases.map(db => db.toRecord()),
+        schemaObjectGroups: this.schemaObjectGroups.map(sog => sog.toRecord()),
+        virtualWarehouses: this.virtualWarehouses.map(vwh => vwh.toRecord()),
+        functionalRoles: this.functionalRoles.map(fr => fr.toRecord())
+      }
+    }
+  }
+
   mergeVirtualWarehouses(virtualWarehouses: VirtualWarehouse[]): Project {
-    for(const newVirtualWarehouse of virtualWarehouses) {
+    for (const newVirtualWarehouse of virtualWarehouses) {
       const existingVirtualWarehouse = find(this.virtualWarehouses, vwh => vwh.name === newVirtualWarehouse.name)
-      if(!existingVirtualWarehouse) {
+      if (!existingVirtualWarehouse) {
         this.virtualWarehouses.push(newVirtualWarehouse)
         continue
       }
@@ -62,21 +76,31 @@ export class Project extends Deployable {
   }
 
   mergeRoles(roles: FunctionalRole[]): Project {
-    for(const newRole of roles) {
-      if(!this.functionalRoles.includes(newRole)) this.functionalRoles.push(newRole)
+    for (const newRole of roles) {
+      if (!this.functionalRoles.includes(newRole)) this.functionalRoles.push(newRole)
     }
     return this
   }
 
   mergeDatabases(databases: Database[]): Project {
     const mergeSchemata = (existingSchemata: Schema[], newSchemata: Schema[]): Schema[] => {
-      // TODO implement me
+      for(const newSchema of newSchemata) {
+        const existingSchema = find(existingSchemata, s => s.name === newSchema.name)
+        if(!existingSchema) {
+          existingSchemata.push(newSchema)
+          continue
+        }
+        existingSchema.managedAccess = newSchema.managedAccess
+        existingSchema.transient = newSchema.transient
+        existingSchema.dataRetentionTimeInDays = newSchema.dataRetentionTimeInDays
+      }
+
       return existingSchemata
     }
 
-    for(const newDatabase of databases) {
+    for (const newDatabase of databases) {
       const existingDatabase = find(this.databases, db => db.name === newDatabase.name)
-      if(!existingDatabase) {
+      if (!existingDatabase) {
         this.databases.push(newDatabase)
         continue
       }
@@ -267,7 +291,7 @@ export class Project extends Deployable {
     }
 
     // Schema Object Groups
-    const schemaObjectGroupAccesses: {schemaObjectGroupName: string, functionalRoleName: string, environmentName: string | undefined, level: SchemaObjectGroupAccessLevel }[] = []
+    const schemaObjectGroupAccesses: { schemaObjectGroupName: string, functionalRoleName: string, environmentName: string | undefined, level: SchemaObjectGroupAccessLevel }[] = []
     if (projectMap.has('schemaObjectGroups')) {
       for (const schemaObjectGroupMap of (projectMap.get('schemaObjectGroups') as YAMLSeq<YAMLMap>).items) {
         const schemaObjectGroupName = schemaObjectGroupMap.get('name') as string
@@ -450,14 +474,14 @@ export class Project extends Deployable {
             name: obj.schema.database.name
           })
           const envDatabase = find(environment.databases, db => db.name === envDatabaseName)
-          if(!envDatabase) throw new ProjectFileError(`Could not find schema object group database ${envDatabaseName}`)
+          if (!envDatabase) throw new ProjectFileError(`Could not find schema object group database ${envDatabaseName}`)
           const envSchemaName = renderName('schema', project.namingConvention, {
             database: envDatabase.name,
             env: environment.name,
             name: obj.schema.name
           })
           const envSchema = find(envDatabase.schemata, s => s.name === envSchemaName)
-          if(!envSchema) throw new ProjectFileError(`Could not find schema object group schema ${envSchemaName}`)
+          if (!envSchema) throw new ProjectFileError(`Could not find schema object group schema ${envSchemaName}`)
           return new Table(obj.name, envSchema)
         })
       }
