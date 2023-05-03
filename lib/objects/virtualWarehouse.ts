@@ -3,6 +3,7 @@ import {VirtualWarehouseAccessRole} from '../roles/virtualWarehouseAccessRole'
 import {VirtualWarehouseAccessLevel} from '../access/virtualWarehouseAccessLevel'
 import {NamingConvention} from '../namingConvention'
 import {FunctionalRole} from '../roles/functionalRole'
+import {YAMLMap} from 'yaml'
 
 export type VirtualWarehouseType = 'STANDARD' | 'SNOWPARK-OPTIMIZED'
 
@@ -109,5 +110,26 @@ export class VirtualWarehouse implements VirtualWarehouseOptions {
 
   equals(other: VirtualWarehouse) {
     return this.name === other.name
+  }
+
+  toRecord() {
+    const accessRecords = Array(...this.access.entries()).map(([role, level]) => {
+      return {role: role.name, level: VirtualWarehouseAccessLevel[level]}
+    })
+    return {
+      name: this.name,
+      options: {
+        size: this.size,
+        minClusterCount: this.minClusterCount,
+        maxClusterCount: this.maxClusterCount,
+        scalingPolicy: this.scalingPolicy,
+        autoSuspend: this.autoSuspend,
+        autoResume: this.autoResume,
+        enableQueryAcceleration: this.enableQueryAcceleration,
+        queryAccelerationMaxScaleFactor: this.queryAccelerationMaxScaleFactor,
+        type: this.type
+      },
+      access: accessRecords
+    }
   }
 }

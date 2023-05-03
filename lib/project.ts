@@ -15,7 +15,7 @@ import {Environment} from './environment'
 import {Deployable} from './deployable'
 import {parseSchemaObjectGroupAccessLevel, SchemaObjectGroupAccessLevel} from './access/schemaObjectGroupAccessLevel'
 import {Table} from './objects/table'
-import {find} from 'lodash'
+import {find, includes} from 'lodash'
 import {SchemaObjectGroup} from './schemaObjectGroup'
 import {View} from './objects/view'
 
@@ -45,16 +45,47 @@ export class Project extends Deployable {
     this.environments = []
   }
 
-  mergeDatabases(databases: Database[]) {
+  mergeVirtualWarehouses(virtualWarehouses: VirtualWarehouse[]): Project {
+    for(const newVirtualWarehouse of virtualWarehouses) {
+      const existingVirtualWarehouse = find(this.virtualWarehouses, vwh => vwh.name === newVirtualWarehouse.name)
+      if(!existingVirtualWarehouse) {
+        this.virtualWarehouses.push(newVirtualWarehouse)
+        continue
+      }
 
+      const existingAccess = existingVirtualWarehouse.access
+      this.virtualWarehouses = this.virtualWarehouses.filter(vwh => vwh.name !== newVirtualWarehouse.name)
+      newVirtualWarehouse.access = existingAccess
+      this.virtualWarehouses.push(newVirtualWarehouse)
+    }
+    return this
   }
 
-  mergeVirtualWarehouses(virtualWarehouses: VirtualWarehouse[]) {
-
+  mergeRoles(roles: FunctionalRole[]): Project {
+    for(const newRole of roles) {
+      if(!this.functionalRoles.includes(newRole)) this.functionalRoles.push(newRole)
+    }
+    return this
   }
 
-  mergeFunctionalRoles(functionalRoles: FunctionalRole[]) {
+  mergeDatabases(databases: Database[]): Project {
+    const mergeSchemata = (existingSchemata: Schema[], newSchemata: Schema[]): Schema[] => {
+      // TODO implement me
+      return existingSchemata
+    }
 
+    for(const newDatabase of databases) {
+      const existingDatabase = find(this.databases, db => db.name === newDatabase.name)
+      if(!existingDatabase) {
+        this.databases.push(newDatabase)
+        continue
+      }
+
+      existingDatabase.schemata = mergeSchemata(existingDatabase.schemata, newDatabase.schemata)
+      existingDatabase.transient = newDatabase.transient
+      existingDatabase.dataRetentionTimeInDays = newDatabase.dataRetentionTimeInDays
+    }
+    return this
   }
 
   static fromYAML(contents: string): Project {

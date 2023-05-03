@@ -77,7 +77,7 @@ export class SnowflakeConnector {
     const roleoutDatabases: Database[] = []
 
     const databases = await this._databasesQuery()
-    for (const database of databases) {
+    for (const database of databases.filter((db: any) => db.name !== 'SNOWFLAKE')) {
       const databaseName = database['name']
       const databaseRetentionTime = database['retention_time'] !== undefined ? parseInt(database['retention_time']) : undefined
       const databaseTransient = (database['options'] as string).includes('TRANSIENT')

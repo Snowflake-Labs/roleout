@@ -18,7 +18,8 @@
     "color": "^4.2.3",
     "commander": "^9.2.0",
     "lodash": "^4.17.21",
-    "snowflake-sdk": "^1.6.21"
+    "snowflake-sdk": "^1.6.21",
+    "yaml": "^2.2.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.191",
