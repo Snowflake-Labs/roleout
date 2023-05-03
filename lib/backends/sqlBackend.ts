@@ -173,7 +173,10 @@ Foreach-Object {
               `MAX_CLUSTER_COUNT = ${vwh.maxClusterCount}`,
               vwh.maxClusterCount > vwh.minClusterCount ? `SCALING_POLICY = ${vwh.scalingPolicy}` : null,
               `AUTO_SUSPEND = ${vwh.autoSuspend * 60}`,
-              `AUTO_RESUME = ${vwh.autoResume ? 'TRUE' : 'FALSE'};\n`,
+              `AUTO_RESUME = ${vwh.autoResume ? 'TRUE' : 'FALSE'}`,
+              `ENABLE_QUERY_ACCELERATION = ${vwh.enableQueryAcceleration ? 'TRUE' : 'FALSE'}`,
+              `QUERY_ACCELERATION_MAX_SCALE_FACTOR = ${vwh.queryAccelerationMaxScaleFactor}`,
+              `WAREHOUSE_TYPE = ${vwh.type};\n`
             ])).join('\n')
         )
       ).join('\n')

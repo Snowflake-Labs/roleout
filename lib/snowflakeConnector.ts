@@ -3,6 +3,7 @@ import {Database, defaultDatabaseOptions} from './objects/database'
 import {FunctionalRole} from './roles/functionalRole'
 import {Connection, ConnectionOptions, createConnection} from 'snowflake-sdk'
 import {Schema} from './objects/schema'
+import {round} from 'lodash'
 
 export function getConnectionOptionsFromEnv(): ConnectionOptions {
   if (!process.env.SNOWFLAKE_ACCOUNT || !process.env.SNOWFLAKE_USER) throw new Error('Account and username must be specified')
@@ -56,7 +57,7 @@ export class SnowflakeConnector {
         size: parseVirtualWarehouseSize(vwh['size']),
         minClusterCount: parseInt(vwh['min_cluster_count']),
         maxClusterCount: parseInt(vwh['max_cluster_count']),
-        autoSuspend: parseInt(vwh['auto_suspend']),
+        autoSuspend: round(parseInt(vwh['auto_suspend']) / 60),
         autoResume: vwh['auto_resume'] === 'true',
         scalingPolicy: vwh['scaling_policy'],
         enableQueryAcceleration: vwh['enable_query_acceleration'] === 'true',
@@ -74,27 +75,29 @@ export class SnowflakeConnector {
 
 
   async getDatabases(): Promise<Database[]> {
+    const parseRetentionTime = (retentionTimeStr: string | undefined): number | undefined => {
+      // if retention_time is 1, assume the reason is that's the default value and so leave it undefined on the new db
+      return retentionTimeStr !== undefined && retentionTimeStr != '1' ? parseInt(retentionTimeStr) : undefined
+    }
     const roleoutDatabases: Database[] = []
 
     const databases = await this._databasesQuery()
     for (const database of databases.filter((db: any) => db.name !== 'SNOWFLAKE')) {
       const databaseName = database['name']
-      const databaseRetentionTime = database['retention_time'] !== undefined ? parseInt(database['retention_time']) : undefined
       const databaseTransient = (database['options'] as string).includes('TRANSIENT')
       const roleoutDatabase = new Database(databaseName, {
         transient: databaseTransient,
-        dataRetentionTimeInDays: databaseRetentionTime
+        dataRetentionTimeInDays: parseRetentionTime(database['retention_time'])
       })
 
       const schemas = await this._schemasQuery(databaseName)
       for (const schema of schemas.filter((s: any) => !SnowflakeConnector.SYSTEM_SCHEMATA.includes(s['name']))) {
         const schemaName = schema['name']
-        const schemaRetentionTime = schema['retention_time'] !== undefined ? parseInt(schema['retention_time']) : undefined
         const schemaTransient = (schema['options'] as string).includes('TRANSIENT')
         const schemaManagedAccess = (schema['options'] as string).includes('MANAGED ACCESS')
         const roleoutSchema = new Schema(schemaName, roleoutDatabase, {
           transient: schemaTransient,
-          dataRetentionTimeInDays: schemaRetentionTime,
+          dataRetentionTimeInDays: parseRetentionTime(schema['retention_time']),
           managedAccess: schemaManagedAccess
         })
         roleoutDatabase.schemata.push(roleoutSchema)

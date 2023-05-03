@@ -59,6 +59,9 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
       this.maxClusterCount > this.minClusterCount ? spacing + `scaling_policy = "${this.scalingPolicy}"` : null,
       spacing + `auto_suspend = ${this.autoSuspend * 60}`,
       spacing + `auto_resume = ${this.autoResume}`,
+      spacing + `enable_query_acceleration = ${this.enableQueryAcceleration}`,
+      spacing + `query_acceleration_max_scale_factor = ${this.queryAccelerationMaxScaleFactor}`,
+      spacing + `warehouse_type = ${this.type}`,
       '}',
     ]).join('\n')
   }
