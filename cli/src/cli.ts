@@ -155,8 +155,10 @@ async function populateFromSnowflakeAccount(program: Command, opts?: any) {
   const connectionOptions = getConnectionOptionsFromEnv()
   const connection = await createSnowflakeConnection(connectionOptions)
   const connector = new SnowflakeConnector(connection)
+
   const virtualWarehouses = await connector.getVirtualWarehouses()
-  console.log(virtualWarehouses)
+  const roles = await connector.getRoles()
+  const databases = await connector.getDatabases()
 }
 
 async function main() {

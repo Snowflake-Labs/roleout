@@ -21,7 +21,6 @@ export const defaultSchemaOptions: SchemaOptions = {
 export class Schema implements SchemaOptions {
   name: string
   database: Database
-  tables: Table[]
   access: DataAccess
   managedAccess: boolean
   transient: boolean
@@ -30,7 +29,6 @@ export class Schema implements SchemaOptions {
   constructor(name: string, database: Database, options: SchemaOptions = defaultSchemaOptions) {
     this.name = name
     this.database = database
-    this.tables = []
     this.access = new Map<FunctionalRole, DataAccessLevel>()
     this.managedAccess = options.managedAccess
     this.transient = options.transient
