@@ -165,21 +165,37 @@ async function populateFromSnowflakeAccount(program: Command, opts: SnowflakeOpt
     project = await Project.fromYAML(contents.toString('utf8'))
   }
 
-  const connectionOptions = getConnectionOptionsFromEnv()
-  const connection = await createSnowflakeConnection(connectionOptions)
-  const connector = new SnowflakeConnector(connection)
+  try {
+    const connectionOptions = getConnectionOptionsFromEnv()
+    console.log(`Connecting to Snowflake account ${connectionOptions.account} as user ${connectionOptions.username}...`)
+    const connection = await createSnowflakeConnection(connectionOptions)
+    const connector = new SnowflakeConnector(connection)
+    console.log(chalk.green('Successfully connected to Snowflake'))
 
-  const virtualWarehouses = await connector.getVirtualWarehouses()
-  const roles = await connector.getRoles()
-  const databases = await connector.getDatabases()
+    console.log('Listing Virtual Warehouses...')
+    const virtualWarehouses = await connector.getVirtualWarehouses()
+    console.log(chalk.green(`Imported ${virtualWarehouses.length} Virtual Warehouses`))
 
-  project.mergeVirtualWarehouses(virtualWarehouses).mergeRoles(roles).mergeDatabases(databases)
+    console.log('Listing Databases...')
+    const databases = await connector.getDatabases()
+    console.log(chalk.green(`Imported ${databases.length} Databases`))
 
-  const yaml = YAML.stringify(project.toRecord())
+    console.log('Listing Roles...')
+    const roles = await connector.getRoles()
+    console.log(chalk.green(`Imported ${roles.length} Roles`))
 
-  const filename = opts.output
-  await fs.mkdir(path.dirname(filename), {recursive: true})
-  await fs.writeFile(filename, yaml)
+    const filename = opts.output
+    console.log(`Writing project file to ${filename}`)
+    project.mergeVirtualWarehouses(virtualWarehouses).mergeRoles(roles).mergeDatabases(databases)
+
+    const yaml = YAML.stringify(project.toRecord())
+
+    await fs.mkdir(path.dirname(filename), {recursive: true})
+    await fs.writeFile(filename, yaml)
+    console.log(chalk.green('Finished!'))
+  } catch (e: any) {
+    console.error(chalk.red(e.toString()))
+  }
 }
 
 async function main() {

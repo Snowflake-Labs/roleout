@@ -43,8 +43,9 @@ export async function createSnowflakeConnection(connectionOptions: ConnectionOpt
 
 export class SnowflakeConnector {
   conn: Connection
-  protected static SYSTEM_ROLES = ['ACCOUNTADMIN', 'SECURITYADMIN', 'USERADMIN', 'SYSADMIN', 'PUBLIC']
+  protected static SYSTEM_ROLES = ['ORGADMIN', 'ACCOUNTADMIN', 'SECURITYADMIN', 'USERADMIN', 'SYSADMIN', 'PUBLIC']
   protected static SYSTEM_SCHEMATA = ['INFORMATION_SCHEMA', 'PUBLIC']
+  protected static SYSTEM_DATABASES = ['SNOWFLAKE', 'SNOWFLAKE_SAMPLE_DATA']
 
   constructor(conn: Connection) {
     this.conn = conn
@@ -73,7 +74,6 @@ export class SnowflakeConnector {
     return roles.filter((r: any) => !SnowflakeConnector.SYSTEM_ROLES.includes(r['name'])).map((r: any) => new FunctionalRole(r['name']))
   }
 
-
   async getDatabases(): Promise<Database[]> {
     const parseRetentionTime = (retentionTimeStr: string | undefined): number | undefined => {
       // if retention_time is 1, assume the reason is that's the default value and so leave it undefined on the new db
@@ -82,7 +82,7 @@ export class SnowflakeConnector {
     const roleoutDatabases: Database[] = []
 
     const databases = await this._databasesQuery()
-    for (const database of databases.filter((db: any) => db.name !== 'SNOWFLAKE')) {
+    for (const database of databases.filter((db: any) => !SnowflakeConnector.SYSTEM_DATABASES.includes(db.name))) {
       const databaseName = database['name']
       const databaseTransient = (database['options'] as string).includes('TRANSIENT')
       const roleoutDatabase = new Database(databaseName, {
