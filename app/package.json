@@ -1,6 +1,6 @@
 {
   "name": "roleout-app",
-  "version": "1.9.0-pre1",
+  "version": "1.9.0-pre2",
   "main": "./src/main/main.ts",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
