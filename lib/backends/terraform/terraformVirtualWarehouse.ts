@@ -61,7 +61,7 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
       spacing + `auto_resume = ${this.autoResume}`,
       spacing + `enable_query_acceleration = ${this.enableQueryAcceleration}`,
       spacing + `query_acceleration_max_scale_factor = ${this.queryAccelerationMaxScaleFactor}`,
-      spacing + `warehouse_type = ${this.type}`,
+      spacing + `warehouse_type = "${this.type}"`,
       '}',
     ]).join('\n')
   }
