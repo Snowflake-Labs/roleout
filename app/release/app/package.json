@@ -1,6 +1,6 @@
 {
   "name": "roleout-app",
-  "version": "1.9.0-pre2",
+  "version": "1.9.0-pre3",
   "description": "A Snowflake environment builder",
   "author": {
     "name": "Snowflake"

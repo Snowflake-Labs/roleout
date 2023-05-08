@@ -12,7 +12,7 @@ import {NamingConvention} from 'roleout-lib/build/namingConvention'
 import chalk from 'chalk'
 import {Role} from 'roleout-lib/build/roles/role'
 import {SchemaObjectGrantKinds} from 'roleout-lib/build/grants/schemaObjectGrant'
-import {some} from 'lodash'
+import {round, some} from 'lodash'
 import {VERSION} from 'roleout-lib/build/version'
 import YAML from 'yaml'
 import {
@@ -29,7 +29,7 @@ const exec = util.promisify(require('child_process').exec)
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('aws-sdk/lib/maintenance_mode_message').suppress = true
 
-type DeployOpts = { config: string, output: string }
+type DeployOpts = { config: string, output: string, verbose: boolean }
 type RemoveLegacyCurrentGrantsStateOpts = { output: string }
 type SnowflakeOpts = { config: string, output: string }
 
@@ -93,34 +93,65 @@ async function importTerraform(program: Command, opts: DeployOpts) {
     await fs.writeFile(opts.output, commands.join('\n'))
   } else {
     // run commands
-    const results = {successes: 0, alreadyManaged: 0, nonExistent: 0, errors: 0}
-    for (const cmd of commands) {
+    const results = {
+      successes: [] as string[],
+      alreadyManaged: [] as string[],
+      nonExistent: [] as string[],
+      invalidId: [] as string[],
+      errors: [] as string[]
+    }
+    for (const [i, cmd] of commands.entries()) {
       try {
         const {stdout} = await exec(cmd)
 
+        if(opts.verbose) console.log(stdout)
+
         if (stdout.includes('Import successful')) {
-          results.successes += 1
+          results.successes.push(cmd)
         }
       } catch (e: any) {
         const errorString = e.toString()
         console.error(errorString)
 
         if (errorString.includes('Cannot import non-existent remote object') || errorString.includes('does not exist')) {
-          results.nonExistent += 1
+          results.nonExistent.push(cmd)
         } else if (errorString.includes('Resource already managed by Terraform')) {
-          results.alreadyManaged += 1
+          results.alreadyManaged.push(cmd)
+        } else if (errorString.includes('unexpected format of ID')) {
+          results.invalidId.push(cmd)
         } else (
-          results.errors += 1
+          results.errors.push(cmd)
         )
       }
+
+      const pct_complete = round((i + 1) / commands.length * 100)
+      console.log(`${i + 1}/${commands.length} = ${pct_complete}% complete`)
     }
 
     console.log('\nResults:\n-------------------')
-    console.log(`${chalk.green(results.successes + ' imports succeeded')}`)
-    console.log(`${results.alreadyManaged} imports were unnecessary because the resource was already managed by Terraform`)
-    console.log(`${chalk.red(results.nonExistent + ' imports failed due to non-existent remote object')}`)
-    console.log(`${chalk.red(results.errors + ' imports failed due to other errors')}`)
+    console.log(`${chalk.green(results.successes.length + ' imports succeeded')}`)
+    console.log(`${results.alreadyManaged.length} imports were unnecessary because the resource was already managed by Terraform`)
+    console.log(`${chalk.red(results.nonExistent.length + ' imports failed due to non-existent objects')}`)
+    console.log(`${chalk.red(results.invalidId.length + ' imports failed due to invalid resource IDs')}`)
+    console.log(`${chalk.red(results.errors.length + ' imports failed due to other errors')}`)
     console.log('-------------------')
+
+    if(opts.verbose) {
+      console.log(chalk.red('Non-existent object:'))
+      for(const cmd of results.nonExistent) {
+        console.log(cmd)
+      }
+
+      console.log(chalk.red('Invalid IDs:'))
+      for(const cmd of results.invalidId) {
+        console.log(cmd)
+      }
+
+      console.log(chalk.red('Other errors:'))
+      for(const cmd of results.errors) {
+        console.log(cmd)
+      }
+    }
   }
 }
 
@@ -160,7 +191,7 @@ async function removeLegacyCurrentGrantsState(program: Command, opts: RemoveLega
 
 async function populateFromSnowflakeAccount(program: Command, opts: SnowflakeOpts) {
   let project = new Project('Project from Snowflake Account')
-  if(opts.config) {
+  if (opts.config) {
     const contents = await fs.readFile(opts.config)
     project = await Project.fromYAML(contents.toString('utf8'))
   }
@@ -225,6 +256,7 @@ async function main() {
   terraformCmd.command('import')
     .description('Import Terraform resources. Must be run in your Terraform directory.')
     .option('-o, --output <files>', 'Write import commands to a file instead of running them')
+    .option('-v, --verbose', 'Verbose output')
     .action(opts => importTerraform(program, opts))
     .requiredOption('-c, --config <file>')
 

@@ -59,8 +59,8 @@ export class TerraformDatabaseGrant extends TerraformGrant {
   }
 
   resourceID(): string {
-    // name|||privilege|role|false
-    return `${this.database.name}|||${this.privilege}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|false`
+    // database_name|privilege|with_grant_option|roles|shares
+    return `${this.database.name}|${this.privilege}|false|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
   }
 
   resourceBlock(namingConvention: NamingConvention): string {
@@ -77,7 +77,7 @@ export class TerraformDatabaseGrant extends TerraformGrant {
     ]).join('\n')
   }
 
-  static fromDatabaseGrant(grant: DatabaseGrant): TerraformDatabaseGrant {
-    return new TerraformDatabaseGrant(grant.database, grant.privilege, [grant.role], [])
+  static fromDatabaseGrant(grant: DatabaseGrant, dependsOn: TerraformResource[] = []): TerraformDatabaseGrant {
+    return new TerraformDatabaseGrant(grant.database, grant.privilege, [grant.role], [], dependsOn)
   }
 }
