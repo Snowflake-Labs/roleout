@@ -18,10 +18,13 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
   autoSuspend: number
   autoResume: boolean
   enableQueryAcceleration: boolean
-  queryAccelerationMaxScaleFactor: number
+  queryAccelerationMaxScaleFactor?: number
   type: VirtualWarehouseType
+  statementTimeoutInSeconds?: number
+  resourceMonitor?: string
+  initiallySuspended: boolean
 
-  constructor(name: string, size: VirtualWarehouseSize, minClusterCount: number, maxClusterCount: number, scalingPolicy: VirtualWarehouseScalingPolicy, autoSuspend: number, autoResume: boolean, enableQueryAcceleration: boolean, queryAccelerationMaxScaleFactor: number, type: VirtualWarehouseType) {
+  constructor(name: string, size: VirtualWarehouseSize, minClusterCount: number, maxClusterCount: number, scalingPolicy: VirtualWarehouseScalingPolicy, autoSuspend: number, autoResume: boolean, enableQueryAcceleration: boolean, queryAccelerationMaxScaleFactor: number | undefined, type: VirtualWarehouseType, statementTimeoutInSeconds: number | undefined, resourceMonitor: string | undefined, initiallySuspended: boolean) {
     this.name = name
     this.size = size
     this.minClusterCount = minClusterCount
@@ -32,6 +35,9 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
     this.enableQueryAcceleration = enableQueryAcceleration
     this.queryAccelerationMaxScaleFactor = queryAccelerationMaxScaleFactor
     this.type = type
+    this.statementTimeoutInSeconds = statementTimeoutInSeconds
+    this.resourceMonitor = resourceMonitor
+    this.initiallySuspended = initiallySuspended
   }
 
   resourceType(): string {
@@ -53,15 +59,17 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
       `resource ${this.resourceType()} ${this.resourceName()} {`,
       spacing + `name = "${this.name}"`,
       spacing + `warehouse_size = "${this.size}"`,
-      spacing + 'initially_suspended = true',
       spacing + `max_cluster_count = ${this.maxClusterCount}`,
       spacing + `min_cluster_count = ${this.minClusterCount}`,
       this.maxClusterCount > this.minClusterCount ? spacing + `scaling_policy = "${this.scalingPolicy}"` : null,
       spacing + `auto_suspend = ${this.autoSuspend * 60}`,
       spacing + `auto_resume = ${this.autoResume}`,
       spacing + `enable_query_acceleration = ${this.enableQueryAcceleration}`,
-      spacing + `query_acceleration_max_scale_factor = ${this.queryAccelerationMaxScaleFactor}`,
+      this.queryAccelerationMaxScaleFactor ? spacing + `query_acceleration_max_scale_factor = ${this.queryAccelerationMaxScaleFactor}` : null,
       spacing + `warehouse_type = "${this.type}"`,
+      this.statementTimeoutInSeconds ? spacing + `statement_timeout_in_seconds = ${this.statementTimeoutInSeconds}` : null,
+      this.resourceMonitor ? spacing + `resource_monitor = "${this.resourceMonitor}"` : null,
+      spacing + `initially_suspended = ${this.initiallySuspended}`,
       '}',
     ]).join('\n')
   }
@@ -77,7 +85,10 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
       virtualWarehouse.autoResume,
       virtualWarehouse.enableQueryAcceleration,
       virtualWarehouse.queryAccelerationMaxScaleFactor,
-      virtualWarehouse.type
+      virtualWarehouse.type,
+      virtualWarehouse.statementTimeoutInSeconds,
+      virtualWarehouse.resourceMonitor,
+      virtualWarehouse.initiallySuspended
     )
   }
 }

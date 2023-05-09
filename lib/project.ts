@@ -547,7 +547,10 @@ export class Project extends Deployable {
       autoResume: optionsMap.get('autoResume') as boolean | undefined ?? defaultVirtualWarehouseOptions.autoResume,
       enableQueryAcceleration: optionsMap.get('enableQueryAcceleration') as boolean | undefined ?? defaultVirtualWarehouseOptions.enableQueryAcceleration,
       queryAccelerationMaxScaleFactor: optionsMap.get('queryAccelerationMaxScaleFactor') as number | undefined ?? defaultVirtualWarehouseOptions.queryAccelerationMaxScaleFactor,
-      type: optionsMap.get('type') as VirtualWarehouseType | undefined ?? defaultVirtualWarehouseOptions.type
+      type: optionsMap.get('type') as VirtualWarehouseType | undefined ?? defaultVirtualWarehouseOptions.type,
+      statementTimeoutInSeconds: optionsMap.get('statementTimeoutInSeconds') as number | undefined ?? defaultVirtualWarehouseOptions.statementTimeoutInSeconds,
+      resourceMonitor: optionsMap.get('resourceMonitor') as string | undefined ?? defaultVirtualWarehouseOptions.resourceMonitor,
+      initiallySuspended: optionsMap.get('initiallySuspended') as boolean | undefined ?? defaultVirtualWarehouseOptions.initiallySuspended
     }
   }
 

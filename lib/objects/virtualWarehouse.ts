@@ -58,8 +58,11 @@ export interface VirtualWarehouseOptions {
   autoResume: boolean
   scalingPolicy: VirtualWarehouseScalingPolicy
   enableQueryAcceleration: boolean
-  queryAccelerationMaxScaleFactor: number
+  queryAccelerationMaxScaleFactor?: number
   type: VirtualWarehouseType
+  statementTimeoutInSeconds?: number
+  resourceMonitor?: string
+  initiallySuspended: boolean
 }
 
 export const defaultVirtualWarehouseOptions: VirtualWarehouseOptions = {
@@ -70,8 +73,10 @@ export const defaultVirtualWarehouseOptions: VirtualWarehouseOptions = {
   autoResume: true,
   scalingPolicy: 'STANDARD',
   enableQueryAcceleration: false,
-  queryAccelerationMaxScaleFactor: 8,
-  type: 'STANDARD'
+  queryAccelerationMaxScaleFactor: undefined,
+  type: 'STANDARD',
+  statementTimeoutInSeconds: undefined,
+  initiallySuspended: true
 }
 
 export class VirtualWarehouse implements VirtualWarehouseOptions {
@@ -83,9 +88,12 @@ export class VirtualWarehouse implements VirtualWarehouseOptions {
   autoSuspend: number
   autoResume: boolean
   enableQueryAcceleration: boolean
-  queryAccelerationMaxScaleFactor: number
+  queryAccelerationMaxScaleFactor?: number
   type: 'STANDARD' | 'SNOWPARK-OPTIMIZED'
   access: VirtualWarehouseAccess
+  statementTimeoutInSeconds?: number
+  resourceMonitor?: string
+  initiallySuspended: boolean
 
   constructor(name: string, options: VirtualWarehouseOptions = defaultVirtualWarehouseOptions) {
     this.name = name
@@ -99,6 +107,9 @@ export class VirtualWarehouse implements VirtualWarehouseOptions {
     this.queryAccelerationMaxScaleFactor = options.queryAccelerationMaxScaleFactor
     this.type = options.type
     this.access = new Map<FunctionalRole, VirtualWarehouseAccessLevel>()
+    this.statementTimeoutInSeconds = options.statementTimeoutInSeconds
+    this.resourceMonitor = options.resourceMonitor
+    this.initiallySuspended = options.initiallySuspended
   }
 
   accessRoles(namingConvention: NamingConvention): VirtualWarehouseAccessRole[] {
@@ -128,7 +139,10 @@ export class VirtualWarehouse implements VirtualWarehouseOptions {
         autoResume: this.autoResume,
         enableQueryAcceleration: this.enableQueryAcceleration,
         queryAccelerationMaxScaleFactor: this.queryAccelerationMaxScaleFactor,
-        type: this.type
+        type: this.type,
+        statementTimeoutInSeconds: this.statementTimeoutInSeconds,
+        resourceMonitor: this.resourceMonitor,
+        initiallySuspended: this.initiallySuspended
       },
       access: accessRecords
     }

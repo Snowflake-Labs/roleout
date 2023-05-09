@@ -62,6 +62,9 @@ project:
         scalingPolicy: ECONOMY
         autoSuspend: 309
         autoResume: false
+        statementTimeoutInSeconds: 3600
+        resourceMonitor: FOO
+        initiallySuspended: false
       access:
         - role: DATA_ANALYST
           level: Usage

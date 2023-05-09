@@ -28,8 +28,10 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
   const dispatch = useAppDispatch()
 
   const [newAutoSuspendStr, setNewAutoSuspendStr] = useState(options.autoSuspend.toString())
-  const [newQueryAccelerationMaxScaleFactorStr, setNewQueryAccelerationMaxScaleFactorStr] = useState(options.queryAccelerationMaxScaleFactor.toString())
+  const [newQueryAccelerationMaxScaleFactorStr, setNewQueryAccelerationMaxScaleFactorStr] = useState(options.queryAccelerationMaxScaleFactor ? options.queryAccelerationMaxScaleFactor.toString() : '')
   const [multiClusterError, setMultiClusterError] = useState<string | null>(null)
+  const [newStatementTimeoutStr, setNewStatementTimeoutStr] = useState(options.statementTimeoutInSeconds ? options.statementTimeoutInSeconds.toString() : '')
+  const [newResourceMonitorStr, setNewResourceMonitorStr] = useState(options.resourceMonitor ? options.resourceMonitor.toString() : '')
 
   useEffect(() => {
     if (options.maxClusterCount < options.minClusterCount && !multiClusterError) {
@@ -99,7 +101,7 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
     if ('' === strValue) {
       setNewQueryAccelerationMaxScaleFactorStr('')
       setOption(draft => {
-        draft.queryAccelerationMaxScaleFactor = 0
+        draft.queryAccelerationMaxScaleFactor = undefined
       })
       return
     }
@@ -116,6 +118,46 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
   const handleChangeType = (e: SelectChangeEvent) =>
     setOption(draft => {
       draft.type = e.target.value as VirtualWarehouseType
+    })
+
+  const handleChangeStatementTimeout = (e: ChangeEvent<HTMLInputElement>) => {
+    const strValue = (e.target.value as string).replace(/[^0-9]/, '')
+    if ('' === strValue) {
+      setNewStatementTimeoutStr('')
+      setOption(draft => {
+        draft.statementTimeoutInSeconds = undefined
+      })
+      return
+    }
+
+    const numberValue = parseInt(strValue)
+    if (!isNaN(numberValue)) {
+      setNewStatementTimeoutStr(numberValue.toString())
+      setOption(draft => {
+        draft.statementTimeoutInSeconds = numberValue
+      })
+    }
+  }
+
+  const handleChangeResourceMonitor = (e: ChangeEvent<HTMLInputElement>) => {
+    const strValue = e.target.value
+    if ('' === strValue) {
+      setNewResourceMonitorStr('')
+      setOption(draft => {
+        draft.resourceMonitor = undefined
+      })
+      return
+    }
+
+    setNewResourceMonitorStr(strValue)
+    setOption(draft => {
+      draft.resourceMonitor = strValue
+    })
+  }
+
+  const handleChangeInitiallySuspended = (checked: boolean) =>
+    setOption(draft => {
+      draft.initiallySuspended = checked
     })
 
   return (
@@ -188,8 +230,36 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
       <Grid item>
         <TextField size="small" value={newQueryAccelerationMaxScaleFactorStr} label={'QA Max Scale Factor'}
           sx={{width: '17ch'}}
+          InputLabelProps={{
+            shrink: true,
+          }}
           onChange={handleChangeQueryAccelerationMaxScaleFactor}
         />
+      </Grid>
+      <Grid item>
+        <TextField size="small" value={newStatementTimeoutStr} label={'Statement Timeout'}
+          sx={{width: '16ch'}}
+          InputProps={newStatementTimeoutStr ? {
+            endAdornment: <InputAdornment position="end">sec(s)</InputAdornment>,
+          } : {}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={handleChangeStatementTimeout}
+        />
+      </Grid>
+      <Grid item>
+        <TextField size="small" value={newResourceMonitorStr} label={'Resource Monitor'}
+          sx={{width: '17ch'}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={handleChangeResourceMonitor}
+        />
+      </Grid>
+      <Grid item>
+        <LabelledCheckbox label="Initially Suspended" checked={options.initiallySuspended}
+          handleChange={handleChangeInitiallySuspended}/>
       </Grid>
     </Grid>
   )

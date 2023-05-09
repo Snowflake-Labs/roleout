@@ -20,6 +20,7 @@ import {
   getConnectionOptionsFromEnv,
   SnowflakeConnector
 } from 'roleout-lib/build/snowflakeConnector'
+import {isTerraformSchemaObjectGrant} from 'roleout-lib/build/backends/terraform/terraformSchemaObjectGrant'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const exec = util.promisify(require('child_process').exec)
@@ -29,7 +30,8 @@ const exec = util.promisify(require('child_process').exec)
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('aws-sdk/lib/maintenance_mode_message').suppress = true
 
-type DeployOpts = { config: string, output: string, verbose: boolean }
+type DeployOpts = { config: string, output: string }
+type ImportOpts = { config: string, output: string, noGrants: boolean, verbose: boolean }
 type RemoveLegacyCurrentGrantsStateOpts = { output: string }
 type SnowflakeOpts = { config: string, output: string }
 
@@ -57,7 +59,7 @@ async function deployTerraform(program: Command, opts: DeployOpts) {
   }
 }
 
-async function importTerraform(program: Command, opts: DeployOpts) {
+async function importTerraform(program: Command, opts: ImportOpts) {
   function importCommand(resource: TerraformResource, namingConvention: NamingConvention): string {
     return `terraform import ${resource.resourceType()}."${resource.resourceName(namingConvention)}" "${resource.resourceID()}"`
   }
@@ -86,6 +88,10 @@ async function importTerraform(program: Command, opts: DeployOpts) {
     ].flat()
   }
 
+  if(opts.noGrants) {
+    resources = resources.filter(r => !isTerraformSchemaObjectGrant(r))
+  }
+
   const commands = resources.map(r => importCommand(r, project.namingConvention))
 
   if (opts.output) {
@@ -104,7 +110,7 @@ async function importTerraform(program: Command, opts: DeployOpts) {
       try {
         const {stdout} = await exec(cmd)
 
-        if(opts.verbose) console.log(stdout)
+        if (opts.verbose) console.log(stdout)
 
         if (stdout.includes('Import successful')) {
           results.successes.push(cmd)
@@ -136,19 +142,19 @@ async function importTerraform(program: Command, opts: DeployOpts) {
     console.log(`${chalk.red(results.errors.length + ' imports failed due to other errors')}`)
     console.log('-------------------')
 
-    if(opts.verbose) {
+    if (opts.verbose) {
       console.log(chalk.red('Non-existent object:'))
-      for(const cmd of results.nonExistent) {
+      for (const cmd of results.nonExistent) {
         console.log(cmd)
       }
 
       console.log(chalk.red('Invalid IDs:'))
-      for(const cmd of results.invalidId) {
+      for (const cmd of results.invalidId) {
         console.log(cmd)
       }
 
       console.log(chalk.red('Other errors:'))
-      for(const cmd of results.errors) {
+      for (const cmd of results.errors) {
         console.log(cmd)
       }
     }
@@ -257,6 +263,7 @@ async function main() {
     .description('Import Terraform resources. Must be run in your Terraform directory.')
     .option('-o, --output <files>', 'Write import commands to a file instead of running them')
     .option('-v, --verbose', 'Verbose output')
+    .option('--no-grants', 'Do not import any grants')
     .action(opts => importTerraform(program, opts))
     .requiredOption('-c, --config <file>')
 

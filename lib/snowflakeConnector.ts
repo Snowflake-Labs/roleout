@@ -53,7 +53,8 @@ export class SnowflakeConnector {
 
   async getVirtualWarehouses(): Promise<VirtualWarehouse[]> {
     const warehouses = await this._virtualWarehousesQuery()
-    return warehouses.map((vwh: any) => {
+    return warehouses.map(async (vwh: any) => {
+      const statementTimeoutInSeconds = await this._getStatementTimeoutInSeconds(vwh['name'])
       const virtualWarehouseOptions: VirtualWarehouseOptions = {
         size: parseVirtualWarehouseSize(vwh['size']),
         minClusterCount: parseInt(vwh['min_cluster_count']),
@@ -63,7 +64,10 @@ export class SnowflakeConnector {
         scalingPolicy: vwh['scaling_policy'],
         enableQueryAcceleration: vwh['enable_query_acceleration'] === 'true',
         queryAccelerationMaxScaleFactor: parseInt(vwh['query_acceleration_max_scale_factor']),
-        type: vwh['type']
+        type: vwh['type'],
+        statementTimeoutInSeconds: statementTimeoutInSeconds === 172800 ? undefined : statementTimeoutInSeconds,
+        resourceMonitor: vwh['resource_monitor'] ? vwh['resourceMonitor'] : undefined,
+        initiallySuspended: false
       }
       return new VirtualWarehouse(vwh['name'], virtualWarehouseOptions)
     })
@@ -108,6 +112,28 @@ export class SnowflakeConnector {
     return roleoutDatabases
   }
 
+  async _getStatementTimeoutInSeconds(vwh: string): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      const sqlQuery = `SHOW PARAMETERS IN WAREHOUSE ${vwh};`
+
+      this.conn.execute({
+        sqlText: sqlQuery,
+        complete: (err, stmt, rows) => {
+          if (err) {
+            reject(err)
+          } else {
+            const timeoutRow = rows?.find(row => row.key === 'STATEMENT_TIMEOUT_IN_SECONDS')
+            if (!timeoutRow) {
+              reject(new Error(`No STATEMENT_TIMEOUT_IN_SECONDS found for virtual warehouse: ${vwh}`))
+            } else {
+              const timeoutInSeconds = Number(timeoutRow.value)
+              resolve(timeoutInSeconds)
+            }
+          }
+        },
+      })
+    })
+  }
 
   protected async _virtualWarehousesQuery() {
     return await this._executeQuery('SHOW WAREHOUSES')
