@@ -263,7 +263,7 @@ async function main() {
     .description('Import Terraform resources. Must be run in your Terraform directory.')
     .option('-o, --output <files>', 'Write import commands to a file instead of running them')
     .option('-v, --verbose', 'Verbose output')
-    .option('--no-grants', 'Do not import any grants')
+    .option('--noGrants', 'Do not import any grants', false)
     .action(opts => importTerraform(program, opts))
     .requiredOption('-c, --config <file>')
 

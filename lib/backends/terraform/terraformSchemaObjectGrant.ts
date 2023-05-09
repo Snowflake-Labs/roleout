@@ -184,5 +184,5 @@ export class TerraformSchemaObjectGrant extends TerraformGrant {
 }
 
 export function isTerraformSchemaObjectGrant(obj: TerraformResource): obj is TerraformSchemaObjectGrant {
-  return (obj as TerraformSchemaObjectGrant).kind !== undefined && typeof (obj as TerraformSchemaObjectGrant).onAll === 'function'
+  return (obj as TerraformSchemaObjectGrant).kind !== undefined
 }
