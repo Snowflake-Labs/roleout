@@ -1,6 +1,6 @@
 {
   "name": "roleout-lib",
-  "version": "2.0.0-pre2",
+  "version": "2.0.0-pre5",
   "scripts": {
     "build": "tsc -p .",
     "lint": "eslint .",

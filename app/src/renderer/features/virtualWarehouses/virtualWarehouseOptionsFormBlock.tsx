@@ -42,8 +42,6 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
   }, [options])
 
   const setOption = (recipe: (draft: Draft<VirtualWarehouseOptions>) => void) => {
-    console.log('setting option')
-    console.log(setOptions(produce(options, recipe)))
     dispatch(setOptions(produce(options, recipe)))
   }
 

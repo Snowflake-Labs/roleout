@@ -232,6 +232,7 @@ async function populateFromSnowflakeAccount(program: Command, opts: SnowflakeOpt
     console.log(chalk.green('Finished!'))
   } catch (e: any) {
     console.error(chalk.red(e.toString()))
+    console.error(chalk.red(e.stack))
   }
 }
 

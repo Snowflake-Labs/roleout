@@ -1,18 +1,17 @@
 import {immerable} from 'immer'
 import {TerraformGrant} from './terraformGrant'
-import {SchemaObjectGrant, SchemaObjectGrantKind, SchemaObjectGrantKinds} from '../../grants/schemaObjectGrant'
+import {SchemaObjectGrant, SchemaObjectGrantKind} from '../../grants/schemaObjectGrant'
 import {NamingConvention} from '../../namingConvention'
 import {TerraformBackend} from '../terraformBackend'
 import {TerraformDatabase} from './terraformDatabase'
 import {TerraformSchema} from './terraformSchema'
-import {Privilege} from '../../privilege'
 import Mustache from 'mustache'
 import {TerraformRole} from './terraformRole'
 import {Role} from '../../roles/role'
 import {terraformGrantFromGrant} from './helpers'
 import {compact} from 'lodash'
 import {TerraformResource} from './terraformResource'
-import {NO_SHARES_IN_ID_RESOURCES, ON_ALL_SUPPORTED_RESOURCES} from './terraformVersion'
+import {NO_SHARES_IN_ID_RESOURCES} from './terraformVersion'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
 
 export class TerraformSchemaObjectGrant extends TerraformGrant {
@@ -82,33 +81,21 @@ export class TerraformSchemaObjectGrant extends TerraformGrant {
   }
 
   resourceID(): string {
-    if(['function', 'procedure'].includes(this.kind)) {
+    if (['function', 'procedure'].includes(this.kind)) {
       //database_name|schema_name|object_name|argument_data_types|privilege|with_grant_option|on_future|roles
       //FIXME this can't currently actually grant on a specific procedure/function because we don't collect argument types
       return `${this.database.name}|${this.schema.name}|${this.objectName || ''}||${this.privilege}|false|${this.onFuture}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
     }
 
-    if (ON_ALL_SUPPORTED_RESOURCES.includes(this.kind) && NO_SHARES_IN_ID_RESOURCES.includes(this.kind)) {
+    if (NO_SHARES_IN_ID_RESOURCES.includes(this.kind)) {
       // no shares and on_all
       //database_name|schema_name|object_name|privilege|with_grant_option|on_future|on_all|roles
       return `${this.database.name}|${this.schema.name}|${this.objectName || ''}|${this.privilege}|false|${this.onFuture}|${this.onAll()}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}`
     }
 
-    if (ON_ALL_SUPPORTED_RESOURCES.includes(this.kind)) {
-      // shares and on_all
-      // database_name|schema_name|object_name|privilege|with_grant_option|on_future|on_all|roles|shares
-      return `${this.database.name}|${this.schema.name}|${this.objectName || ''}|${this.privilege}|false|${this.onFuture}|${this.onAll()}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
-    }
-
-    if (NO_SHARES_IN_ID_RESOURCES.includes(this.kind)) {
-      // no shares and no on_all
-      //database_name|schema_name|object_name|privilege|with_grant_option|on_future|roles
-      return `${this.database.name}|${this.schema.name}|${this.objectName || ''}|${this.privilege}|false|${this.onFuture}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}`
-    }
-
-    //shares and no on_all
-    //database_name|schema_name|view_name|privilege|with_grant_option|on_future|roles|shares
-    return `${this.database.name}|${this.schema.name}|${this.objectName || ''}|${this.privilege}|false|${this.onFuture}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
+    // shares and on_all
+    // database_name|schema_name|object_name|privilege|with_grant_option|on_future|on_all|roles|shares
+    return `${this.database.name}|${this.schema.name}|${this.objectName || ''}|${this.privilege}|false|${this.onFuture}|${this.onAll()}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
   }
 
   resourceBlock(namingConvention: NamingConvention): string {
@@ -160,12 +147,13 @@ export class TerraformSchemaObjectGrant extends TerraformGrant {
       ]).join('\n')
     }
 
+    // TODO this shouldn't be reachable anymore
     // current grant on_all not supported for this kind of object in terraform provider
     return ''
   }
 
   onAll(): boolean {
-    return !this.onFuture && !this.objectName && ON_ALL_SUPPORTED_RESOURCES.includes(this.kind.toString())
+    return !this.onFuture && !this.objectName
   }
 
   static fromSchemaObjectGrant(grant: SchemaObjectGrant, dependsOn: TerraformResource[] = []): TerraformSchemaObjectGrant {

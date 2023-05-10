@@ -3,22 +3,20 @@ import {VirtualWarehouseAccessRole} from '../roles/virtualWarehouseAccessRole'
 import {VirtualWarehouseAccessLevel} from '../access/virtualWarehouseAccessLevel'
 import {NamingConvention} from '../namingConvention'
 import {FunctionalRole} from '../roles/functionalRole'
-import {YAMLMap} from 'yaml'
-import {Environment} from '../environment'
 
 export type VirtualWarehouseType = 'STANDARD' | 'SNOWPARK-OPTIMIZED'
 
 export enum VirtualWarehouseSize {
-  XSMALL = 'XSMALL',
-  SMALL = 'SMALL',
-  MEDIUM = 'MEDIUM',
-  LARGE = 'LARGE',
-  XLARGE = 'XLARGE',
-  XXLARGE = 'XXLARGE',
-  XXXLARGE = 'XXXLARGE',
-  X4LARGE = 'X4LARGE',
-  X5LARGE = 'X5LARGE',
-  X6LARGE = 'X6LARGE'
+  XSMALL = 'X-Small',
+  SMALL = 'Small',
+  MEDIUM = 'Medium',
+  LARGE = 'Large',
+  XLARGE = 'X-Large',
+  XXLARGE = '2X-Large',
+  XXXLARGE = '3X-Large',
+  X4LARGE = '4X-Large',
+  X5LARGE = '5X-Large',
+  X6LARGE = '6X-Large'
 }
 
 export function parseVirtualWarehouseSize(s: string): VirtualWarehouseSize {
@@ -42,6 +40,26 @@ export function parseVirtualWarehouseSize(s: string): VirtualWarehouseSize {
   case '5X-Large':
     return VirtualWarehouseSize.X5LARGE
   case '6X-Large':
+    return VirtualWarehouseSize.X6LARGE
+  case 'XSMALL':
+    return VirtualWarehouseSize.XSMALL
+  case 'SMALL':
+    return VirtualWarehouseSize.SMALL
+  case 'MEDIUM':
+    return VirtualWarehouseSize.MEDIUM
+  case 'LARGE':
+    return VirtualWarehouseSize.LARGE
+  case 'XLARGE':
+    return VirtualWarehouseSize.XLARGE
+  case 'XXLARGE':
+    return VirtualWarehouseSize.XXLARGE
+  case 'XXXLARGE':
+    return VirtualWarehouseSize.XXXLARGE
+  case 'X4LARGE':
+    return VirtualWarehouseSize.X4LARGE
+  case 'X5LARGE':
+    return VirtualWarehouseSize.X5LARGE
+  case 'X6LARGE':
     return VirtualWarehouseSize.X6LARGE
   default:
     throw new Error(`Invalid virtual warehouse size string '${s}'`)

@@ -1,5 +1,6 @@
 import {TerraformResource} from './terraformResource'
 import {
+  defaultVirtualWarehouseOptions,
   VirtualWarehouse,
   VirtualWarehouseOptions,
   VirtualWarehouseScalingPolicy,
@@ -65,11 +66,11 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
       spacing + `auto_suspend = ${this.autoSuspend * 60}`,
       spacing + `auto_resume = ${this.autoResume}`,
       spacing + `enable_query_acceleration = ${this.enableQueryAcceleration}`,
-      this.queryAccelerationMaxScaleFactor ? spacing + `query_acceleration_max_scale_factor = ${this.queryAccelerationMaxScaleFactor}` : null,
+      this.queryAccelerationMaxScaleFactor && this.queryAccelerationMaxScaleFactor != 8 ? spacing + `query_acceleration_max_scale_factor = ${this.queryAccelerationMaxScaleFactor}` : null,
       spacing + `warehouse_type = "${this.type}"`,
       this.statementTimeoutInSeconds ? spacing + `statement_timeout_in_seconds = ${this.statementTimeoutInSeconds}` : null,
       this.resourceMonitor ? spacing + `resource_monitor = "${this.resourceMonitor}"` : null,
-      spacing + `initially_suspended = ${this.initiallySuspended}`,
+      this.initiallySuspended ? spacing + `initially_suspended = ${this.initiallySuspended}` : null,
       '}',
     ]).join('\n')
   }

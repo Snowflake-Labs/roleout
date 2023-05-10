@@ -53,7 +53,7 @@ export class SnowflakeConnector {
 
   async getVirtualWarehouses(): Promise<VirtualWarehouse[]> {
     const warehouses = await this._virtualWarehousesQuery()
-    return warehouses.map(async (vwh: any) => {
+    return Promise.all(warehouses.map(async (vwh: any) => {
       const statementTimeoutInSeconds = await this._getStatementTimeoutInSeconds(vwh['name'])
       const virtualWarehouseOptions: VirtualWarehouseOptions = {
         size: parseVirtualWarehouseSize(vwh['size']),
@@ -66,11 +66,11 @@ export class SnowflakeConnector {
         queryAccelerationMaxScaleFactor: parseInt(vwh['query_acceleration_max_scale_factor']),
         type: vwh['type'],
         statementTimeoutInSeconds: statementTimeoutInSeconds === 172800 ? undefined : statementTimeoutInSeconds,
-        resourceMonitor: vwh['resource_monitor'] ? vwh['resourceMonitor'] : undefined,
+        resourceMonitor: vwh['resource_monitor'] && vwh['resource_monitor'] != 'null' ? vwh['resource_monitor'] : undefined,
         initiallySuspended: false
       }
       return new VirtualWarehouse(vwh['name'], virtualWarehouseOptions)
-    })
+    }))
   }
 
   async getRoles(): Promise<FunctionalRole[]> {

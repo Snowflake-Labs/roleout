@@ -2,7 +2,7 @@ import YAML, {isMap, isSeq, YAMLMap, YAMLSeq} from 'yaml'
 import {Database, DatabaseOptions, defaultDatabaseOptions} from './objects/database'
 import {defaultSchemaOptions, Schema, SchemaOptions} from './objects/schema'
 import {
-  defaultVirtualWarehouseOptions,
+  defaultVirtualWarehouseOptions, parseVirtualWarehouseSize,
   VirtualWarehouse,
   VirtualWarehouseOptions,
   VirtualWarehouseSize, VirtualWarehouseType
@@ -536,10 +536,10 @@ export class Project extends Deployable {
     return project
   }
 
-  static getVirtualWarehouseOptionsFromYAML(optionsMap: YAMLMap):
-    VirtualWarehouseOptions {
+  static getVirtualWarehouseOptionsFromYAML(optionsMap: YAMLMap): VirtualWarehouseOptions {
+    const size = optionsMap.get('size') ? parseVirtualWarehouseSize(optionsMap.get('size') as string) : defaultVirtualWarehouseOptions.size
     return {
-      size: optionsMap.get('size') as VirtualWarehouseSize | undefined ?? defaultVirtualWarehouseOptions.size,
+      size: size,
       maxClusterCount: optionsMap.get('maxClusterCount') as number | undefined ?? defaultVirtualWarehouseOptions.maxClusterCount,
       minClusterCount: optionsMap.get('minClusterCount') as number | undefined ?? defaultVirtualWarehouseOptions.minClusterCount,
       scalingPolicy: optionsMap.get('scalingPolicy') as 'STANDARD' | 'ECONOMY' | undefined ?? defaultVirtualWarehouseOptions.scalingPolicy,

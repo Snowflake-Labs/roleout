@@ -1,7 +1,7 @@
 import {Backend} from './backend'
 import {SchemaGrant} from '../grants/schemaGrant'
 import {DatabaseGrant} from '../grants/databaseGrant'
-import {Grant, GrantKind} from '../grants/grant'
+import {Grant, GrantKind, isSchemaObjectGrant} from '../grants/grant'
 import {SchemaObjectGrant, SchemaObjectGrantKinds} from '../grants/schemaObjectGrant'
 import {VirtualWarehouseGrant} from '../grants/virtualWarehouseGrant'
 import {Deployable} from '../deployable'
@@ -23,6 +23,7 @@ import {TerraformDatabaseGrant} from './terraform/terraformDatabaseGrant'
 import {Role} from '../roles/role'
 import {TERRAFORM_VERSION} from './terraform/terraformVersion'
 import {TerraformRoleOwnershipGrant} from './terraform/terraformRoleOwnershipGrant'
+import {flatten, set} from 'lodash'
 
 
 export class TerraformBackend extends Backend {
@@ -102,6 +103,15 @@ provider "snowflake" {
     let resources: (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformGrant)[] = []
     const grantMap: Map<GrantKind, TerraformGrant[]> = new Map()
 
+    // build a data structure of database -> schema -> kind = on_all ownership grant
+    const onAllOwnershipLookup: Record<string, Record<string, Record<string, TerraformSchemaObjectGrant>>> = {}
+    const allGrants: Grant[] = flatten(deployable.accessRoles().flatMap(ar => ar.grants))
+    for (const grant of allGrants) {
+      if (isSchemaObjectGrant(grant) && grant.privilege === Privilege.OWNERSHIP && !grant.future) {
+        set(onAllOwnershipLookup, [grant.schema.database.name, grant.schema.name, grant.kind], TerraformSchemaObjectGrant.fromSchemaObjectGrant(grant))
+      }
+    }
+
     for (const accessRole of deployable.accessRoles()) {
       // create access role
       const terraformAccessRole = new TerraformRole(accessRole.name)
@@ -112,8 +122,16 @@ provider "snowflake" {
       resources.push(ownershipRole)
 
       // grant privileges to access role
+      // all schema object grants must depend on the on_all ownership grants on the same object kind
       for (const grant of accessRole.grants) {
-        const resource = TerraformBackend.generateGrantResource(grant, [ownershipRole])
+        const dependsOn: TerraformResource[] = [ownershipRole]
+        if (isSchemaObjectGrant(grant) && !(grant.privilege === Privilege.OWNERSHIP && !grant.future)) {
+          const onAllOwnershipGrant = onAllOwnershipLookup[grant.schema.database.name][grant.schema.name][grant.kind]
+          if (!onAllOwnershipGrant) throw new Error(`No on_all ownership grant for ${grant.schema.database.name}.${grant.schema.name} ${grant.kind}s`)
+          dependsOn.push(onAllOwnershipGrant)
+        }
+
+        const resource = TerraformBackend.generateGrantResource(grant, dependsOn)
         if (resource) {
           if (!grantMap.has(resource.kind)) grantMap.set(resource.kind, [])
           grantMap.get(resource.kind)?.push(resource)

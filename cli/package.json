@@ -1,6 +1,6 @@
 {
   "name": "roleout-cli",
-  "version": "2.0.0-pre2",
+  "version": "2.0.0-pre4",
   "description": "Roleout CLI",
   "main": "./build/cli.js",
   "bin": {
