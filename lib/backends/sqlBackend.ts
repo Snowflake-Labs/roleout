@@ -16,7 +16,8 @@ export class SQLBackend extends Backend {
     function schemaObjectGrantSQL(grant: SchemaObjectGrant): string {
       const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
       if(grant.objectName()) return `GRANT ${grant.privilege} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
-      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}";`
+      const revokeCurrentGrants = grant.privilege === Privilege.OWNERSHIP && !grant.future ? ' REVOKE CURRENT GRANTS' : ''
+      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${revokeCurrentGrants};`
     }
 
     if (grant.type === 'SchemaObjectGrant') {
@@ -163,7 +164,7 @@ Foreach-Object {
       ]) as string[]).concat(
         deployable.virtualWarehouses.map(vwh =>
           [
-            `CREATE WAREHOUSE IF NOT EXISTS "${vwh.name}" WITH INITIALLY_SUSPENDED = TRUE WAREHOUSE_SIZE = ${vwh.size};`
+            `CREATE WAREHOUSE IF NOT EXISTS "${vwh.name}" WITH INITIALLY_SUSPENDED = ${vwh.initiallySuspended ? 'TRUE' : 'FALSE'} WAREHOUSE_SIZE = ${vwh.size};`
           ].concat(
             compact([
               `ALTER WAREHOUSE "${vwh.name}" SET`,
@@ -175,7 +176,9 @@ Foreach-Object {
               `AUTO_SUSPEND = ${vwh.autoSuspend * 60}`,
               `AUTO_RESUME = ${vwh.autoResume ? 'TRUE' : 'FALSE'}`,
               `ENABLE_QUERY_ACCELERATION = ${vwh.enableQueryAcceleration ? 'TRUE' : 'FALSE'}`,
-              `QUERY_ACCELERATION_MAX_SCALE_FACTOR = ${vwh.queryAccelerationMaxScaleFactor}`,
+              vwh.queryAccelerationMaxScaleFactor ? `QUERY_ACCELERATION_MAX_SCALE_FACTOR = ${vwh.queryAccelerationMaxScaleFactor}` : null,
+              vwh.statementTimeoutInSeconds ? `STATEMENT_TIMEOUT_IN_SECONDS = ${vwh.statementTimeoutInSeconds}` : null,
+              vwh.resourceMonitor ? `RESOURCE_MONITOR = ${vwh.resourceMonitor}` : null,
               `WAREHOUSE_TYPE = ${vwh.type};\n`
             ])).join('\n')
         )

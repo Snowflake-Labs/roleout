@@ -6,8 +6,14 @@ import {RootState} from '../../app/store'
 import {SchemaObjectGroupAccessLevel} from 'roleout-lib/build/access/schemaObjectGroupAccessLevel'
 import {removeEnvironment, updateEnvironment} from '../environments/environmentsSlice'
 import {removeFunctionalRole, updateFunctionalRole} from '../functionalRoles/functionalRolesSlice'
+import {removeDatabase, removeSchema, renameDatabase, renameSchema} from '../databases/databasesSlice'
 
-export type SchemaObjectGroupObjectPayload = { schemaObjectGroupName: string, databaseName: string, schemaName: string, name: string }
+export type SchemaObjectGroupObjectPayload = {
+  schemaObjectGroupName: string,
+  databaseName: string,
+  schemaName: string,
+  name: string
+}
 export type SchemaObjectGroupObjectPayloadAction = PayloadAction<SchemaObjectGroupObjectPayload>
 
 type SchemaObjectGroupState = SchemaObjectGroup[]
@@ -123,43 +129,44 @@ export const schemaObjectGroupsSlice = createSlice({
           if (action.payload in schemaObjectGroup.access) delete schemaObjectGroup.access[action.payload]
         }
       })
-      /*
-      // when a database is renamed we must rename it in all the schema object group access objects
+    // when a database is renamed we must rename it in all the schema object group access objects
       .addCase(renameDatabase, (state: Draft<SchemaObjectGroupState>, action) => {
-        // TODO FIXME
         for (const schemaObjectGroup of state) {
-          if (action.payload.name in schemaObjectGroup.access) {
-            schemaObjectGroup.access[action.payload.newName] = schemaObjectGroup.access[action.payload.name]
-            delete schemaObjectGroup.access[action.payload.name]
+          if (action.payload.name in schemaObjectGroup.objects) {
+            schemaObjectGroup.objects[action.payload.newName] = schemaObjectGroup.objects[action.payload.name]
+            delete schemaObjectGroup.objects[action.payload.name]
           }
         }
       })
-      // when a database is deleted we must remove the corresponding schema object group objects
+    // when a database is deleted we must remove the corresponding schema object group objects
       .addCase(removeDatabase, (state: Draft<SchemaObjectGroupState>, action) => {
-        // TODO FIXME
         for (const schemaObjectGroup of state) {
-          if (action.payload in schemaObjectGroup.access) delete schemaObjectGroup.access[action.payload]
+          if (action.payload in schemaObjectGroup.objects) delete schemaObjectGroup.objects[action.payload]
         }
       })
-      // when a schema is renamed we must rename it in all the schema object group access objects
+    // when a schema is renamed we must rename it in all the schema object group access objects
       .addCase(renameSchema, (state: Draft<SchemaObjectGroupState>, action) => {
-        // TODO FIXME
+        const database = action.payload.database
+        const schema = action.payload.schema
         for (const schemaObjectGroup of state) {
-          if (action.payload.name in schemaObjectGroup.access) {
-            schemaObjectGroup.access[action.payload.newName] = schemaObjectGroup.access[action.payload.name]
-            delete schemaObjectGroup.access[action.payload.name]
+          if (database in schemaObjectGroup.objects) {
+            if (schema in schemaObjectGroup.objects[database]) {
+              schemaObjectGroup.objects[database][action.payload.newName] = schemaObjectGroup.objects[database][schema]
+              delete schemaObjectGroup.objects[database][schema]
+            }
           }
         }
       })
-      // when a schema is deleted we must remove the corresponding schema object group objects
+    // when a schema is deleted we must remove the corresponding schema object group objects
       .addCase(removeSchema, (state: Draft<SchemaObjectGroupState>, action) => {
-        // TODO FIXME
+        const database = action.payload.database
+        const schema = action.payload.schema
         for (const schemaObjectGroup of state) {
-          if (action.payload in schemaObjectGroup.access) delete schemaObjectGroup.access[action.payload]
+          if (database in schemaObjectGroup.objects) {
+            if (schema in schemaObjectGroup.objects[database]) delete schemaObjectGroup.objects[database][schema]
+          }
         }
       })
-
-       */
   }
 }
 )
@@ -176,7 +183,11 @@ export const {
 
 export const selectSchemaObjectGroups = (state: RootState) => state.schemaObjectGroups
 export const selectSchemaObjectGroup = (state: RootState, name: string) => state.schemaObjectGroups.find(sog => sog.name === name)
-export const schemaObjectGroupDataObjectExists = (schemaObjectGroup: SchemaObjectGroup, search: { database: string, schema: string, objectName: string }) => {
+export const schemaObjectGroupDataObjectExists = (schemaObjectGroup: SchemaObjectGroup, search: {
+  database: string,
+  schema: string,
+  objectName: string
+}) => {
   const database = schemaObjectGroup.objects[search.database]
   if (!database) return false
   const schema = database[search.schema]

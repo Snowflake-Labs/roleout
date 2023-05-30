@@ -11,8 +11,8 @@ import util from 'util'
 import {NamingConvention} from 'roleout-lib/build/namingConvention'
 import chalk from 'chalk'
 import {Role} from 'roleout-lib/build/roles/role'
-import {SchemaObjectGrantKinds} from 'roleout-lib/build/grants/schemaObjectGrant'
-import {round, some} from 'lodash'
+import {SchemaObjectGrant} from 'roleout-lib/build/grants/schemaObjectGrant'
+import {round} from 'lodash'
 import {VERSION} from 'roleout-lib/build/version'
 import YAML from 'yaml'
 import {
@@ -20,7 +20,10 @@ import {
   getConnectionOptionsFromEnv,
   SnowflakeConnector
 } from 'roleout-lib/build/snowflakeConnector'
-import {isTerraformSchemaObjectGrant} from 'roleout-lib/build/backends/terraform/terraformSchemaObjectGrant'
+import {isTerraformGrant} from 'roleout-lib/build/backends/terraform/terraformGrant'
+import {isSchemaObjectGrant} from 'roleout-lib/build/grants/grant'
+import {Privilege} from 'roleout-lib/build/privilege'
+import {AccessRole} from 'roleout-lib/build/roles/accessRole'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const exec = util.promisify(require('child_process').exec)
@@ -31,8 +34,8 @@ const exec = util.promisify(require('child_process').exec)
 require('aws-sdk/lib/maintenance_mode_message').suppress = true
 
 type DeployOpts = { config: string, output: string }
-type ImportOpts = { config: string, output: string, noGrants: boolean, verbose: boolean }
-type RemoveLegacyCurrentGrantsStateOpts = { output: string }
+type ImportOpts = { config: string, output: string, grants: boolean, verbose: boolean }
+type RevokeFutureGrantsOpts = { config: string, output: string, ownershipOnly: boolean }
 type SnowflakeOpts = { config: string, output: string }
 
 async function deploySQL(program: Command, opts: DeployOpts) {
@@ -88,9 +91,9 @@ async function importTerraform(program: Command, opts: ImportOpts) {
     ].flat()
   }
 
-  if(opts.noGrants) {
-    resources = resources.filter(r => !isTerraformSchemaObjectGrant(r))
-  }
+  if(!opts.grants) resources = resources.filter(r => !isTerraformGrant(r))
+
+  console.log(`${resources.length} resources`)
 
   const commands = resources.map(r => importCommand(r, project.namingConvention))
 
@@ -161,32 +164,38 @@ async function importTerraform(program: Command, opts: ImportOpts) {
   }
 }
 
-async function removeLegacyCurrentGrantsState(program: Command, opts: RemoveLegacyCurrentGrantsStateOpts) {
+async function revokeFutureGrants(program: Command, opts: RevokeFutureGrantsOpts) {
   try {
-    const {stdout} = await exec('terraform state list')
-    const stateLines: string[] = stdout.split('\n')
+    const contents = await fs.readFile(opts.config)
+    const project = await Project.fromYAML(contents.toString('utf8'))
 
-    const commands = stateLines.filter(line => {
-      return line.startsWith('module.') &&
-        some(SchemaObjectGrantKinds, kind => {
-          // we should remove lines where the data object kind does not match the current grant kind
-          return line.includes(`on_current_${kind}s`) && !line.includes(`snowflake_${kind}`)
-        })
-    }).map(line => `terraform state rm ${line}`)
+    let accessRoles: AccessRole[] = []
+    if(project.environments.length > 0) {
+      for(const env of project.environments) {
+        accessRoles = accessRoles.concat(env.accessRoles())
+      }
+    } else {
+      accessRoles = project.accessRoles()
+    }
+
+    // gather future grants
+    let grants: SchemaObjectGrant[] = accessRoles.flatMap(ar => ar.grants).filter(g => isSchemaObjectGrant(g) && g.future) as SchemaObjectGrant[]
+
+    // optionally filter to only ownership grants
+    if(opts.ownershipOnly) grants = grants.filter(g => g.privilege === Privilege.OWNERSHIP)
+
+    const statements = grants.map(grant => {
+      const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
+      return `REVOKE ${grant.privilege} ON FUTURE ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" FROM ROLE "${grant.role.name}";`
+    })
+    statements.unshift('USE ROLE SECURITYADMIN;')
 
     if (opts.output) {
-      // write commands to file
-      await fs.writeFile(opts.output, commands.join('\n'))
+      // write statements to file
+      await fs.writeFile(opts.output, statements.join('\n'))
     } else {
-      for (const cmd of commands) {
-        try {
-          // run state rm command
-          const {stdout} = await exec(cmd)
-          console.log(stdout)
-        } catch (e: any) {
-          const errorString = e.toString()
-          console.error(errorString)
-        }
+      for (const statement of statements) {
+        console.log(statement)
       }
     }
   } catch (e: any) {
@@ -264,14 +273,16 @@ async function main() {
     .description('Import Terraform resources. Must be run in your Terraform directory.')
     .option('-o, --output <files>', 'Write import commands to a file instead of running them')
     .option('-v, --verbose', 'Verbose output')
-    .option('--noGrants', 'Do not import any grants', false)
+    .option('--grants', 'Attempt to import grants', false)
     .action(opts => importTerraform(program, opts))
     .requiredOption('-c, --config <file>')
 
-  terraformCmd.command('removeLegacyCurrentGrantsState')
-    .description('Removes legacy Terraform state for current grants when upgrading from version 1.5.0 or earlier. Must be run in your Terraform directory.')
-    .option('-o, --output <files>', 'Write state rm commands to a file instead of running them')
-    .action(opts => removeLegacyCurrentGrantsState(program, opts))
+  program.command('revokeFutureGrants')
+    .description('Generates SQL commands to revoke all future grants in schemas in your Roleout project')
+    .option('-o, --output <file>', 'Write SQL statements to a file instead of printing them')
+    .option('--ownershipOnly', 'Only revoke future OWNERSHIP grants in the schemas in your Roleout project')
+    .requiredOption('-c, --config <file>')
+    .action(opts => revokeFutureGrants(program, opts))
 
   snowflakeCmd.command('populateProject')
     .description('Read a Snowflake account and populate a project with the databases, schemas, virtual warehouses, and roles from that account')

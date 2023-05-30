@@ -133,23 +133,17 @@ export class TerraformSchemaObjectGrant extends TerraformGrant {
     ]).join('\n')
 
     // current grant on all
-    if (this.onAll()) {
-      return compact([
-        `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
-        spacing + `database_name = snowflake_database.${this.database.resourceName()}.name`,
-        spacing + `schema_name = snowflake_schema.${this.schema.resourceName()}.name`,
-        spacing + `privilege = "${this.privilege}"`,
-        spacing + `roles = [${roles}]`,
-        spacing + 'enable_multiple_grants = true',
-        spacing + 'on_all = true',
-        dependsOn.length > 0 ? spacing + `depends_on = [${dependsOn}]` : null,
-        '}'
-      ]).join('\n')
-    }
-
-    // TODO this shouldn't be reachable anymore
-    // current grant on_all not supported for this kind of object in terraform provider
-    return ''
+    return compact([
+      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
+      spacing + `database_name = snowflake_database.${this.database.resourceName()}.name`,
+      spacing + `schema_name = snowflake_schema.${this.schema.resourceName()}.name`,
+      spacing + `privilege = "${this.privilege}"`,
+      spacing + `roles = [${roles}]`,
+      spacing + 'enable_multiple_grants = true',
+      spacing + 'on_all = true',
+      dependsOn.length > 0 ? spacing + `depends_on = [${dependsOn}]` : null,
+      '}'
+    ]).join('\n')
   }
 
   onAll(): boolean {
