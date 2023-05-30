@@ -47,12 +47,14 @@ describe('Project', () => {
         expect(Array(...virtualWarehouse!.access.entries())).toEqual([expectedAccess])
       }
       const biWarehouse = project.virtualWarehouses.find(vwh => vwh.name === 'PROD_BI')!
-      expect(biWarehouse.size).toEqual('XSMALL')
+      expect(biWarehouse.size).toEqual('X-Small')
       expect(biWarehouse.minClusterCount).toEqual(2)
       expect(biWarehouse.maxClusterCount).toEqual(10)
       expect(biWarehouse.scalingPolicy).toEqual('ECONOMY')
       expect(biWarehouse.autoSuspend).toEqual(309)
       expect(biWarehouse.autoResume).toEqual(false)
+      expect(biWarehouse.statementTimeoutInSeconds).toEqual(3600)
+      expect(biWarehouse.type).toEqual('STANDARD')
 
       // warehouses with no specified options should hae the default options
       for(const warehouseName of ['PROD_DSCI', 'PROD_ELT']) {
@@ -148,20 +150,28 @@ describe('Project', () => {
       // Virtual Warehouses
       const expectedBIOptionsMatrix = {
         'PROD': {
-          size: 'XSMALL',
+          size: 'X-Small',
           minClusterCount: 2,
           maxClusterCount: 10,
           scalingPolicy: 'ECONOMY',
           autoSuspend: 309,
-          autoResume: false
+          autoResume: false,
+          type: 'STANDARD',
+          initiallySuspended: false,
+          statementTimeoutInSeconds: 3600,
+          enableQueryAcceleration: false
         },
         'DEV': {
-          size: 'SMALL',
+          size: 'Small',
           minClusterCount: 3,
           maxClusterCount: 9,
           scalingPolicy: 'ECONOMY',
           autoSuspend: 300,
-          autoResume: true
+          autoResume: true,
+          type: 'STANDARD',
+          initiallySuspended: false,
+          statementTimeoutInSeconds: 60,
+          enableQueryAcceleration: false
         },
         'TEST': defaultVirtualWarehouseOptions
       }

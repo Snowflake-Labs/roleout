@@ -2,68 +2,170 @@ resource snowflake_role PROD_DB_COMMON_R_AR {
   name = "PROD_DB_COMMON_R_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_db_common_r_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DB_COMMON_R_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_DB_COMMON_RW_AR {
   name = "PROD_DB_COMMON_RW_AR"
+}
+
+resource snowflake_role_ownership_grant role_prod_db_common_rw_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DB_COMMON_RW_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_role PROD_DB_COMMON_FULL_AR {
   name = "PROD_DB_COMMON_FULL_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_db_common_full_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DB_COMMON_FULL_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_DB_RAW_R_AR {
   name = "PROD_DB_RAW_R_AR"
+}
+
+resource snowflake_role_ownership_grant role_prod_db_raw_r_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DB_RAW_R_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_role PROD_DB_RAW_RW_AR {
   name = "PROD_DB_RAW_RW_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_db_raw_rw_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DB_RAW_RW_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_DB_RAW_FULL_AR {
   name = "PROD_DB_RAW_FULL_AR"
+}
+
+resource snowflake_role_ownership_grant role_prod_db_raw_full_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DB_RAW_FULL_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_role SOG_SOME_OBJECTS_R_AR {
   name = "SOG_SOME_OBJECTS_R_AR"
 }
 
+resource snowflake_role_ownership_grant role_sog_some_objects_r_ar_ownership_grant {
+  on_role_name = snowflake_role.SOG_SOME_OBJECTS_R_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role SOG_SOME_OBJECTS_RW_AR {
   name = "SOG_SOME_OBJECTS_RW_AR"
+}
+
+resource snowflake_role_ownership_grant role_sog_some_objects_rw_ar_ownership_grant {
+  on_role_name = snowflake_role.SOG_SOME_OBJECTS_RW_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_role PROD_BI_U_AR {
   name = "PROD_BI_U_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_bi_u_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_BI_U_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_BI_UM_AR {
   name = "PROD_BI_UM_AR"
+}
+
+resource snowflake_role_ownership_grant role_prod_bi_um_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_BI_UM_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_role PROD_BI_FULL_AR {
   name = "PROD_BI_FULL_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_bi_full_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_BI_FULL_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_DSCI_U_AR {
   name = "PROD_DSCI_U_AR"
+}
+
+resource snowflake_role_ownership_grant role_prod_dsci_u_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DSCI_U_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_role PROD_DSCI_UM_AR {
   name = "PROD_DSCI_UM_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_dsci_um_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DSCI_UM_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_DSCI_FULL_AR {
   name = "PROD_DSCI_FULL_AR"
+}
+
+resource snowflake_role_ownership_grant role_prod_dsci_full_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_DSCI_FULL_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_role PROD_ELT_U_AR {
   name = "PROD_ELT_U_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_elt_u_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_ELT_U_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_ELT_UM_AR {
   name = "PROD_ELT_UM_AR"
 }
 
+resource snowflake_role_ownership_grant role_prod_elt_um_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_ELT_UM_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
+}
+
 resource snowflake_role PROD_ELT_FULL_AR {
   name = "PROD_ELT_FULL_AR"
+}
+
+resource snowflake_role_ownership_grant role_prod_elt_full_ar_ownership_grant {
+  on_role_name = snowflake_role.PROD_ELT_FULL_AR.name
+  to_role_name = "USERADMIN"
+  revert_ownership_to_role_name = "SYSADMIN"
 }
 
 resource snowflake_database_grant grant_usage_on_prod_db_database {
@@ -73,70 +175,72 @@ resource snowflake_database_grant grant_usage_on_prod_db_database {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant]
 }
 
-resource snowflake_schema_grant grant_usage_on_prod_db_common_schema {
+resource snowflake_schema_grant grant_usage_on_prod_db__common_schema {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name, snowflake_role.SOG_SOME_OBJECTS_R_AR.name, snowflake_role.SOG_SOME_OBJECTS_RW_AR.name]
 
-  depends_on = [snowflake_role_grants.role_prod_db_common_r_ar_grants,snowflake_role_grants.role_prod_db_common_rw_ar_grants,snowflake_role_grants.role_prod_db_common_full_ar_grants,snowflake_role_grants.role_prod_db_common_full_ar_grants,snowflake_role_grants.role_sog_some_objects_r_ar_grants,snowflake_role_grants.role_sog_some_objects_rw_ar_grants]
+  depends_on = [snowflake_role_grants.role_prod_db_common_r_ar_grants, snowflake_role_grants.role_prod_db_common_rw_ar_grants, snowflake_role_grants.role_prod_db_common_full_ar_grants, snowflake_role_grants.role_prod_db_common_full_ar_grants, snowflake_role_grants.role_sog_some_objects_r_ar_grants, snowflake_role_grants.role_sog_some_objects_rw_ar_grants, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant]
 
   with_grant_option = false
   enable_multiple_grants = true
 }
 
-resource snowflake_schema_grant grant_ownership_on_prod_db_common_schema {
+resource snowflake_schema_grant grant_ownership_on_prod_db__common_schema {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
 
-  depends_on = [snowflake_role_grants.role_prod_db_common_full_ar_grants]
+  depends_on = [snowflake_role_grants.role_prod_db_common_full_ar_grants, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 
   with_grant_option = false
   enable_multiple_grants = true
 }
 
-resource snowflake_schema_grant grant_usage_on_prod_db_raw_schema {
+resource snowflake_schema_grant grant_usage_on_prod_db__raw_schema {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name, snowflake_role.SOG_SOME_OBJECTS_R_AR.name, snowflake_role.SOG_SOME_OBJECTS_RW_AR.name]
 
-  depends_on = [snowflake_role_grants.role_prod_db_raw_r_ar_grants,snowflake_role_grants.role_prod_db_raw_rw_ar_grants,snowflake_role_grants.role_prod_db_raw_full_ar_grants,snowflake_role_grants.role_prod_db_raw_full_ar_grants,snowflake_role_grants.role_sog_some_objects_r_ar_grants,snowflake_role_grants.role_sog_some_objects_rw_ar_grants]
+  depends_on = [snowflake_role_grants.role_prod_db_raw_r_ar_grants, snowflake_role_grants.role_prod_db_raw_rw_ar_grants, snowflake_role_grants.role_prod_db_raw_full_ar_grants, snowflake_role_grants.role_prod_db_raw_full_ar_grants, snowflake_role_grants.role_sog_some_objects_r_ar_grants, snowflake_role_grants.role_sog_some_objects_rw_ar_grants, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant]
 
   with_grant_option = false
   enable_multiple_grants = true
 }
 
-resource snowflake_schema_grant grant_ownership_on_prod_db_raw_schema {
+resource snowflake_schema_grant grant_ownership_on_prod_db__raw_schema {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
 
-  depends_on = [snowflake_role_grants.role_prod_db_raw_full_ar_grants]
+  depends_on = [snowflake_role_grants.role_prod_db_raw_full_ar_grants, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 
   with_grant_option = false
   enable_multiple_grants = true
 }
 
-module "PROD_DB__COMMON_grant_SELECT_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_select_on_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "SELECT"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_select_on_future_prod_db_prod_db__common_tables {
+resource snowflake_table_grant grant_select_on_future_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -146,46 +250,50 @@ resource snowflake_table_grant grant_select_on_future_prod_db_prod_db__common_ta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-module "PROD_DB__COMMON_grant_INSERT_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_insert_on_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "INSERT"
   roles = [snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-module "PROD_DB__COMMON_grant_UPDATE_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_update_on_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "UPDATE"
   roles = [snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-module "PROD_DB__COMMON_grant_DELETE_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_delete_on_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "DELETE"
   roles = [snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-module "PROD_DB__COMMON_grant_REFERENCES_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_references_on_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "REFERENCES"
   roles = [snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_insert_on_future_prod_db_prod_db__common_tables {
+resource snowflake_table_grant grant_insert_on_future_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -195,10 +303,10 @@ resource snowflake_table_grant grant_insert_on_future_prod_db_prod_db__common_ta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_update_on_future_prod_db_prod_db__common_tables {
+resource snowflake_table_grant grant_update_on_future_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -208,10 +316,10 @@ resource snowflake_table_grant grant_update_on_future_prod_db_prod_db__common_ta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_delete_on_future_prod_db_prod_db__common_tables {
+resource snowflake_table_grant grant_delete_on_future_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -221,10 +329,10 @@ resource snowflake_table_grant grant_delete_on_future_prod_db_prod_db__common_ta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_references_on_future_prod_db_prod_db__common_tables {
+resource snowflake_table_grant grant_references_on_future_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -234,19 +342,20 @@ resource snowflake_table_grant grant_references_on_future_prod_db_prod_db__commo
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_ownership_on_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 }
 
-resource snowflake_table_grant grant_ownership_on_future_prod_db_prod_db__common_tables {
+resource snowflake_table_grant grant_ownership_on_future_prod_db__common_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -256,19 +365,20 @@ resource snowflake_table_grant grant_ownership_on_future_prod_db_prod_db__common
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-module "PROD_DB__RAW_grant_SELECT_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_select_on_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "SELECT"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_select_on_future_prod_db_prod_db__raw_tables {
+resource snowflake_table_grant grant_select_on_future_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -278,46 +388,50 @@ resource snowflake_table_grant grant_select_on_future_prod_db_prod_db__raw_table
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-module "PROD_DB__RAW_grant_INSERT_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_insert_on_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "INSERT"
   roles = [snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-module "PROD_DB__RAW_grant_UPDATE_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_update_on_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "UPDATE"
   roles = [snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-module "PROD_DB__RAW_grant_DELETE_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_delete_on_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "DELETE"
   roles = [snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-module "PROD_DB__RAW_grant_REFERENCES_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_references_on_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "REFERENCES"
   roles = [snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_insert_on_future_prod_db_prod_db__raw_tables {
+resource snowflake_table_grant grant_insert_on_future_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -327,10 +441,10 @@ resource snowflake_table_grant grant_insert_on_future_prod_db_prod_db__raw_table
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_update_on_future_prod_db_prod_db__raw_tables {
+resource snowflake_table_grant grant_update_on_future_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -340,10 +454,10 @@ resource snowflake_table_grant grant_update_on_future_prod_db_prod_db__raw_table
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_delete_on_future_prod_db_prod_db__raw_tables {
+resource snowflake_table_grant grant_delete_on_future_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -353,10 +467,10 @@ resource snowflake_table_grant grant_delete_on_future_prod_db_prod_db__raw_table
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_references_on_future_prod_db_prod_db__raw_tables {
+resource snowflake_table_grant grant_references_on_future_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -366,19 +480,20 @@ resource snowflake_table_grant grant_references_on_future_prod_db_prod_db__raw_t
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_tables" {
-  source = "./modules/snowflake-grant-all-current-tables"
+resource snowflake_table_grant grant_ownership_on_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 }
 
-resource snowflake_table_grant grant_ownership_on_future_prod_db_prod_db__raw_tables {
+resource snowflake_table_grant grant_ownership_on_future_prod_db__raw_tables {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -388,10 +503,10 @@ resource snowflake_table_grant grant_ownership_on_future_prod_db_prod_db__raw_ta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_select_on_prod_db_prod_db__raw_tables_MY_TABLE {
+resource snowflake_table_grant grant_select_on_prod_db__raw_tables_MY_TABLE {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   table_name = "MY_TABLE"
@@ -400,10 +515,10 @@ resource snowflake_table_grant grant_select_on_prod_db_prod_db__raw_tables_MY_TA
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_r_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_select_on_prod_db_prod_db__common_tables_SEED_DATA {
+resource snowflake_table_grant grant_select_on_prod_db__common_tables_SEED_DATA {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   table_name = "SEED_DATA"
@@ -412,10 +527,10 @@ resource snowflake_table_grant grant_select_on_prod_db_prod_db__common_tables_SE
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_r_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_insert_on_prod_db_prod_db__raw_tables_MY_TABLE {
+resource snowflake_table_grant grant_insert_on_prod_db__raw_tables_MY_TABLE {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   table_name = "MY_TABLE"
@@ -424,10 +539,10 @@ resource snowflake_table_grant grant_insert_on_prod_db_prod_db__raw_tables_MY_TA
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_update_on_prod_db_prod_db__raw_tables_MY_TABLE {
+resource snowflake_table_grant grant_update_on_prod_db__raw_tables_MY_TABLE {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   table_name = "MY_TABLE"
@@ -436,10 +551,10 @@ resource snowflake_table_grant grant_update_on_prod_db_prod_db__raw_tables_MY_TA
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_delete_on_prod_db_prod_db__raw_tables_MY_TABLE {
+resource snowflake_table_grant grant_delete_on_prod_db__raw_tables_MY_TABLE {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   table_name = "MY_TABLE"
@@ -448,10 +563,10 @@ resource snowflake_table_grant grant_delete_on_prod_db_prod_db__raw_tables_MY_TA
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__raw_tables]
 }
 
-resource snowflake_table_grant grant_insert_on_prod_db_prod_db__common_tables_SEED_DATA {
+resource snowflake_table_grant grant_insert_on_prod_db__common_tables_SEED_DATA {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   table_name = "SEED_DATA"
@@ -460,10 +575,10 @@ resource snowflake_table_grant grant_insert_on_prod_db_prod_db__common_tables_SE
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_update_on_prod_db_prod_db__common_tables_SEED_DATA {
+resource snowflake_table_grant grant_update_on_prod_db__common_tables_SEED_DATA {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   table_name = "SEED_DATA"
@@ -472,10 +587,10 @@ resource snowflake_table_grant grant_update_on_prod_db_prod_db__common_tables_SE
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-resource snowflake_table_grant grant_delete_on_prod_db_prod_db__common_tables_SEED_DATA {
+resource snowflake_table_grant grant_delete_on_prod_db__common_tables_SEED_DATA {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   table_name = "SEED_DATA"
@@ -484,19 +599,20 @@ resource snowflake_table_grant grant_delete_on_prod_db_prod_db__common_tables_SE
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_rw_ar_ownership_grant, snowflake_table_grant.grant_ownership_on_prod_db__common_tables]
 }
 
-module "PROD_DB__COMMON_grant_SELECT_on_current_views" {
-  source = "./modules/snowflake-grant-all-current-views"
+resource snowflake_view_grant grant_select_on_prod_db__common_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "SELECT"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__common_views]
 }
 
-resource snowflake_view_grant grant_select_on_future_prod_db_prod_db__common_views {
+resource snowflake_view_grant grant_select_on_future_prod_db__common_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -506,19 +622,20 @@ resource snowflake_view_grant grant_select_on_future_prod_db_prod_db__common_vie
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__common_views]
 }
 
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_views" {
-  source = "./modules/snowflake-grant-all-current-views"
+resource snowflake_view_grant grant_ownership_on_prod_db__common_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 }
 
-resource snowflake_view_grant grant_ownership_on_future_prod_db_prod_db__common_views {
+resource snowflake_view_grant grant_ownership_on_future_prod_db__common_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -528,19 +645,20 @@ resource snowflake_view_grant grant_ownership_on_future_prod_db_prod_db__common_
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__common_views]
 }
 
-module "PROD_DB__RAW_grant_SELECT_on_current_views" {
-  source = "./modules/snowflake-grant-all-current-views"
+resource snowflake_view_grant grant_select_on_prod_db__raw_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "SELECT"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__raw_views]
 }
 
-resource snowflake_view_grant grant_select_on_future_prod_db_prod_db__raw_views {
+resource snowflake_view_grant grant_select_on_future_prod_db__raw_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -550,19 +668,20 @@ resource snowflake_view_grant grant_select_on_future_prod_db_prod_db__raw_views 
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__raw_views]
 }
 
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_views" {
-  source = "./modules/snowflake-grant-all-current-views"
+resource snowflake_view_grant grant_ownership_on_prod_db__raw_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 }
 
-resource snowflake_view_grant grant_ownership_on_future_prod_db_prod_db__raw_views {
+resource snowflake_view_grant grant_ownership_on_future_prod_db__raw_views {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -572,10 +691,10 @@ resource snowflake_view_grant grant_ownership_on_future_prod_db_prod_db__raw_vie
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__raw_views]
 }
 
-resource snowflake_view_grant grant_select_on_prod_db_prod_db__raw_views_MY_VIEW {
+resource snowflake_view_grant grant_select_on_prod_db__raw_views_MY_VIEW {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   view_name = "MY_VIEW"
@@ -584,10 +703,10 @@ resource snowflake_view_grant grant_select_on_prod_db_prod_db__raw_views_MY_VIEW
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_r_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__raw_views]
 }
 
-resource snowflake_view_grant grant_select_on_prod_db_prod_db__common_views_ANOTHER_VIEW {
+resource snowflake_view_grant grant_select_on_prod_db__common_views_ANOTHER_VIEW {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   view_name = "ANOTHER_VIEW"
@@ -596,19 +715,20 @@ resource snowflake_view_grant grant_select_on_prod_db_prod_db__common_views_ANOT
 
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = []
+  depends_on = [snowflake_role_ownership_grant.role_sog_some_objects_r_ar_ownership_grant, snowflake_view_grant.grant_ownership_on_prod_db__common_views]
 }
 
-module "PROD_DB__COMMON_grant_USAGE_on_current_sequences" {
-  source = "./modules/snowflake-grant-all-current-sequences"
+resource snowflake_sequence_grant grant_usage_on_prod_db__common_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_sequence_grant.grant_ownership_on_prod_db__common_sequences]
 }
 
-resource snowflake_sequence_grant grant_usage_on_future_prod_db_prod_db__common_sequences {
+resource snowflake_sequence_grant grant_usage_on_future_prod_db__common_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -618,19 +738,20 @@ resource snowflake_sequence_grant grant_usage_on_future_prod_db_prod_db__common_
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_sequence_grant.grant_ownership_on_prod_db__common_sequences]
 }
 
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_sequences" {
-  source = "./modules/snowflake-grant-all-current-sequences"
+resource snowflake_sequence_grant grant_ownership_on_prod_db__common_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 }
 
-resource snowflake_sequence_grant grant_ownership_on_future_prod_db_prod_db__common_sequences {
+resource snowflake_sequence_grant grant_ownership_on_future_prod_db__common_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -640,19 +761,20 @@ resource snowflake_sequence_grant grant_ownership_on_future_prod_db_prod_db__com
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_sequence_grant.grant_ownership_on_prod_db__common_sequences]
 }
 
-module "PROD_DB__RAW_grant_USAGE_on_current_sequences" {
-  source = "./modules/snowflake-grant-all-current-sequences"
+resource snowflake_sequence_grant grant_usage_on_prod_db__raw_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_sequence_grant.grant_ownership_on_prod_db__raw_sequences]
 }
 
-resource snowflake_sequence_grant grant_usage_on_future_prod_db_prod_db__raw_sequences {
+resource snowflake_sequence_grant grant_usage_on_future_prod_db__raw_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -662,19 +784,20 @@ resource snowflake_sequence_grant grant_usage_on_future_prod_db_prod_db__raw_seq
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_sequence_grant.grant_ownership_on_prod_db__raw_sequences]
 }
 
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_sequences" {
-  source = "./modules/snowflake-grant-all-current-sequences"
+resource snowflake_sequence_grant grant_ownership_on_prod_db__raw_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 }
 
-resource snowflake_sequence_grant grant_ownership_on_future_prod_db_prod_db__raw_sequences {
+resource snowflake_sequence_grant grant_ownership_on_future_prod_db__raw_sequences {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -684,28 +807,30 @@ resource snowflake_sequence_grant grant_ownership_on_future_prod_db_prod_db__raw
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_sequence_grant.grant_ownership_on_prod_db__raw_sequences]
 }
 
-module "PROD_DB__COMMON_grant_USAGE_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_usage_on_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__common_stages]
 }
 
-module "PROD_DB__COMMON_grant_READ_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_read_on_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "READ"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__common_stages]
 }
 
-resource snowflake_stage_grant grant_usage_on_future_prod_db_prod_db__common_stages {
+resource snowflake_stage_grant grant_usage_on_future_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -715,10 +840,10 @@ resource snowflake_stage_grant grant_usage_on_future_prod_db_prod_db__common_sta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__common_stages]
 }
 
-resource snowflake_stage_grant grant_read_on_future_prod_db_prod_db__common_stages {
+resource snowflake_stage_grant grant_read_on_future_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -728,10 +853,10 @@ resource snowflake_stage_grant grant_read_on_future_prod_db_prod_db__common_stag
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__common_stages]
 }
 
-resource snowflake_stage_grant grant_write_on_future_prod_db_prod_db__common_stages {
+resource snowflake_stage_grant grant_write_on_future_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -741,28 +866,30 @@ resource snowflake_stage_grant grant_write_on_future_prod_db_prod_db__common_sta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_stage_grant.grant_usage_on_future_prod_db_prod_db__common_stages, snowflake_stage_grant.grant_read_on_future_prod_db_prod_db__common_stages]
+  depends_on = [snowflake_stage_grant.grant_usage_on_future_prod_db__common_stages, snowflake_stage_grant.grant_read_on_future_prod_db__common_stages, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__common_stages]
 }
 
-module "PROD_DB__COMMON_grant_WRITE_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_write_on_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "WRITE"
   roles = [snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__common_stages]
 }
 
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_ownership_on_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 }
 
-resource snowflake_stage_grant grant_ownership_on_future_prod_db_prod_db__common_stages {
+resource snowflake_stage_grant grant_ownership_on_future_prod_db__common_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -772,28 +899,30 @@ resource snowflake_stage_grant grant_ownership_on_future_prod_db_prod_db__common
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__common_stages]
 }
 
-module "PROD_DB__RAW_grant_USAGE_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_usage_on_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__raw_stages]
 }
 
-module "PROD_DB__RAW_grant_READ_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_read_on_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "READ"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__raw_stages]
 }
 
-resource snowflake_stage_grant grant_usage_on_future_prod_db_prod_db__raw_stages {
+resource snowflake_stage_grant grant_usage_on_future_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -803,10 +932,10 @@ resource snowflake_stage_grant grant_usage_on_future_prod_db_prod_db__raw_stages
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__raw_stages]
 }
 
-resource snowflake_stage_grant grant_read_on_future_prod_db_prod_db__raw_stages {
+resource snowflake_stage_grant grant_read_on_future_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -816,10 +945,10 @@ resource snowflake_stage_grant grant_read_on_future_prod_db_prod_db__raw_stages 
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__raw_stages]
 }
 
-resource snowflake_stage_grant grant_write_on_future_prod_db_prod_db__raw_stages {
+resource snowflake_stage_grant grant_write_on_future_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -829,28 +958,30 @@ resource snowflake_stage_grant grant_write_on_future_prod_db_prod_db__raw_stages
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_stage_grant.grant_usage_on_future_prod_db_prod_db__raw_stages, snowflake_stage_grant.grant_read_on_future_prod_db_prod_db__raw_stages]
+  depends_on = [snowflake_stage_grant.grant_usage_on_future_prod_db__raw_stages, snowflake_stage_grant.grant_read_on_future_prod_db__raw_stages, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__raw_stages]
 }
 
-module "PROD_DB__RAW_grant_WRITE_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_write_on_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "WRITE"
   roles = [snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__raw_stages]
 }
 
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_stages" {
-  source = "./modules/snowflake-grant-all-current-stages"
+resource snowflake_stage_grant grant_ownership_on_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 }
 
-resource snowflake_stage_grant grant_ownership_on_future_prod_db_prod_db__raw_stages {
+resource snowflake_stage_grant grant_ownership_on_future_prod_db__raw_stages {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -860,19 +991,20 @@ resource snowflake_stage_grant grant_ownership_on_future_prod_db_prod_db__raw_st
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_stage_grant.grant_ownership_on_prod_db__raw_stages]
 }
 
-module "PROD_DB__COMMON_grant_USAGE_on_current_file-formats" {
-  source = "./modules/snowflake-grant-all-current-file-formats"
+resource snowflake_file_format_grant grant_usage_on_prod_db__common_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_file_format_grant.grant_ownership_on_prod_db__common_file_formats]
 }
 
-resource snowflake_file_format_grant grant_usage_on_future_prod_db_prod_db__common_file_formats {
+resource snowflake_file_format_grant grant_usage_on_future_prod_db__common_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -882,19 +1014,20 @@ resource snowflake_file_format_grant grant_usage_on_future_prod_db_prod_db__comm
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_file_format_grant.grant_ownership_on_prod_db__common_file_formats]
 }
 
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_file-formats" {
-  source = "./modules/snowflake-grant-all-current-file-formats"
+resource snowflake_file_format_grant grant_ownership_on_prod_db__common_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 }
 
-resource snowflake_file_format_grant grant_ownership_on_future_prod_db_prod_db__common_file_formats {
+resource snowflake_file_format_grant grant_ownership_on_future_prod_db__common_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -904,19 +1037,20 @@ resource snowflake_file_format_grant grant_ownership_on_future_prod_db_prod_db__
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_file_format_grant.grant_ownership_on_prod_db__common_file_formats]
 }
 
-module "PROD_DB__RAW_grant_USAGE_on_current_file-formats" {
-  source = "./modules/snowflake-grant-all-current-file-formats"
+resource snowflake_file_format_grant grant_usage_on_prod_db__raw_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_file_format_grant.grant_ownership_on_prod_db__raw_file_formats]
 }
 
-resource snowflake_file_format_grant grant_usage_on_future_prod_db_prod_db__raw_file_formats {
+resource snowflake_file_format_grant grant_usage_on_future_prod_db__raw_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -926,19 +1060,20 @@ resource snowflake_file_format_grant grant_usage_on_future_prod_db_prod_db__raw_
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_file_format_grant.grant_ownership_on_prod_db__raw_file_formats]
 }
 
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_file-formats" {
-  source = "./modules/snowflake-grant-all-current-file-formats"
+resource snowflake_file_format_grant grant_ownership_on_prod_db__raw_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 }
 
-resource snowflake_file_format_grant grant_ownership_on_future_prod_db_prod_db__raw_file_formats {
+resource snowflake_file_format_grant grant_ownership_on_future_prod_db__raw_file_formats {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -948,19 +1083,20 @@ resource snowflake_file_format_grant grant_ownership_on_future_prod_db_prod_db__
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_file_format_grant.grant_ownership_on_prod_db__raw_file_formats]
 }
 
-module "PROD_DB__COMMON_grant_SELECT_on_current_streams" {
-  source = "./modules/snowflake-grant-all-current-streams"
+resource snowflake_stream_grant grant_select_on_prod_db__common_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "SELECT"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_stream_grant.grant_ownership_on_prod_db__common_streams]
 }
 
-resource snowflake_stream_grant grant_select_on_future_prod_db_prod_db__common_streams {
+resource snowflake_stream_grant grant_select_on_future_prod_db__common_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -970,19 +1106,20 @@ resource snowflake_stream_grant grant_select_on_future_prod_db_prod_db__common_s
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_stream_grant.grant_ownership_on_prod_db__common_streams]
 }
 
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_streams" {
-  source = "./modules/snowflake-grant-all-current-streams"
+resource snowflake_stream_grant grant_ownership_on_prod_db__common_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 }
 
-resource snowflake_stream_grant grant_ownership_on_future_prod_db_prod_db__common_streams {
+resource snowflake_stream_grant grant_ownership_on_future_prod_db__common_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -992,19 +1129,20 @@ resource snowflake_stream_grant grant_ownership_on_future_prod_db_prod_db__commo
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_stream_grant.grant_ownership_on_prod_db__common_streams]
 }
 
-module "PROD_DB__RAW_grant_SELECT_on_current_streams" {
-  source = "./modules/snowflake-grant-all-current-streams"
+resource snowflake_stream_grant grant_select_on_prod_db__raw_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "SELECT"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_stream_grant.grant_ownership_on_prod_db__raw_streams]
 }
 
-resource snowflake_stream_grant grant_select_on_future_prod_db_prod_db__raw_streams {
+resource snowflake_stream_grant grant_select_on_future_prod_db__raw_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -1014,19 +1152,20 @@ resource snowflake_stream_grant grant_select_on_future_prod_db_prod_db__raw_stre
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_stream_grant.grant_ownership_on_prod_db__raw_streams]
 }
 
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_streams" {
-  source = "./modules/snowflake-grant-all-current-streams"
+resource snowflake_stream_grant grant_ownership_on_prod_db__raw_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 }
 
-resource snowflake_stream_grant grant_ownership_on_future_prod_db_prod_db__raw_streams {
+resource snowflake_stream_grant grant_ownership_on_future_prod_db__raw_streams {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -1036,107 +1175,20 @@ resource snowflake_stream_grant grant_ownership_on_future_prod_db_prod_db__raw_s
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_stream_grant.grant_ownership_on_prod_db__raw_streams]
 }
 
-module "PROD_DB__COMMON_grant_USAGE_on_current_procedures" {
-  source = "./modules/snowflake-grant-all-current-procedures"
+resource snowflake_procedure_grant grant_usage_on_prod_db__common_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_procedure_grant.grant_ownership_on_prod_db__common_procedures]
 }
 
-resource snowflake_procedure_grant grant_usage_on_future_prod_db_prod_db__common_procedures {
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__COMMON.name
-
-  privilege = "USAGE"
-  roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
-
-  on_future = true
-  with_grant_option = false
-  enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
-}
-
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_procedures" {
-  source = "./modules/snowflake-grant-all-current-procedures"
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__COMMON.name
-  privilege = "OWNERSHIP"
-  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
-  enable_multiple_grants = true
-}
-
-resource snowflake_procedure_grant grant_ownership_on_future_prod_db_prod_db__common_procedures {
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__COMMON.name
-
-  privilege = "OWNERSHIP"
-  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
-
-  on_future = true
-  with_grant_option = false
-  enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
-}
-
-module "PROD_DB__RAW_grant_USAGE_on_current_procedures" {
-  source = "./modules/snowflake-grant-all-current-procedures"
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__RAW.name
-  privilege = "USAGE"
-  roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
-  enable_multiple_grants = true
-}
-
-resource snowflake_procedure_grant grant_usage_on_future_prod_db_prod_db__raw_procedures {
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__RAW.name
-
-  privilege = "USAGE"
-  roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
-
-  on_future = true
-  with_grant_option = false
-  enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
-}
-
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_procedures" {
-  source = "./modules/snowflake-grant-all-current-procedures"
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__RAW.name
-  privilege = "OWNERSHIP"
-  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
-  enable_multiple_grants = true
-}
-
-resource snowflake_procedure_grant grant_ownership_on_future_prod_db_prod_db__raw_procedures {
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__RAW.name
-
-  privilege = "OWNERSHIP"
-  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
-
-  on_future = true
-  with_grant_option = false
-  enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
-}
-
-module "PROD_DB__COMMON_grant_USAGE_on_current_functions" {
-  source = "./modules/snowflake-grant-all-current-functions"
-  database_name = snowflake_database.PROD_DB.name
-  schema_name = snowflake_schema.PROD_DB__COMMON.name
-  privilege = "USAGE"
-  roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
-  enable_multiple_grants = true
-}
-
-resource snowflake_function_grant grant_usage_on_future_prod_db_prod_db__common_functions {
+resource snowflake_procedure_grant grant_usage_on_future_prod_db__common_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -1146,19 +1198,20 @@ resource snowflake_function_grant grant_usage_on_future_prod_db_prod_db__common_
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_procedure_grant.grant_ownership_on_prod_db__common_procedures]
 }
 
-module "PROD_DB__COMMON_grant_OWNERSHIP_on_current_functions" {
-  source = "./modules/snowflake-grant-all-current-functions"
+resource snowflake_procedure_grant grant_ownership_on_prod_db__common_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
 }
 
-resource snowflake_function_grant grant_ownership_on_future_prod_db_prod_db__common_functions {
+resource snowflake_procedure_grant grant_ownership_on_future_prod_db__common_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -1168,19 +1221,20 @@ resource snowflake_function_grant grant_ownership_on_future_prod_db_prod_db__com
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_procedure_grant.grant_ownership_on_prod_db__common_procedures]
 }
 
-module "PROD_DB__RAW_grant_USAGE_on_current_functions" {
-  source = "./modules/snowflake-grant-all-current-functions"
+resource snowflake_procedure_grant grant_usage_on_prod_db__raw_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "USAGE"
   roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_procedure_grant.grant_ownership_on_prod_db__raw_procedures]
 }
 
-resource snowflake_function_grant grant_usage_on_future_prod_db_prod_db__raw_functions {
+resource snowflake_procedure_grant grant_usage_on_future_prod_db__raw_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -1190,19 +1244,20 @@ resource snowflake_function_grant grant_usage_on_future_prod_db_prod_db__raw_fun
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_procedure_grant.grant_ownership_on_prod_db__raw_procedures]
 }
 
-module "PROD_DB__RAW_grant_OWNERSHIP_on_current_functions" {
-  source = "./modules/snowflake-grant-all-current-functions"
+resource snowflake_procedure_grant grant_ownership_on_prod_db__raw_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OWNERSHIP"
   roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
 }
 
-resource snowflake_function_grant grant_ownership_on_future_prod_db_prod_db__raw_functions {
+resource snowflake_procedure_grant grant_ownership_on_future_prod_db__raw_procedures {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -1212,28 +1267,214 @@ resource snowflake_function_grant grant_ownership_on_future_prod_db_prod_db__raw
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_procedure_grant.grant_ownership_on_prod_db__raw_procedures]
 }
 
-module "PROD_DB__COMMON_grant_MONITOR_on_current_tasks" {
-  source = "./modules/snowflake-grant-all-current-tasks"
+resource snowflake_function_grant grant_usage_on_prod_db__common_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+  privilege = "USAGE"
+  roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_function_grant.grant_ownership_on_prod_db__common_functions]
+}
+
+resource snowflake_function_grant grant_usage_on_future_prod_db__common_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+
+  privilege = "USAGE"
+  roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_function_grant.grant_ownership_on_prod_db__common_functions]
+}
+
+resource snowflake_function_grant grant_ownership_on_prod_db__common_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
+}
+
+resource snowflake_function_grant grant_ownership_on_future_prod_db__common_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_function_grant.grant_ownership_on_prod_db__common_functions]
+}
+
+resource snowflake_function_grant grant_usage_on_prod_db__raw_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+  privilege = "USAGE"
+  roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_function_grant.grant_ownership_on_prod_db__raw_functions]
+}
+
+resource snowflake_function_grant grant_usage_on_future_prod_db__raw_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+
+  privilege = "USAGE"
+  roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_function_grant.grant_ownership_on_prod_db__raw_functions]
+}
+
+resource snowflake_function_grant grant_ownership_on_prod_db__raw_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
+}
+
+resource snowflake_function_grant grant_ownership_on_future_prod_db__raw_functions {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_function_grant.grant_ownership_on_prod_db__raw_functions]
+}
+
+resource snowflake_materialized_view_grant grant_select_on_prod_db__common_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+  privilege = "SELECT"
+  roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_materialized_view_grant.grant_ownership_on_prod_db__common_materialized_views]
+}
+
+resource snowflake_materialized_view_grant grant_select_on_future_prod_db__common_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+
+  privilege = "SELECT"
+  roles = [snowflake_role.PROD_DB_COMMON_R_AR.name, snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_r_ar_ownership_grant, snowflake_materialized_view_grant.grant_ownership_on_prod_db__common_materialized_views]
+}
+
+resource snowflake_materialized_view_grant grant_ownership_on_prod_db__common_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
+}
+
+resource snowflake_materialized_view_grant grant_ownership_on_future_prod_db__common_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_materialized_view_grant.grant_ownership_on_prod_db__common_materialized_views]
+}
+
+resource snowflake_materialized_view_grant grant_select_on_prod_db__raw_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+  privilege = "SELECT"
+  roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_materialized_view_grant.grant_ownership_on_prod_db__raw_materialized_views]
+}
+
+resource snowflake_materialized_view_grant grant_select_on_future_prod_db__raw_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+
+  privilege = "SELECT"
+  roles = [snowflake_role.PROD_DB_RAW_R_AR.name, snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_r_ar_ownership_grant, snowflake_materialized_view_grant.grant_ownership_on_prod_db__raw_materialized_views]
+}
+
+resource snowflake_materialized_view_grant grant_ownership_on_prod_db__raw_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
+}
+
+resource snowflake_materialized_view_grant grant_ownership_on_future_prod_db__raw_materialized_views {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_materialized_view_grant.grant_ownership_on_prod_db__raw_materialized_views]
+}
+
+resource snowflake_task_grant grant_monitor_on_prod_db__common_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "MONITOR"
   roles = [snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__common_tasks]
 }
 
-module "PROD_DB__COMMON_grant_OPERATE_on_current_tasks" {
-  source = "./modules/snowflake-grant-all-current-tasks"
+resource snowflake_task_grant grant_operate_on_prod_db__common_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
   privilege = "OPERATE"
   roles = [snowflake_role.PROD_DB_COMMON_RW_AR.name, snowflake_role.PROD_DB_COMMON_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__common_tasks]
 }
 
-resource snowflake_task_grant grant_monitor_on_future_prod_db_prod_db__common_tasks {
+resource snowflake_task_grant grant_monitor_on_future_prod_db__common_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -1243,10 +1484,10 @@ resource snowflake_task_grant grant_monitor_on_future_prod_db_prod_db__common_ta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__common_tasks]
 }
 
-resource snowflake_task_grant grant_operate_on_future_prod_db_prod_db__common_tasks {
+resource snowflake_task_grant grant_operate_on_future_prod_db__common_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__COMMON.name
 
@@ -1256,28 +1497,53 @@ resource snowflake_task_grant grant_operate_on_future_prod_db_prod_db__common_ta
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_common_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__common_tasks]
 }
 
-module "PROD_DB__RAW_grant_MONITOR_on_current_tasks" {
-  source = "./modules/snowflake-grant-all-current-tasks"
+resource snowflake_task_grant grant_ownership_on_prod_db__common_tasks {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant]
+}
+
+resource snowflake_task_grant grant_ownership_on_future_prod_db__common_tasks {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__COMMON.name
+
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_COMMON_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__common_schema, snowflake_role_ownership_grant.role_prod_db_common_full_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__common_tasks]
+}
+
+resource snowflake_task_grant grant_monitor_on_prod_db__raw_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "MONITOR"
   roles = [snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__raw_tasks]
 }
 
-module "PROD_DB__RAW_grant_OPERATE_on_current_tasks" {
-  source = "./modules/snowflake-grant-all-current-tasks"
+resource snowflake_task_grant grant_operate_on_prod_db__raw_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
   privilege = "OPERATE"
   roles = [snowflake_role.PROD_DB_RAW_RW_AR.name, snowflake_role.PROD_DB_RAW_FULL_AR.name]
   enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__raw_tasks]
 }
 
-resource snowflake_task_grant grant_monitor_on_future_prod_db_prod_db__raw_tasks {
+resource snowflake_task_grant grant_monitor_on_future_prod_db__raw_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -1287,10 +1553,10 @@ resource snowflake_task_grant grant_monitor_on_future_prod_db_prod_db__raw_tasks
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__raw_tasks]
 }
 
-resource snowflake_task_grant grant_operate_on_future_prod_db_prod_db__raw_tasks {
+resource snowflake_task_grant grant_operate_on_future_prod_db__raw_tasks {
   database_name = snowflake_database.PROD_DB.name
   schema_name = snowflake_schema.PROD_DB__RAW.name
 
@@ -1300,7 +1566,30 @@ resource snowflake_task_grant grant_operate_on_future_prod_db_prod_db__raw_tasks
   on_future = true
   with_grant_option = false
   enable_multiple_grants = true
-  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db_raw_schema]
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_rw_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__raw_tasks]
+}
+
+resource snowflake_task_grant grant_ownership_on_prod_db__raw_tasks {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
+  enable_multiple_grants = true
+  on_all = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant]
+}
+
+resource snowflake_task_grant grant_ownership_on_future_prod_db__raw_tasks {
+  database_name = snowflake_database.PROD_DB.name
+  schema_name = snowflake_schema.PROD_DB__RAW.name
+
+  privilege = "OWNERSHIP"
+  roles = [snowflake_role.PROD_DB_RAW_FULL_AR.name]
+
+  on_future = true
+  with_grant_option = false
+  enable_multiple_grants = true
+  depends_on = [snowflake_schema_grant.grant_ownership_on_prod_db__raw_schema, snowflake_role_ownership_grant.role_prod_db_raw_full_ar_ownership_grant, snowflake_task_grant.grant_ownership_on_prod_db__raw_tasks]
 }
 
 resource snowflake_warehouse_grant grant_usage_on_warehouse_prod_bi {
@@ -1311,6 +1600,7 @@ resource snowflake_warehouse_grant grant_usage_on_warehouse_prod_bi {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_bi_u_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_monitor_on_warehouse_prod_bi {
@@ -1321,6 +1611,7 @@ resource snowflake_warehouse_grant grant_monitor_on_warehouse_prod_bi {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_bi_um_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_ownership_on_warehouse_prod_bi {
@@ -1331,6 +1622,7 @@ resource snowflake_warehouse_grant grant_ownership_on_warehouse_prod_bi {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_bi_full_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_usage_on_warehouse_prod_dsci {
@@ -1341,6 +1633,7 @@ resource snowflake_warehouse_grant grant_usage_on_warehouse_prod_dsci {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_dsci_u_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_monitor_on_warehouse_prod_dsci {
@@ -1351,6 +1644,7 @@ resource snowflake_warehouse_grant grant_monitor_on_warehouse_prod_dsci {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_dsci_um_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_ownership_on_warehouse_prod_dsci {
@@ -1361,6 +1655,7 @@ resource snowflake_warehouse_grant grant_ownership_on_warehouse_prod_dsci {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_dsci_full_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_usage_on_warehouse_prod_elt {
@@ -1371,6 +1666,7 @@ resource snowflake_warehouse_grant grant_usage_on_warehouse_prod_elt {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_elt_u_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_monitor_on_warehouse_prod_elt {
@@ -1381,6 +1677,7 @@ resource snowflake_warehouse_grant grant_monitor_on_warehouse_prod_elt {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_elt_um_ar_ownership_grant]
 }
 
 resource snowflake_warehouse_grant grant_ownership_on_warehouse_prod_elt {
@@ -1391,6 +1688,7 @@ resource snowflake_warehouse_grant grant_ownership_on_warehouse_prod_elt {
 
   with_grant_option = false
   enable_multiple_grants = true
+  depends_on = [snowflake_role_ownership_grant.role_prod_elt_full_ar_ownership_grant]
 }
 
 resource snowflake_role_grants role_prod_db_common_r_ar_grants {

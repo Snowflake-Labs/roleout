@@ -10,6 +10,7 @@ import {Deployable} from '../deployable'
 import {DeploymentOptions} from './deploymentOptions'
 import {AccessRole} from '../roles/accessRole'
 import {every} from 'lodash'
+import {virtualWarehouseSizeSQLIdentifier} from '../objects/virtualWarehouse'
 
 export class SQLBackend extends Backend {
   private static generateGrantSQL(grant: Grant, accessRoleName: string): string {
@@ -164,12 +165,12 @@ Foreach-Object {
       ]) as string[]).concat(
         deployable.virtualWarehouses.map(vwh =>
           [
-            `CREATE WAREHOUSE IF NOT EXISTS "${vwh.name}" WITH INITIALLY_SUSPENDED = ${vwh.initiallySuspended ? 'TRUE' : 'FALSE'} WAREHOUSE_SIZE = ${vwh.size};`
+            `CREATE WAREHOUSE IF NOT EXISTS "${vwh.name}" WITH INITIALLY_SUSPENDED = ${vwh.initiallySuspended ? 'TRUE' : 'FALSE'} WAREHOUSE_SIZE = ${virtualWarehouseSizeSQLIdentifier(vwh.size)};`
           ].concat(
             compact([
               `ALTER WAREHOUSE "${vwh.name}" SET`,
               'WAIT_FOR_COMPLETION = TRUE',
-              `WAREHOUSE_SIZE = ${vwh.size}`,
+              `WAREHOUSE_SIZE = ${virtualWarehouseSizeSQLIdentifier(vwh.size)}`,
               `MIN_CLUSTER_COUNT = ${vwh.minClusterCount}`,
               `MAX_CLUSTER_COUNT = ${vwh.maxClusterCount}`,
               vwh.maxClusterCount > vwh.minClusterCount ? `SCALING_POLICY = ${vwh.scalingPolicy}` : null,

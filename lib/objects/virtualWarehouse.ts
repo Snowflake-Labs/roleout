@@ -19,6 +19,31 @@ export enum VirtualWarehouseSize {
   X6LARGE = '6X-Large'
 }
 
+export function virtualWarehouseSizeSQLIdentifier(s: VirtualWarehouseSize): string {
+  switch (s) {
+  case VirtualWarehouseSize.XSMALL:
+    return 'XSMALL'
+  case VirtualWarehouseSize.SMALL:
+    return 'SMALL'
+  case VirtualWarehouseSize.MEDIUM:
+    return 'MEDIUM'
+  case VirtualWarehouseSize.LARGE:
+    return 'LARGE'
+  case VirtualWarehouseSize.XLARGE:
+    return 'XLARGE'
+  case VirtualWarehouseSize.XXLARGE:
+    return 'XXLARGE'
+  case VirtualWarehouseSize.XXXLARGE:
+    return 'XXXLARGE'
+  case VirtualWarehouseSize.X4LARGE:
+    return 'X4LARGE'
+  case VirtualWarehouseSize.X5LARGE:
+    return 'X5LARGE'
+  case VirtualWarehouseSize.X6LARGE:
+    return 'X6LARGE'
+  }
+}
+
 export function parseVirtualWarehouseSize(s: string): VirtualWarehouseSize {
   switch (s) {
   case 'X-Small':
