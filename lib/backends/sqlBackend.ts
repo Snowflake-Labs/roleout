@@ -10,13 +10,15 @@ import {Deployable} from '../deployable'
 import {DeploymentOptions} from './deploymentOptions'
 import {AccessRole} from '../roles/accessRole'
 import {every} from 'lodash'
+import {virtualWarehouseSizeSQLIdentifier} from '../objects/virtualWarehouse'
 
 export class SQLBackend extends Backend {
   private static generateGrantSQL(grant: Grant, accessRoleName: string): string {
     function schemaObjectGrantSQL(grant: SchemaObjectGrant): string {
       const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
       if(grant.objectName()) return `GRANT ${grant.privilege} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
-      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}";`
+      const revokeCurrentGrants = grant.privilege === Privilege.OWNERSHIP && !grant.future ? ' REVOKE CURRENT GRANTS' : ''
+      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${revokeCurrentGrants};`
     }
 
     if (grant.type === 'SchemaObjectGrant') {
@@ -163,17 +165,22 @@ Foreach-Object {
       ]) as string[]).concat(
         deployable.virtualWarehouses.map(vwh =>
           [
-            `CREATE WAREHOUSE IF NOT EXISTS "${vwh.name}" WITH INITIALLY_SUSPENDED = TRUE WAREHOUSE_SIZE = ${vwh.size};`
+            `CREATE WAREHOUSE IF NOT EXISTS "${vwh.name}" WITH INITIALLY_SUSPENDED = ${vwh.initiallySuspended ? 'TRUE' : 'FALSE'} WAREHOUSE_SIZE = ${virtualWarehouseSizeSQLIdentifier(vwh.size)};`
           ].concat(
             compact([
               `ALTER WAREHOUSE "${vwh.name}" SET`,
               'WAIT_FOR_COMPLETION = TRUE',
-              `WAREHOUSE_SIZE = ${vwh.size}`,
+              `WAREHOUSE_SIZE = ${virtualWarehouseSizeSQLIdentifier(vwh.size)}`,
               `MIN_CLUSTER_COUNT = ${vwh.minClusterCount}`,
               `MAX_CLUSTER_COUNT = ${vwh.maxClusterCount}`,
               vwh.maxClusterCount > vwh.minClusterCount ? `SCALING_POLICY = ${vwh.scalingPolicy}` : null,
               `AUTO_SUSPEND = ${vwh.autoSuspend * 60}`,
-              `AUTO_RESUME = ${vwh.autoResume ? 'TRUE' : 'FALSE'};\n`,
+              `AUTO_RESUME = ${vwh.autoResume ? 'TRUE' : 'FALSE'}`,
+              `ENABLE_QUERY_ACCELERATION = ${vwh.enableQueryAcceleration ? 'TRUE' : 'FALSE'}`,
+              vwh.queryAccelerationMaxScaleFactor ? `QUERY_ACCELERATION_MAX_SCALE_FACTOR = ${vwh.queryAccelerationMaxScaleFactor}` : null,
+              vwh.statementTimeoutInSeconds ? `STATEMENT_TIMEOUT_IN_SECONDS = ${vwh.statementTimeoutInSeconds}` : null,
+              vwh.resourceMonitor ? `RESOURCE_MONITOR = ${vwh.resourceMonitor}` : null,
+              `WAREHOUSE_TYPE = ${vwh.type};\n`
             ])).join('\n')
         )
       ).join('\n')

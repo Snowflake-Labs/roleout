@@ -1,6 +1,6 @@
 import { Schema } from './schema'
 
-export class Table {
+export class MaterializedView {
   name: string
   schema: Schema
 

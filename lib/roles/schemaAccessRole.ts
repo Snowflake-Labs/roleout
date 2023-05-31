@@ -16,6 +16,7 @@ import {ProcedureGrant} from '../grants/procedureGrant'
 import {UserDefinedFunctionGrant} from '../grants/userDefinedFunctionGrant'
 import {TaskGrant} from '../grants/taskGrant'
 import {SequenceGrant} from '../grants/sequenceGrant'
+import {MaterializedViewGrant} from '../grants/materializedViewGrant'
 
 export class SchemaAccessRole implements AccessRole {
   schema: Schema
@@ -78,6 +79,8 @@ export class SchemaAccessRole implements AccessRole {
       new ProcedureGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
       new UserDefinedFunctionGrant(this.schema, false, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
       new UserDefinedFunctionGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
+      new MaterializedViewGrant(this.schema, false, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
+      new MaterializedViewGrant(this.schema, true, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
     ]
 
     const readWriteGrants = () =>
@@ -119,6 +122,10 @@ export class SchemaAccessRole implements AccessRole {
         new ProcedureGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
         new UserDefinedFunctionGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
         new UserDefinedFunctionGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
+        new MaterializedViewGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
+        new MaterializedViewGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
+        new TaskGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
+        new TaskGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
       ].concat(readWriteGrants())
     }
 

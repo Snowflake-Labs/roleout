@@ -7,6 +7,7 @@ import {SchemaObjectGroupAccessRole} from './roles/schemaObjectGroupAccessRole'
 import {SchemaObjectGroupAccessLevel} from './access/schemaObjectGroupAccessLevel'
 import {SchemaObjectGroupAccess} from './access/schemaObjectGroupAccess'
 import {FunctionalRole} from './roles/functionalRole'
+import {VirtualWarehouseAccessLevel} from './access/virtualWarehouseAccessLevel'
 
 export class SchemaObjectGroup {
   name: string
@@ -27,6 +28,18 @@ export class SchemaObjectGroup {
     return [SchemaObjectGroupAccessLevel.Read, SchemaObjectGroupAccessLevel.ReadWrite].map(
       (level) => new SchemaObjectGroupAccessRole(this, this.identifier, level, namingConvention)
     )
+  }
+
+  toRecord() {
+    const accessRecords = Array(...this.access.entries()).map(([role, level]) => {
+      return {role: role.name, level: SchemaObjectGroupAccessLevel[level]}
+    })
+    return {
+      name: this.name,
+      tables: this.tables.map(t => t.toRecord()),
+      views: this.views.map(v => v.toRecord()),
+      access: accessRecords
+    }
   }
 
   static identifierSafeName(name: string): string {

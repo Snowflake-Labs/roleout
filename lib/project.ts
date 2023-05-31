@@ -2,10 +2,10 @@ import YAML, {isMap, isSeq, YAMLMap, YAMLSeq} from 'yaml'
 import {Database, DatabaseOptions, defaultDatabaseOptions} from './objects/database'
 import {defaultSchemaOptions, Schema, SchemaOptions} from './objects/schema'
 import {
-  defaultVirtualWarehouseOptions,
+  defaultVirtualWarehouseOptions, parseVirtualWarehouseSize,
   VirtualWarehouse,
   VirtualWarehouseOptions,
-  VirtualWarehouseSize
+  VirtualWarehouseSize, VirtualWarehouseType
 } from './objects/virtualWarehouse'
 import {FunctionalRole} from './roles/functionalRole'
 import {DataAccessLevel, parseDataAccessLevel} from './access/dataAccessLevel'
@@ -15,7 +15,7 @@ import {Environment} from './environment'
 import {Deployable} from './deployable'
 import {parseSchemaObjectGroupAccessLevel, SchemaObjectGroupAccessLevel} from './access/schemaObjectGroupAccessLevel'
 import {Table} from './objects/table'
-import {find} from 'lodash'
+import {find, includes} from 'lodash'
 import {SchemaObjectGroup} from './schemaObjectGroup'
 import {View} from './objects/view'
 
@@ -43,6 +43,73 @@ export class Project extends Deployable {
     super(name, {...defaultNamingConvention})
     this.options = defaultProjectOptions
     this.environments = []
+  }
+
+  toRecord() {
+    return {
+      project: {
+        name: this.name,
+        options: this.options,
+        namingConvention: this.namingConvention,
+        databases: this.databases.map(db => db.toRecord()),
+        schemaObjectGroups: this.schemaObjectGroups.map(sog => sog.toRecord()),
+        virtualWarehouses: this.virtualWarehouses.map(vwh => vwh.toRecord()),
+        functionalRoles: this.functionalRoles.map(fr => fr.toRecord())
+      }
+    }
+  }
+
+  mergeVirtualWarehouses(virtualWarehouses: VirtualWarehouse[]): Project {
+    for (const newVirtualWarehouse of virtualWarehouses) {
+      const existingVirtualWarehouse = find(this.virtualWarehouses, vwh => vwh.name === newVirtualWarehouse.name)
+      if (!existingVirtualWarehouse) {
+        this.virtualWarehouses.push(newVirtualWarehouse)
+        continue
+      }
+
+      const existingAccess = existingVirtualWarehouse.access
+      this.virtualWarehouses = this.virtualWarehouses.filter(vwh => vwh.name !== newVirtualWarehouse.name)
+      newVirtualWarehouse.access = existingAccess
+      this.virtualWarehouses.push(newVirtualWarehouse)
+    }
+    return this
+  }
+
+  mergeRoles(roles: FunctionalRole[]): Project {
+    for (const newRole of roles) {
+      if (!this.functionalRoles.includes(newRole)) this.functionalRoles.push(newRole)
+    }
+    return this
+  }
+
+  mergeDatabases(databases: Database[]): Project {
+    const mergeSchemata = (existingSchemata: Schema[], newSchemata: Schema[]): Schema[] => {
+      for(const newSchema of newSchemata) {
+        const existingSchema = find(existingSchemata, s => s.name === newSchema.name)
+        if(!existingSchema) {
+          existingSchemata.push(newSchema)
+          continue
+        }
+        existingSchema.managedAccess = newSchema.managedAccess
+        existingSchema.transient = newSchema.transient
+        existingSchema.dataRetentionTimeInDays = newSchema.dataRetentionTimeInDays
+      }
+
+      return existingSchemata
+    }
+
+    for (const newDatabase of databases) {
+      const existingDatabase = find(this.databases, db => db.name === newDatabase.name)
+      if (!existingDatabase) {
+        this.databases.push(newDatabase)
+        continue
+      }
+
+      existingDatabase.schemata = mergeSchemata(existingDatabase.schemata, newDatabase.schemata)
+      existingDatabase.transient = newDatabase.transient
+      existingDatabase.dataRetentionTimeInDays = newDatabase.dataRetentionTimeInDays
+    }
+    return this
   }
 
   static fromYAML(contents: string): Project {
@@ -224,7 +291,7 @@ export class Project extends Deployable {
     }
 
     // Schema Object Groups
-    const schemaObjectGroupAccesses: {schemaObjectGroupName: string, functionalRoleName: string, environmentName: string | undefined, level: SchemaObjectGroupAccessLevel }[] = []
+    const schemaObjectGroupAccesses: { schemaObjectGroupName: string, functionalRoleName: string, environmentName: string | undefined, level: SchemaObjectGroupAccessLevel }[] = []
     if (projectMap.has('schemaObjectGroups')) {
       for (const schemaObjectGroupMap of (projectMap.get('schemaObjectGroups') as YAMLSeq<YAMLMap>).items) {
         const schemaObjectGroupName = schemaObjectGroupMap.get('name') as string
@@ -407,14 +474,14 @@ export class Project extends Deployable {
             name: obj.schema.database.name
           })
           const envDatabase = find(environment.databases, db => db.name === envDatabaseName)
-          if(!envDatabase) throw new ProjectFileError(`Could not find schema object group database ${envDatabaseName}`)
+          if (!envDatabase) throw new ProjectFileError(`Could not find schema object group database ${envDatabaseName}`)
           const envSchemaName = renderName('schema', project.namingConvention, {
             database: envDatabase.name,
             env: environment.name,
             name: obj.schema.name
           })
           const envSchema = find(envDatabase.schemata, s => s.name === envSchemaName)
-          if(!envSchema) throw new ProjectFileError(`Could not find schema object group schema ${envSchemaName}`)
+          if (!envSchema) throw new ProjectFileError(`Could not find schema object group schema ${envSchemaName}`)
           return new Table(obj.name, envSchema)
         })
       }
@@ -469,15 +536,21 @@ export class Project extends Deployable {
     return project
   }
 
-  static getVirtualWarehouseOptionsFromYAML(optionsMap: YAMLMap):
-    VirtualWarehouseOptions {
+  static getVirtualWarehouseOptionsFromYAML(optionsMap: YAMLMap): VirtualWarehouseOptions {
+    const size = optionsMap.get('size') ? parseVirtualWarehouseSize(optionsMap.get('size') as string) : defaultVirtualWarehouseOptions.size
     return {
-      size: optionsMap.get('size') as VirtualWarehouseSize | undefined ?? defaultVirtualWarehouseOptions.size,
+      size: size,
       maxClusterCount: optionsMap.get('maxClusterCount') as number | undefined ?? defaultVirtualWarehouseOptions.maxClusterCount,
       minClusterCount: optionsMap.get('minClusterCount') as number | undefined ?? defaultVirtualWarehouseOptions.minClusterCount,
       scalingPolicy: optionsMap.get('scalingPolicy') as 'STANDARD' | 'ECONOMY' | undefined ?? defaultVirtualWarehouseOptions.scalingPolicy,
       autoSuspend: optionsMap.get('autoSuspend') as number | undefined ?? defaultVirtualWarehouseOptions.autoSuspend,
       autoResume: optionsMap.get('autoResume') as boolean | undefined ?? defaultVirtualWarehouseOptions.autoResume,
+      enableQueryAcceleration: optionsMap.get('enableQueryAcceleration') as boolean | undefined ?? defaultVirtualWarehouseOptions.enableQueryAcceleration,
+      queryAccelerationMaxScaleFactor: optionsMap.get('queryAccelerationMaxScaleFactor') as number | undefined ?? defaultVirtualWarehouseOptions.queryAccelerationMaxScaleFactor,
+      type: optionsMap.get('type') as VirtualWarehouseType | undefined ?? defaultVirtualWarehouseOptions.type,
+      statementTimeoutInSeconds: optionsMap.get('statementTimeoutInSeconds') as number | undefined ?? defaultVirtualWarehouseOptions.statementTimeoutInSeconds,
+      resourceMonitor: optionsMap.get('resourceMonitor') as string | undefined ?? defaultVirtualWarehouseOptions.resourceMonitor,
+      initiallySuspended: optionsMap.get('initiallySuspended') as boolean | undefined ?? defaultVirtualWarehouseOptions.initiallySuspended
     }
   }
 

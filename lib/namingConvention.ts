@@ -13,6 +13,7 @@ export interface NamingConvention {
   terraformGrantResourceName: string
   terraformGrantVirtualWarehouseResourceName: string
   terraformGrantRoleResourceName: string
+  terraformRoleOwnershipGrantResourceName: string
 }
 
 export const defaultNamingConvention: NamingConvention = {
@@ -26,10 +27,11 @@ export const defaultNamingConvention: NamingConvention = {
   virtualWarehouseAccessRole: '{{name}}_{{levelShort}}_AR',
   environmentManagerRole: '{{env}}_SYSADMIN',
   terraformGrantResourceName:
-    'grant_{{privilegeLower}}_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}{{schemaLower}}_{{/schema}}{{kindLower}}{{#objectName}}_{{objectName}}{{/objectName}}',
+    'grant_{{privilegeLower}}_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}_{{schemaLower}}_{{/schema}}{{kindLower}}{{#objectName}}_{{objectName}}{{/objectName}}',
   terraformGrantVirtualWarehouseResourceName:
     'grant_{{privilegeLower}}_on_warehouse_{{virtualWarehouseLower}}',
   terraformGrantRoleResourceName: 'role_{{roleLower}}_grants',
+  terraformRoleOwnershipGrantResourceName: 'role_{{roleLower}}_ownership_grant',
 }
 
 export const renderName = (template: keyof NamingConvention, namingConvention: NamingConvention, view: any) => {

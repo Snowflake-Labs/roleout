@@ -8,4 +8,10 @@ export class FunctionalRole extends Role {
   equals(other: FunctionalRole) {
     return this.name === other.name
   }
+
+  toRecord() {
+    return {
+      name: this.name
+    }
+  }
 }

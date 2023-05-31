@@ -44,7 +44,7 @@ export const optionsForm = <Options, ParentOptions = never>({
       return (
         <Stack spacing={1}>
           {environments.map(environment => (
-            <Paper key={environment.name} sx={{p: 1}}>
+            <Paper key={environment.name} sx={{p: 2}}>
               <Stack spacing={1}>
                 <Typography color={theme.palette.text.secondary}
                   variant="body2">{environment.name} Options</Typography>
@@ -60,7 +60,7 @@ export const optionsForm = <Options, ParentOptions = never>({
     }
 
     return (
-      <Paper>
+      <Paper sx={{p: 2}}>
         <OptionsFormBlock options={options} setOptions={setOptions} parentOptions={parentOptions}/>
       </Paper>
     )
