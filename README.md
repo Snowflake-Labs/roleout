@@ -8,6 +8,9 @@
 - [Functionality](#functionality)
 - [Usage](#usage)
 - [CLI Usage](#cli-usage)
+  - [Deployment](#generating-deployment-code)
+  - [Loading Objects from Snowflake](#loading-objects-from-snowflake)
+  - [Importing Objects to Terraform](#importing-existing-snowflake-objects-to-terraform)
 - [Terraform Deployment](#terraform-deployment)
 - [SQL Deployment](#sql-deployment)
 - [Development](#development)
@@ -144,6 +147,24 @@ your liking on the Naming Convention page.
 #### Terraform
 
 `roleout terraform deploy -c my_config.yml -o output_dir`
+
+### Loading Objects from Snowflake
+If you already have a Snowflake environment, you can use the CLI to load your existing databases, schemas, roles, and warehouses
+into your Roleout project. To start a new Roleout project by loading those objects from your Snowflake account:
+1) Setup your connection. roleout-cli will use the same environment variables for authentication as the Terraform provider,
+  so follow [these Authentication instructions](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs#authentication)
+  to export the appropriate environment variables. For example:
+  ```
+export SNOWFLAKE_USER="<your user>"
+export SNOWFLAKE_PRIVATE_KEY_PATH="<your private key path>"
+export SNOWFLAKE_ACCOUNT="<org-account>"
+export SNOWFLAKE_WAREHOUSE="<your warehouse>"
+export SNOWFLAKE_ROLE="ACCOUNTADMIN"
+```
+2) Run `roleout-cli snowflake populateProject -o 'Your New Project Name.yml'`
+
+You can also update an existing Roleout project with objects from your Snowflake account like so:
+`roleout-cli snowflake populateProject -c 'My Existing Project.yml' -o 'Your New Project Name.yml'`
 
 ### Importing Existing Snowflake Objects to Terraform
 
