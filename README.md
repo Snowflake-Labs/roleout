@@ -105,6 +105,13 @@ deployment code for these with the following properties:
 - Schemas will all be MANAGED ACCESS
 - Virtual warehouses are currently set to MEDIUM size and other parameters are left to the defaults
 
+### Schema Object Groups
+
+Although not generally recommended, sometimes you might have a hard requirement to control access to individual tables and views, rather than at the schema level. Enable Schema Object Groups to create groups of tables and views across schemas and databases that should share an access level, and manage that access from the Access page.
+
+On the "Schema Object Groups" page, you can create one or more groups. Clicking the group name will take you to the edit page
+where you can add tables and views from one or more schemas across databases to the group.
+
 ### Functional Roles
 
 Determine what groups of people and programs that will use Snowflake exist in your organization, and make functional
