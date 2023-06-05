@@ -9,6 +9,9 @@ import {SchemaGrant} from '../../grants/schemaGrant'
 import Mustache from 'mustache'
 import {TerraformRole} from './terraformRole'
 import {Role} from '../../roles/role'
+import {TerraformResource} from './terraformResource'
+import {compact} from 'lodash'
+import standardizeIdentifierForResource from './standardizeIdentifierForResource'
 
 export class TerraformSchemaGrant extends TerraformGrant {
   [immerable] = true
@@ -19,14 +22,20 @@ export class TerraformSchemaGrant extends TerraformGrant {
   privilege: string
   toRoles: Role[]
   toTerraformRoles: TerraformRole[]
+  dependsOn: TerraformResource[]
+  onFuture: boolean
+  onAll: boolean
 
-  constructor(database: TerraformDatabase, schema: TerraformSchema, privilege: string, toRoles: Role[], toTerraformRoles: TerraformRole[]) {
+  constructor(database: TerraformDatabase, schema: TerraformSchema, privilege: string, toRoles: Role[], toTerraformRoles: TerraformRole[], dependsOn: TerraformResource[] = [], onFuture = false, onAll = false) {
     super()
     this.database = database
     this.schema = schema
     this.privilege = privilege
     this.toRoles = toRoles
     this.toTerraformRoles = toTerraformRoles
+    this.dependsOn = dependsOn
+    this.onFuture = onFuture
+    this.onAll = onAll
   }
 
   uniqueKey(): string {
@@ -35,6 +44,8 @@ export class TerraformSchemaGrant extends TerraformGrant {
       this.database.name,
       this.schema.name,
       this.privilege,
+      this.onFuture,
+      this.onAll
     ].join('|')
   }
 
@@ -44,45 +55,50 @@ export class TerraformSchemaGrant extends TerraformGrant {
 
   resourceName(namingConvention: NamingConvention): string {
     return Mustache.render(namingConvention.terraformGrantResourceName, {
-      database: this.database.resourceName(),
-      databaseLower: this.database.resourceName().toLowerCase(),
-      schema: this.schema.name.toUpperCase().replace(/[^a-zA-Z0-9_-]/g, '_'),
-      schemaLower: this.schema.name.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase(),
+      database: standardizeIdentifierForResource(this.database.name),
+      databaseLower: standardizeIdentifierForResource(this.database.name).toLowerCase(),
+      schema: standardizeIdentifierForResource(this.schema.name),
+      schemaLower: standardizeIdentifierForResource(this.schema.name).toLowerCase(),
       privilege: this.privilege,
       privilegeLower: this.privilege.toLowerCase(),
       kind: 'schema',
       kindLower: 'schema',
+      future: this.onFuture,
+      onAll: this.onAll
     })
   }
 
   resourceID(): string {
-    // database|schema||privilege|roles|false
-    return `${this.database.name}|${this.schema.name}||${this.privilege}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|false`
+    // database_name|schema_name|privilege|with_grant_option|on_future|on_all|roles|shares
+    return `${this.database.name}|${this.schema.name}|${this.privilege}|false|${this.onFuture}|${this.onAll}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
   }
 
   resourceBlock(namingConvention: NamingConvention): string {
     const spacing = TerraformBackend.SPACING
+    const dependencies = this.toTerraformRoles.map(r => `snowflake_role_grants.role_${r.resourceName().toLowerCase()}_grants`)
+      .concat(this.dependsOn.map(r => `${r.resourceType()}.${r.resourceName(namingConvention)}`))
 
-    return [
+    return compact([
       `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
       spacing + `database_name = snowflake_database.${this.database.resourceName()}.name`,
       spacing + `schema_name = snowflake_schema.${this.schema.resourceName()}.name\n`,
       spacing + `privilege = "${this.privilege}"`,
       spacing + `roles = [${this.roleAndRoleResourceStrings().join(', ')}]\n`,
-      spacing + `depends_on = [${this.toTerraformRoles.map(r => `snowflake_role_grants.role_${r.resourceName().toLowerCase()}_grants`)}]\n`,
+      this.dependsOn.length > 0 ? spacing + `depends_on = [${dependencies.join(', ')}]\n` : null,
       spacing + 'with_grant_option = false',
       spacing + 'enable_multiple_grants = true',
       '}',
-    ].join('\n')
+    ]).join('\n')
   }
 
-  static fromSchemaGrant(grant: SchemaGrant): TerraformSchemaGrant {
+  static fromSchemaGrant(grant: SchemaGrant, dependsOn: TerraformResource[] = []): TerraformSchemaGrant {
     return new TerraformSchemaGrant(
       TerraformDatabase.fromDatabase(grant.schema.database),
       TerraformSchema.fromSchema(grant.schema),
       grant.privilege,
       [],
-      [TerraformRole.fromRole(grant.role)]
+      [TerraformRole.fromRole(grant.role)],
+      dependsOn
     )
   }
 }

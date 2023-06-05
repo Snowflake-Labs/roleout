@@ -3,8 +3,9 @@ import {TerraformSchemaObjectGrant} from './terraformSchemaObjectGrant'
 import {TerraformSchemaGrant} from './terraformSchemaGrant'
 import {TerraformDatabaseGrant} from './terraformDatabaseGrant'
 import {TerraformVirtualWarehouseGrant} from './terraformVirtualWarehouseGrant'
+import {TerraformResource} from './terraformResource'
 
-export const terraformGrantFromGrant = (grant: Grant): TerraformSchemaGrant | TerraformSchemaObjectGrant | TerraformDatabaseGrant | TerraformVirtualWarehouseGrant => {
+export const terraformGrantFromGrant = (grant: Grant): TerraformResource => {
   if (isSchemaObjectGrant(grant)) return TerraformSchemaObjectGrant.fromSchemaObjectGrant(grant)
   if (isSchemaGrant(grant)) return TerraformSchemaGrant.fromSchemaGrant(grant)
   if (isDatabaseGrant(grant)) return TerraformDatabaseGrant.fromDatabaseGrant(grant)

@@ -1,8 +1,6 @@
 import React, {ChangeEvent, FunctionComponent, useEffect, useState} from 'react'
 import {AdvancedOptionsProps} from '../options/options'
 import {
-  FormControlLabel,
-  formControlLabelClasses,
   FormHelperText,
   Grid,
   InputAdornment,
@@ -12,12 +10,11 @@ import {
 import {
   VirtualWarehouseOptions,
   VirtualWarehouseScalingPolicy,
-  VirtualWarehouseSize
+  VirtualWarehouseSize, VirtualWarehouseType
 } from 'roleout-lib/build/objects/virtualWarehouse'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
-import styled from '@emotion/styled'
 import {produce} from 'immer'
 import {SelectChangeEvent} from '@mui/material/Select'
 import {range} from 'lodash'
@@ -31,7 +28,10 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
   const dispatch = useAppDispatch()
 
   const [newAutoSuspendStr, setNewAutoSuspendStr] = useState(options.autoSuspend.toString())
+  const [newQueryAccelerationMaxScaleFactorStr, setNewQueryAccelerationMaxScaleFactorStr] = useState(options.queryAccelerationMaxScaleFactor ? options.queryAccelerationMaxScaleFactor.toString() : '')
   const [multiClusterError, setMultiClusterError] = useState<string | null>(null)
+  const [newStatementTimeoutStr, setNewStatementTimeoutStr] = useState(options.statementTimeoutInSeconds ? options.statementTimeoutInSeconds.toString() : '')
+  const [newResourceMonitorStr, setNewResourceMonitorStr] = useState(options.resourceMonitor ? options.resourceMonitor.toString() : '')
 
   useEffect(() => {
     if (options.maxClusterCount < options.minClusterCount && !multiClusterError) {
@@ -42,8 +42,6 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
   }, [options])
 
   const setOption = (recipe: (draft: Draft<VirtualWarehouseOptions>) => void) => {
-    console.log('setting option')
-    console.log(setOptions(produce(options, recipe)))
     dispatch(setOptions(produce(options, recipe)))
   }
 
@@ -70,7 +68,7 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
   const handleChangeAutoSuspend = (e: ChangeEvent<HTMLInputElement>) => {
     const strValue = (e.target.value as string).replace(/[^0-9]/, '')
     if ('' === strValue) {
-      setNewAutoSuspendStr('0')
+      setNewAutoSuspendStr('')
       setOption(draft => {
         draft.autoSuspend = 0
       })
@@ -91,14 +89,76 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
       draft.autoResume = checked
     })
 
-  const StyledFormControlLabel = styled(FormControlLabel)(() => ({
-    [`&.${formControlLabelClasses.label}`]: {
-      fontSize: '0.9rem'
-    },
-  }))
+  const handleChangeEnableQueryAcceleration = (checked: boolean) =>
+    setOption(draft => {
+      draft.enableQueryAcceleration = checked
+    })
+
+  const handleChangeQueryAccelerationMaxScaleFactor = (e: ChangeEvent<HTMLInputElement>) => {
+    const strValue = (e.target.value as string).replace(/[^0-9]/, '')
+    if ('' === strValue) {
+      setNewQueryAccelerationMaxScaleFactorStr('')
+      setOption(draft => {
+        draft.queryAccelerationMaxScaleFactor = undefined
+      })
+      return
+    }
+
+    const numberValue = parseInt(strValue)
+    if (!isNaN(numberValue) && numberValue > 0) {
+      setNewQueryAccelerationMaxScaleFactorStr(numberValue.toString())
+      setOption(draft => {
+        draft.queryAccelerationMaxScaleFactor = numberValue
+      })
+    }
+  }
+
+  const handleChangeType = (e: SelectChangeEvent) =>
+    setOption(draft => {
+      draft.type = e.target.value as VirtualWarehouseType
+    })
+
+  const handleChangeStatementTimeout = (e: ChangeEvent<HTMLInputElement>) => {
+    const strValue = (e.target.value as string).replace(/[^0-9]/, '')
+    if ('' === strValue) {
+      setNewStatementTimeoutStr('')
+      setOption(draft => {
+        draft.statementTimeoutInSeconds = undefined
+      })
+      return
+    }
+
+    const numberValue = parseInt(strValue)
+    if (!isNaN(numberValue)) {
+      setNewStatementTimeoutStr(numberValue.toString())
+      setOption(draft => {
+        draft.statementTimeoutInSeconds = numberValue
+      })
+    }
+  }
+
+  const handleChangeResourceMonitor = (e: ChangeEvent<HTMLInputElement>) => {
+    const strValue = e.target.value
+    if ('' === strValue) {
+      setNewResourceMonitorStr('')
+      setOption(draft => {
+        draft.resourceMonitor = undefined
+      })
+      return
+    }
+
+    setNewResourceMonitorStr(strValue)
+    setOption(draft => {
+      draft.resourceMonitor = strValue
+    })
+  }
+
+  const handleChangeInitiallySuspended = (checked: boolean) =>
+    setOption(draft => {
+      draft.initiallySuspended = checked
+    })
+
   return (
-
-
     <Grid container gap={1}>
       <Grid item>
         <FormControl size="small" fullWidth sx={{minWidth: '14ch'}}>
@@ -107,6 +167,15 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
             {Object.values(VirtualWarehouseSize).map(size =>
               <MenuItem key={size} value={size}>{size}</MenuItem>
             )}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item>
+        <FormControl size="small" fullWidth>
+          <InputLabel>Type</InputLabel>
+          <Select value={options.type} label="Type" onChange={handleChangeType}>
+            <MenuItem value={'STANDARD'}>Standard</MenuItem>
+            <MenuItem value={'SNOWPARK-OPTIMIZED'}>Snowpark Optimized</MenuItem>
           </Select>
         </FormControl>
       </Grid>
@@ -151,6 +220,44 @@ const VirtualWarehouseOptionsFormBlock: FunctionComponent<Props> = ({setOptions,
       </Grid>
       <Grid item>
         <LabelledCheckbox label="Auto Resume" checked={options.autoResume} handleChange={handleChangeAutoResume}/>
+      </Grid>
+      <Grid item>
+        <LabelledCheckbox label="Query Acceleration" checked={options.enableQueryAcceleration}
+          handleChange={handleChangeEnableQueryAcceleration}/>
+      </Grid>
+      <Grid item>
+        <TextField size="small" value={newQueryAccelerationMaxScaleFactorStr} label={'QA Max Scale Factor'}
+          sx={{width: '17ch'}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={handleChangeQueryAccelerationMaxScaleFactor}
+        />
+      </Grid>
+      <Grid item>
+        <TextField size="small" value={newStatementTimeoutStr} label={'Statement Timeout'}
+          sx={{width: '16ch'}}
+          InputProps={newStatementTimeoutStr ? {
+            endAdornment: <InputAdornment position="end">sec(s)</InputAdornment>,
+          } : {}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={handleChangeStatementTimeout}
+        />
+      </Grid>
+      <Grid item>
+        <TextField size="small" value={newResourceMonitorStr} label={'Resource Monitor'}
+          sx={{width: '17ch'}}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={handleChangeResourceMonitor}
+        />
+      </Grid>
+      <Grid item>
+        <LabelledCheckbox label="Initially Suspended" checked={options.initiallySuspended}
+          handleChange={handleChangeInitiallySuspended}/>
       </Grid>
     </Grid>
   )

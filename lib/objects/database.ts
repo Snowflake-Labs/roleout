@@ -26,4 +26,15 @@ export class Database implements DatabaseOptions {
   equals(other: Database) {
     return this.name === other.name
   }
+
+  toRecord() {
+    return {
+      name: this.name,
+      options: {
+        transient: this.transient,
+        dataRetentionTimeInDays: this.dataRetentionTimeInDays
+      },
+      schemata: this.schemata.map(s => s.toRecord())
+    }
+  }
 }

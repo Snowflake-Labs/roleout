@@ -32,8 +32,8 @@ export class TerraformRoleGrants implements TerraformResource {
   }
 
   resourceID(): string {
-    // from_role||||to_roles|false
-    return `${this.fromRole.name}||||${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|false`
+    // {role_name}|{roles}|{users}
+    return `${this.fromRole.name}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
   }
 
   resourceBlock(namingConvention: NamingConvention): string {

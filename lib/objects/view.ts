@@ -8,4 +8,12 @@ export class View {
     this.name = name
     this.schema = schema
   }
+
+  toRecord() {
+    return {
+      database: this.schema.database.name,
+      schema: this.schema.name,
+      name: this.name
+    }
+  }
 }

@@ -307,7 +307,7 @@ Object {
               class="MuiInputBase-input MuiOutlinedInput-input css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input"
               id="terraform-grant resource name-template"
               type="text"
-              value="grant_{{privilegeLower}}_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}{{schemaLower}}_{{/schema}}{{kindLower}}{{#objectName}}_{{objectName}}{{/objectName}}"
+              value="grant_{{privilegeLower}}_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}_{{schemaLower}}_{{/schema}}{{kindLower}}{{#objectName}}_{{objectName}}{{/objectName}}"
             />
             <fieldset
               aria-hidden="true"
@@ -699,7 +699,7 @@ Object {
             class="MuiInputBase-input MuiOutlinedInput-input css-1t8l2tu-MuiInputBase-input-MuiOutlinedInput-input"
             id="terraform-grant resource name-template"
             type="text"
-            value="grant_{{privilegeLower}}_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}{{schemaLower}}_{{/schema}}{{kindLower}}{{#objectName}}_{{objectName}}{{/objectName}}"
+            value="grant_{{privilegeLower}}_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}_{{schemaLower}}_{{/schema}}{{kindLower}}{{#objectName}}_{{objectName}}{{/objectName}}"
           />
           <fieldset
             aria-hidden="true"

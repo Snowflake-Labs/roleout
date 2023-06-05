@@ -1,13 +1,19 @@
 import {SchemaObjectGroup} from './schemaObjectGroup'
-import { createSlice, Draft, PayloadAction} from '@reduxjs/toolkit'
+import {createSlice, Draft, PayloadAction} from '@reduxjs/toolkit'
 import {crudAdd, crudRemove, crudRename, crudSetAccess} from '../../app/slices'
 import {find, includes, remove} from 'lodash'
 import {RootState} from '../../app/store'
 import {SchemaObjectGroupAccessLevel} from 'roleout-lib/build/access/schemaObjectGroupAccessLevel'
 import {removeEnvironment, updateEnvironment} from '../environments/environmentsSlice'
 import {removeFunctionalRole, updateFunctionalRole} from '../functionalRoles/functionalRolesSlice'
+import {removeDatabase, removeSchema, renameDatabase, renameSchema} from '../databases/databasesSlice'
 
-export type SchemaObjectGroupObjectPayload = { schemaObjectGroupName: string, databaseName: string, schemaName: string, name: string }
+export type SchemaObjectGroupObjectPayload = {
+  schemaObjectGroupName: string,
+  databaseName: string,
+  schemaName: string,
+  name: string
+}
 export type SchemaObjectGroupObjectPayloadAction = PayloadAction<SchemaObjectGroupObjectPayload>
 
 type SchemaObjectGroupState = SchemaObjectGroup[]
@@ -88,7 +94,7 @@ export const schemaObjectGroupsSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-    // when an environment is renamed we must rename it in all the virtual warehouse access objects
+    // when an environment is renamed we must rename it in all the schema object group access objects
       .addCase(updateEnvironment, (state: Draft<SchemaObjectGroupState>, action) => {
         for (const schemaObjectGroup of state) {
           // Access
@@ -99,7 +105,7 @@ export const schemaObjectGroupsSlice = createSlice({
           }
         }
       })
-    // when an environment is removed we must remove the corresponding the virtual warehouse access objects
+    // when an environment is removed we must remove the corresponding the schema object group access objects
       .addCase(removeEnvironment, (state: Draft<SchemaObjectGroupState>, action) => {
         for (const schemaObjectGroup of state) {
           // Access
@@ -108,7 +114,7 @@ export const schemaObjectGroupsSlice = createSlice({
           }
         }
       })
-    // when a functional role is renamed we must rename it in all the virtual warehouse access objects
+    // when a functional role is renamed we must rename it in all the schema object group access objects
       .addCase(updateFunctionalRole, (state: Draft<SchemaObjectGroupState>, action) => {
         for (const schemaObjectGroup of state) {
           if (action.payload.name in schemaObjectGroup.access) {
@@ -121,6 +127,44 @@ export const schemaObjectGroupsSlice = createSlice({
       .addCase(removeFunctionalRole, (state: Draft<SchemaObjectGroupState>, action) => {
         for (const schemaObjectGroup of state) {
           if (action.payload in schemaObjectGroup.access) delete schemaObjectGroup.access[action.payload]
+        }
+      })
+    // when a database is renamed we must rename it in all the schema object group access objects
+      .addCase(renameDatabase, (state: Draft<SchemaObjectGroupState>, action) => {
+        for (const schemaObjectGroup of state) {
+          if (action.payload.name in schemaObjectGroup.objects) {
+            schemaObjectGroup.objects[action.payload.newName] = schemaObjectGroup.objects[action.payload.name]
+            delete schemaObjectGroup.objects[action.payload.name]
+          }
+        }
+      })
+    // when a database is deleted we must remove the corresponding schema object group objects
+      .addCase(removeDatabase, (state: Draft<SchemaObjectGroupState>, action) => {
+        for (const schemaObjectGroup of state) {
+          if (action.payload in schemaObjectGroup.objects) delete schemaObjectGroup.objects[action.payload]
+        }
+      })
+    // when a schema is renamed we must rename it in all the schema object group access objects
+      .addCase(renameSchema, (state: Draft<SchemaObjectGroupState>, action) => {
+        const database = action.payload.database
+        const schema = action.payload.schema
+        for (const schemaObjectGroup of state) {
+          if (database in schemaObjectGroup.objects) {
+            if (schema in schemaObjectGroup.objects[database]) {
+              schemaObjectGroup.objects[database][action.payload.newName] = schemaObjectGroup.objects[database][schema]
+              delete schemaObjectGroup.objects[database][schema]
+            }
+          }
+        }
+      })
+    // when a schema is deleted we must remove the corresponding schema object group objects
+      .addCase(removeSchema, (state: Draft<SchemaObjectGroupState>, action) => {
+        const database = action.payload.database
+        const schema = action.payload.schema
+        for (const schemaObjectGroup of state) {
+          if (database in schemaObjectGroup.objects) {
+            if (schema in schemaObjectGroup.objects[database]) delete schemaObjectGroup.objects[database][schema]
+          }
         }
       })
   }
@@ -139,7 +183,11 @@ export const {
 
 export const selectSchemaObjectGroups = (state: RootState) => state.schemaObjectGroups
 export const selectSchemaObjectGroup = (state: RootState, name: string) => state.schemaObjectGroups.find(sog => sog.name === name)
-export const schemaObjectGroupDataObjectExists = (schemaObjectGroup: SchemaObjectGroup, search: { database: string, schema: string, objectName: string }) => {
+export const schemaObjectGroupDataObjectExists = (schemaObjectGroup: SchemaObjectGroup, search: {
+  database: string,
+  schema: string,
+  objectName: string
+}) => {
   const database = schemaObjectGroup.objects[search.database]
   if (!database) return false
   const schema = database[search.schema]

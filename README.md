@@ -8,6 +8,9 @@
 - [Functionality](#functionality)
 - [Usage](#usage)
 - [CLI Usage](#cli-usage)
+  - [Deployment](#generating-deployment-code)
+  - [Loading Objects from Snowflake](#loading-objects-from-snowflake)
+  - [Importing Objects to Terraform](#importing-existing-snowflake-objects-to-terraform)
 - [Terraform Deployment](#terraform-deployment)
 - [SQL Deployment](#sql-deployment)
 - [Development](#development)
@@ -102,6 +105,13 @@ deployment code for these with the following properties:
 - Schemas will all be MANAGED ACCESS
 - Virtual warehouses are currently set to MEDIUM size and other parameters are left to the defaults
 
+### Schema Object Groups
+
+Although not generally recommended, sometimes you might have a hard requirement to control access to individual tables and views, rather than at the schema level. Enable Schema Object Groups to create groups of tables and views across schemas and databases that should share an access level, and manage that access from the Access page.
+
+On the "Schema Object Groups" page, you can create one or more groups. Clicking the group name will take you to the edit page
+where you can add tables and views from one or more schemas across databases to the group.
+
 ### Functional Roles
 
 Determine what groups of people and programs that will use Snowflake exist in your organization, and make functional
@@ -144,6 +154,24 @@ your liking on the Naming Convention page.
 #### Terraform
 
 `roleout terraform deploy -c my_config.yml -o output_dir`
+
+### Loading Objects from Snowflake
+If you already have a Snowflake environment, you can use the CLI to load your existing databases, schemas, roles, and warehouses
+into your Roleout project. To start a new Roleout project by loading those objects from your Snowflake account:
+1) Setup your connection. roleout-cli will use the same environment variables for authentication as the Terraform provider,
+  so follow [these Authentication instructions](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs#authentication)
+  to export the appropriate environment variables. For example:
+  ```
+export SNOWFLAKE_USER="<your user>"
+export SNOWFLAKE_PRIVATE_KEY_PATH="<your private key path>"
+export SNOWFLAKE_ACCOUNT="<org-account>"
+export SNOWFLAKE_WAREHOUSE="<your warehouse>"
+export SNOWFLAKE_ROLE="ACCOUNTADMIN"
+```
+2) Run `roleout-cli snowflake populateProject -o 'Your New Project Name.yml'`
+
+You can also update an existing Roleout project with objects from your Snowflake account like so:
+`roleout-cli snowflake populateProject -c 'My Existing Project.yml' -o 'Your New Project Name.yml'`
 
 ### Importing Existing Snowflake Objects to Terraform
 
