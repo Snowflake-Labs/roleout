@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2023-06-12
+### Fixed
+- Replaced erroneous "REVOKE CURRENT GRANTS" with "COPY CURRENT GRANTS" for object ownership grants in SQL file '04 - RBAC.sql'
+- Added "IF EXISTS" to all "DROP ROLE" statements in SQL file 'teardown/04 - Teardown RBAC.sql'
+- Moved the DROP commands for environment roles from 'teardown/04 - Teardown RBAC.sql' to 'teardown/05 - Teardown Setup.sql'
+ 
 ## [2.0.0] - 2023-05-31
 ### Added
 - New Terraform import functionality allows importing existing objects in a Snowflake account into Terraform state.
@@ -23,4 +29,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependencies corrected for ownership grants in Terraform.
 - Renaming a database/schema would break Schema Object Groups with objects from that database/schema.
 
+[2.0.1]: https://github.com/Snowflake-Labs/roleout/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Snowflake-Labs/roleout/compare/v1.8.0...v2.0.0
