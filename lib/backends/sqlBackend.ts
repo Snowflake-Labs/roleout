@@ -16,9 +16,9 @@ export class SQLBackend extends Backend {
   private static generateGrantSQL(grant: Grant, accessRoleName: string): string {
     function schemaObjectGrantSQL(grant: SchemaObjectGrant): string {
       const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
-      if(grant.objectName()) return `GRANT ${grant.privilege} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
-      const revokeCurrentGrants = grant.privilege === Privilege.OWNERSHIP && !grant.future ? ' REVOKE CURRENT GRANTS' : ''
-      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${revokeCurrentGrants};`
+      const copyCurrentGrants = grant.privilege === Privilege.OWNERSHIP && !grant.future ? ' COPY CURRENT GRANTS' : ''
+      if (grant.objectName()) return `GRANT ${grant.privilege} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
+      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${copyCurrentGrants};`
     }
 
     if (grant.type === 'SchemaObjectGrant') {
@@ -142,7 +142,7 @@ Foreach-Object {
 
       if (options?.environmentName) statements.push(`--\n-- ${options?.environmentName} Environment\n--\n`)
 
-      statements.push(`USE ROLE ${managerRole};`)
+      statements.push(`USE ROLE "${managerRole}";`)
 
       for (const database of deployable.databases) {
         statements.push(`CREATE ${database.transient ? 'TRANSIENT ' : ''}DATABASE IF NOT EXISTS "${database.name}";`)
@@ -328,9 +328,17 @@ Foreach-Object {
         statements.push(`GRANT OWNERSHIP ON WAREHOUSE "${virtualWarehouse.name}" TO ROLE SYSADMIN COPY CURRENT GRANTS;`)
       }
 
+      return statements.join('\n')
+    }
+
+    function teardownSetup(): string {
+      const statements: string[] = []
+
+      if (options?.environmentName) statements.push(`--\n-- ${options?.environmentName} Environment\n--\n`)
+
       // drop env sysadmin
       if (options?.environmentManagerRole) {
-        statements.push(`DROP ROLE "${options.environmentManagerRole}";`)
+        statements.push(`DROP ROLE "${options.environmentManagerRole}";\n`)
       }
 
       return statements.join('\n')
@@ -347,6 +355,7 @@ Foreach-Object {
       ['teardown/02 - Teardown Databases and Schemas.sql', teardownDatabases()],
       ['teardown/03 - Teardown Virtual Warehouses.sql', teardownVirtualWarehouses()],
       ['teardown/04 - Teardown Functional Roles.sql', teardownFunctionalRoles()],
+      options?.environmentName ? ['teardown/05 - Teardown Setup.sql', teardownSetup()] : null,
     ]))
   }
 }
