@@ -17,7 +17,7 @@ export class SQLBackend extends Backend {
     function schemaObjectGrantSQL(grant: SchemaObjectGrant): string {
       const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
       const copyCurrentGrants = grant.privilege === Privilege.OWNERSHIP && !grant.future ? ' COPY CURRENT GRANTS' : ''
-      if(grant.objectName()) return `GRANT ${grant.privilege} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
+      if (grant.objectName()) return `GRANT ${grant.privilege} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
       return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${copyCurrentGrants};`
     }
 
@@ -142,7 +142,7 @@ Foreach-Object {
 
       if (options?.environmentName) statements.push(`--\n-- ${options?.environmentName} Environment\n--\n`)
 
-      statements.push('USE ROLE SYSADMIN;')
+      statements.push(`USE ROLE "${managerRole}";`)
 
       for (const database of deployable.databases) {
         statements.push(`CREATE ${database.transient ? 'TRANSIENT ' : ''}DATABASE IF NOT EXISTS "${database.name}";`)
@@ -159,7 +159,10 @@ Foreach-Object {
     }
 
     function deployVirtualWarehouses(): string {
-      return ['USE ROLE SYSADMIN;\n'].concat(
+      return (compact([
+        options?.environmentName ? `--\n-- ${options?.environmentName} Environment\n--\n` : null,
+        `USE ROLE "${managerRole}";\n`
+      ]) as string[]).concat(
         deployable.virtualWarehouses.map(vwh =>
           [
             `CREATE WAREHOUSE IF NOT EXISTS "${vwh.name}" WITH INITIALLY_SUSPENDED = ${vwh.initiallySuspended ? 'TRUE' : 'FALSE'} WAREHOUSE_SIZE = ${virtualWarehouseSizeSQLIdentifier(vwh.size)};`
