@@ -27,9 +27,9 @@ export const defaultNamingConvention: NamingConvention = {
   virtualWarehouseAccessRole: '{{name}}_{{levelShort}}_AR',
   environmentManagerRole: '{{env}}_SYSADMIN',
   terraformGrantResourceName:
-    'grant_{{privilegeLower}}_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}_{{schemaLower}}_{{/schema}}{{kindLower}}{{#objectName}}_{{objectName}}{{/objectName}}',
+    'grant_{{#allPrivileges}}all_{{/allPrivileges}}privileges_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}_{{schemaLower}}_{{/schema}}{{kindLower}}_to_role_{{role}}',
   terraformGrantVirtualWarehouseResourceName:
-    'grant_{{privilegeLower}}_on_warehouse_{{virtualWarehouseLower}}',
+    'grant_{{#allPrivileges}}all_{{/allPrivileges}}privileges_on_warehouse_{{virtualWarehouseLower}}',
   terraformGrantRoleResourceName: 'role_{{roleLower}}_grants',
   terraformRoleOwnershipGrantResourceName: 'role_{{roleLower}}_ownership_grant',
 }

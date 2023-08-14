@@ -1,4 +1,4 @@
-import {TerraformGrant} from './terraformGrant'
+import {TerraformPrivilegesGrant} from './terraformPrivilegesGrant'
 import {GrantKind} from '../../grants/grant'
 import {TerraformVirtualWarehouse} from './terraformVirtualWarehouse'
 import {immerable} from 'immer'
@@ -11,7 +11,7 @@ import {Role} from '../../roles/role'
 import {TerraformResource} from './terraformResource'
 import {compact} from 'lodash'
 
-export class TerraformVirtualWarehouseGrant extends TerraformGrant {
+export class TerraformVirtualWarehouseGrant extends TerraformPrivilegesGrant {
   [immerable] = true
 
   kind: GrantKind = 'virtual_warehouse'

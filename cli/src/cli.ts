@@ -20,7 +20,7 @@ import {
   getConnectionOptionsFromEnv,
   SnowflakeConnector
 } from 'roleout-lib/build/snowflakeConnector'
-import {isTerraformGrant} from 'roleout-lib/build/backends/terraform/terraformGrant'
+import {isTerraformGrant} from 'lib/backends/terraform/terraformPrivilegesGrant'
 import {isSchemaObjectGrant} from 'roleout-lib/build/grants/grant'
 import {Privilege} from 'roleout-lib/build/privilege'
 import {AccessRole} from 'roleout-lib/build/roles/accessRole'

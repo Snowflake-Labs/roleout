@@ -1,4 +1,4 @@
-import {TerraformGrant} from './terraformGrant'
+import {TerraformPrivilegesGrant} from './terraformPrivilegesGrant'
 import {immerable} from 'immer'
 import {GrantKind} from '../../grants/grant'
 import {NamingConvention} from '../../namingConvention'
@@ -13,7 +13,7 @@ import {TerraformResource} from './terraformResource'
 import {compact} from 'lodash'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
 
-export class TerraformSchemaGrant extends TerraformGrant {
+export class TerraformSchemaGrant extends TerraformPrivilegesGrant {
   [immerable] = true
 
   kind: GrantKind = 'schema'

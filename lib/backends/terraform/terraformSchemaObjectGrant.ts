@@ -1,5 +1,5 @@
 import {immerable} from 'immer'
-import {TerraformGrant} from './terraformGrant'
+import {TerraformPrivilegesGrant} from './terraformPrivilegesGrant'
 import {SchemaObjectGrant, SchemaObjectGrantKind} from '../../grants/schemaObjectGrant'
 import {NamingConvention} from '../../namingConvention'
 import {TerraformBackend} from '../terraformBackend'
@@ -14,7 +14,7 @@ import {TerraformResource} from './terraformResource'
 import {NO_SHARES_IN_ID_RESOURCES} from './terraformVersion'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
 
-export class TerraformSchemaObjectGrant extends TerraformGrant {
+export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
   [immerable] = true
 
   kind: SchemaObjectGrantKind
@@ -81,6 +81,7 @@ export class TerraformSchemaObjectGrant extends TerraformGrant {
   }
 
   resourceID(): string {
+    // format is role_name (string) | privileges (comma-delimited string) | all_privileges (bool) |with_grant_option (bool) | on_account (bool) | on_account_object (bool) | on_schema (bool) | on_schema_object (bool) | all (bool) | future (bool) | object_type (string) | object_name (string) | object_type_plural (string) | in_schema (bool) | schema_name (string) | in_database (bool) | database_name (string)
     if (['function', 'procedure'].includes(this.kind)) {
       //database_name|schema_name|object_name|argument_data_types|privilege|with_grant_option|on_future|roles
       //FIXME this can't currently actually grant on a specific procedure/function because we don't collect argument types

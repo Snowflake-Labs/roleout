@@ -15,7 +15,7 @@ import {TerraformSchema} from './terraform/terraformSchema'
 import {TerraformVirtualWarehouse} from './terraform/terraformVirtualWarehouse'
 import {TerraformRole} from './terraform/terraformRole'
 import {TerraformRoleGrants} from './terraform/terraformRoleGrants'
-import {TerraformGrant} from './terraform/terraformGrant'
+import {TerraformPrivilegesGrant} from './terraform/terraformPrivilegesGrant'
 import {TerraformSchemaObjectGrant} from './terraform/terraformSchemaObjectGrant'
 import {TerraformSchemaGrant} from './terraform/terraformSchemaGrant'
 import {TerraformVirtualWarehouseGrant} from './terraform/terraformVirtualWarehouseGrant'
@@ -74,14 +74,14 @@ provider "snowflake" {
     })
   }
 
-  rbacResources(deployable: Deployable, environmentManagerRole: Role): (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformGrant)[] {
+  rbacResources(deployable: Deployable, environmentManagerRole: Role): (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformPrivilegesGrant)[] {
     // Reduce multiple grants on the same object into 1 Terraform grant resource
-    function reduceGrants(grantMap: Map<GrantKind, TerraformGrant[]>) {
-      let reducedGrants: TerraformGrant[] = []
+    function reduceGrants(grantMap: Map<GrantKind, TerraformPrivilegesGrant[]>) {
+      let reducedGrants: TerraformPrivilegesGrant[] = []
       for (const grants of grantMap.values()) {
         if (grants.length > 0) {
           // build a map of all the grants that differ only in their role
-          const uniqueGrantMap: Map<string, TerraformGrant[]> = new Map()
+          const uniqueGrantMap: Map<string, TerraformPrivilegesGrant[]> = new Map()
           for (const grant of grants) {
             if (!uniqueGrantMap.has(grant.uniqueKey())) uniqueGrantMap.set(grant.uniqueKey(), [])
             uniqueGrantMap.get(grant.uniqueKey())?.push(grant)
@@ -100,8 +100,8 @@ provider "snowflake" {
       return reducedGrants
     }
 
-    let resources: (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformGrant)[] = []
-    const grantMap: Map<GrantKind, TerraformGrant[]> = new Map()
+    let resources: (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformPrivilegesGrant)[] = []
+    const grantMap: Map<GrantKind, TerraformPrivilegesGrant[]> = new Map()
 
     // build a data structure of database -> schema -> kind = on_all ownership grant
     const onAllOwnershipLookup: Record<string, Record<string, Record<string, TerraformSchemaObjectGrant>>> = {}
@@ -191,7 +191,7 @@ provider "snowflake" {
     ]))
   }
 
-  private static generateGrantResource(grant: Grant, dependsOn: TerraformResource[] = []): TerraformGrant | null {
+  private static generateGrantResource(grant: Grant, dependsOn: TerraformResource[] = []): TerraformPrivilegesGrant | null {
     if (SchemaObjectGrantKinds.includes(grant.kind))
       return TerraformSchemaObjectGrant.fromSchemaObjectGrant(grant as SchemaObjectGrant, dependsOn)
 
