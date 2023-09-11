@@ -1,5 +1,4 @@
 import {TerraformPrivilegesGrant} from './terraformPrivilegesGrant'
-import {immerable} from 'immer'
 import {GrantKind} from '../../grants/grant'
 import {NamingConvention} from '../../namingConvention'
 import {TerraformBackend} from '../terraformBackend'
@@ -12,45 +11,23 @@ import {Role} from '../../roles/role'
 import {TerraformResource} from './terraformResource'
 import {compact} from 'lodash'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
+import {Privilege} from '../../privilege'
+
+export type Props = {
+  allPrivileges?: boolean
+  privileges?: Privilege[]
+  withGrantOption?: boolean
+  dependsOn?: TerraformResource[]
+}
 
 export class TerraformSchemaGrant extends TerraformPrivilegesGrant {
-  [immerable] = true
-
-  kind: GrantKind = 'schema'
-  database: TerraformDatabase
   schema: TerraformSchema
-  privilege: string
-  toRoles: Role[]
-  toTerraformRoles: TerraformRole[]
-  dependsOn: TerraformResource[]
-  onFuture: boolean
-  onAll: boolean
+  props: Props
 
-  constructor(database: TerraformDatabase, schema: TerraformSchema, privilege: string, toRoles: Role[], toTerraformRoles: TerraformRole[], dependsOn: TerraformResource[] = [], onFuture = false, onAll = false) {
-    super()
-    this.database = database
+  constructor(role: Role | TerraformRole, schema: TerraformSchema, props: Props) {
+    super(role)
     this.schema = schema
-    this.privilege = privilege
-    this.toRoles = toRoles
-    this.toTerraformRoles = toTerraformRoles
-    this.dependsOn = dependsOn
-    this.onFuture = onFuture
-    this.onAll = onAll
-  }
-
-  uniqueKey(): string {
-    return [
-      this.kind,
-      this.database.name,
-      this.schema.name,
-      this.privilege,
-      this.onFuture,
-      this.onAll
-    ].join('|')
-  }
-
-  resourceType(): string {
-    return 'snowflake_schema_grant'
+    this.props = props
   }
 
   resourceName(namingConvention: NamingConvention): string {

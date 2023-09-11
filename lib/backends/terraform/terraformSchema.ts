@@ -49,6 +49,10 @@ export class TerraformSchema implements TerraformResource, SchemaOptions {
     ]).join('\n')
   }
 
+  qualifiedName(): string {
+    return `"${this.database.name}"."${this.name}"`
+  }
+
   static fromSchema(schema: Schema): TerraformSchema {
     return new TerraformSchema(schema.name, TerraformDatabase.fromDatabase(schema.database), schema.managedAccess, schema.transient, schema.dataRetentionTimeInDays)
   }

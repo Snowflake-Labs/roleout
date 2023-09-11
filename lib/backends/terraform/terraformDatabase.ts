@@ -44,3 +44,7 @@ export class TerraformDatabase implements TerraformResource, DatabaseOptions {
   }
 }
 
+export function isTerraformDatabase(obj: Database | TerraformDatabase): obj is TerraformDatabase {
+  return 'resourceType' in obj && obj.resourceType() === 'snowflake_database'
+}
+

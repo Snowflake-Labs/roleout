@@ -1,10 +1,5 @@
 import {TerraformResource} from './terraformResource'
-import {immerable} from 'immer'
 import {NamingConvention} from '../../namingConvention'
-import {
-  Grant,
-  GrantKind, isSchemaObjectGrant
-} from '../../grants/grant'
 import {Role} from '../../roles/role'
 import {TerraformRole} from './terraformRole'
 import {Privilege} from '../../privilege'
@@ -12,6 +7,8 @@ import {SchemaObjectType, SnowflakeObjectType} from '../../objects/objects'
 import {TerraformDatabase} from './terraformDatabase'
 import {TerraformVirtualWarehouse} from './terraformVirtualWarehouse'
 import {TerraformSchema} from './terraformSchema'
+import {TerraformBackend} from '../terraformBackend'
+import compact from 'lodash/compact'
 
 export type TerraformAccountObject = TerraformDatabase | TerraformVirtualWarehouse
 
@@ -39,6 +36,31 @@ export type OnSchemaObject = {
   future?: OnSchemaObjectFuture
 }
 
+export function onAccountObjectResourceBlock(obj: OnAccountObject, indents: number): string {
+  const spacing = TerraformBackend.SPACING
+  const indentation = spacing.repeat(indents)
+  return [
+    'on_account_object {',
+    spacing + `object_type = "${obj.objectType}"`,
+    spacing + `object_name = ${obj.object.resourceName}`,
+    '}'
+  ].map(line => indentation + line).join('\n')
+}
+
+export function onSchemaResourceBlock(onSchema: OnSchema, indents: number): string {
+  const spacing = TerraformBackend.SPACING
+  const indentation = spacing.repeat(indents)
+  return compact([
+    'on_schema {',
+    onSchema.allSchemasInDatabase ? `all_schemas_in_database = snowflake_database.${onSchema.allSchemasInDatabase.resourceName()}.name` : null,
+    onSchema.futureSchemasInDatabase ? `future_schemas_in_database = snowflake_database.${onSchema.futureSchemasInDatabase.resourceName()}.name` : null,
+    onSchema.schema ? spacing + `schema_name = ${onSchema.schema.qualifiedName()}` : null,
+    '}'
+  ]).map(line => indentation + line).join('\n')
+}
+
+
+/*
 export type Props = {
   allPrivileges?: boolean
   onAccount?: boolean
@@ -47,33 +69,25 @@ export type Props = {
   onSchemaObject?: OnSchemaObject
   privileges?: Privilege[]
   withGrantOption?: boolean
+  dependsOn?: TerraformResource[]
 }
 
+ */
+
 export abstract class TerraformPrivilegesGrant implements TerraformResource {
-  [immerable] = true
-
-  type = 'TerraformPrivilegesGrant'
   role: TerraformRole | Role
-  props: Props
 
-  protected constructor(role: TerraformRole | Role, props: Props) {
+  protected constructor(role: TerraformRole | Role) {
     this.role = role
-    this.props = props
   }
 
   resourceType(): string {
     return 'snowflake_grant_privileges_to_role'
   }
 
-  resourceID(): string
+  abstract resourceID(): string
 
-  resourceBlock(namingConvention: NamingConvention): string
-
-  uniqueKey(): string
+  abstract resourceBlock(namingConvention: NamingConvention): string
 
   abstract resourceName(namingConvention: NamingConvention): string
-}
-
-export function isTerraformPrivilegesGrant(obj: any): obj is TerraformPrivilegesGrant {
-  return 'kind' in obj && obj.type === 'TerraformPrivilegesGrant'
 }
