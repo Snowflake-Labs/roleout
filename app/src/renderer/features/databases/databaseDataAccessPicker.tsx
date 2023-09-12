@@ -4,11 +4,10 @@ import {useTheme} from '@mui/material'
 import {styled} from '@mui/material/styles'
 import UnstyledTableCell, {tableCellClasses} from '@mui/material/TableCell'
 import {useAppDispatch} from '../../app/hooks'
-import {setSchemaAccess} from './databasesSlice'
+import {setDatabaseAccess} from './databasesSlice'
 
 type Props = {
   databaseName: string
-  schemaName: string
   functionalRoleName: string
   state?: DataAccessLevel
   environmentName?: string
@@ -28,16 +27,16 @@ const TableCell = styled(UnstyledTableCell)(({theme}) => ({
 }))
 
 
-const DataAccessPicker: FunctionComponent<Props> = ({databaseName, schemaName, functionalRoleName, environmentName, state}) => {
+const DatabaseDataAccessPicker: FunctionComponent<Props> = ({databaseName, functionalRoleName, environmentName, state}) => {
   const dispatch = useAppDispatch()
   const theme = useTheme()
 
   const setState = (newState: DataAccessLevel | null) => {
-    dispatch(setSchemaAccess({database: databaseName, schema: schemaName, role: functionalRoleName, level: newState, environment: environmentName}))
+    dispatch(setDatabaseAccess({database: databaseName, role: functionalRoleName, level: newState, environment: environmentName}))
   }
 
   const handleClick = () => {
-    if(state === DataAccessLevel.Full) {
+    if(state === DataAccessLevel.ReadWrite) {
       setState(null)
     } else if(state === undefined) {
       setState(DataAccessLevel.Read)
@@ -66,12 +65,8 @@ const DataAccessPicker: FunctionComponent<Props> = ({databaseName, schemaName, f
       </TableCell>
     )
   case DataAccessLevel.Full:
-    return (
-      <TableCell onClick={handleClick} sx={{backgroundColor: theme.palette.warning.main}}>
-        Full
-      </TableCell>
-    )
+    throw new Error('Full access on databases is unsupported')
   }
 }
 
-export default memo(DataAccessPicker)
+export default memo(DatabaseDataAccessPicker)

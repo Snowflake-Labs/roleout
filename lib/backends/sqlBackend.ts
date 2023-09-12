@@ -341,6 +341,10 @@ Foreach-Object {
 
       // drop all schema ARS
       for (const database of deployable.databases) {
+        for (const accessRole of database.accessRoles(deployable.namingConvention)) {
+          statements.push(`DROP ROLE IF EXISTS "${accessRole.name}";`)
+        }
+
         for (const schema of database.schemata) {
           for (const accessRole of schema.accessRoles(deployable.namingConvention)) {
             statements.push(`DROP ROLE IF EXISTS "${accessRole.name}";`)
