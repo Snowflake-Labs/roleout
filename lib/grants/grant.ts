@@ -4,8 +4,6 @@ import {SchemaObjectGrant, SchemaObjectGrantKind} from './schemaObjectGrant'
 import {SchemaGrant} from './schemaGrant'
 import {DatabaseGrant} from './databaseGrant'
 import {VirtualWarehouseGrant} from './virtualWarehouseGrant'
-import {DatabaseSchemaObjectsGrant} from './databaseSchemaObjectsGrant'
-import {DatabaseSchemataGrant} from './databaseSchemataGrant'
 
 export type GrantType = 'DatabaseSchemaObjectsGrant' | 'DatabaseSchemataGrant' | 'SchemaObjectGrant' | 'SchemaGrant' | 'DatabaseGrant' | 'VirtualWarehouseGrant'
 export type GrantKind = SchemaObjectGrantKind | 'schema' | 'database' | 'virtual_warehouse'
@@ -27,14 +25,6 @@ export function isSchemaGrant(obj: Grant): obj is SchemaGrant {
 
 export function isDatabaseGrant(obj: Grant): obj is DatabaseGrant {
   return 'type' in obj && obj.type === 'DatabaseGrant'
-}
-
-export function isDatabaseSchemataGrant(obj: Grant): obj is DatabaseSchemataGrant {
-  return 'type' in obj && obj.type === 'DatabaseSchemataGrant'
-}
-
-export function isDatabaseSchemaObjectsGrant(obj: Grant): obj is DatabaseSchemaObjectsGrant {
-  return 'type' in obj && obj.type === 'DatabaseSchemaObjectsGrant'
 }
 
 export function isVirtualWarehouseGrant(obj: Grant): obj is VirtualWarehouseGrant {

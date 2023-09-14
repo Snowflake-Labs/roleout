@@ -120,6 +120,7 @@ const ProjectAccess = () => {
               {functionalRoles.map(functionalRole => (
                 <SchemaDataAccessPicker key={functionalRole.name} databaseName={database.name} schemaName={schema.name}
                   functionalRoleName={functionalRole.name} environmentName={environment?.name}
+                  databaseState={database.access[functionalRole.name]?.find(a => a.environment === environment?.name)?.level}
                   state={schema.access[functionalRole.name]?.find(a => a.environment === environment?.name)?.level}/>
               ))}
             </TableRow>

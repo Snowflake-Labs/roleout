@@ -36,7 +36,7 @@ export class Database implements DatabaseOptions {
   }
 
   accessRoles(namingConvention: NamingConvention): DatabaseAccessRole[] {
-    return [DataAccessLevel.Read, DataAccessLevel.ReadWrite].map(
+    return [DataAccessLevel.Read, DataAccessLevel.ReadWrite, DataAccessLevel.Full].map(
       (level) => new DatabaseAccessRole(this, level, namingConvention)
     )
   }

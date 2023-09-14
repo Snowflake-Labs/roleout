@@ -27,18 +27,28 @@ const TableCell = styled(UnstyledTableCell)(({theme}) => ({
 }))
 
 
-const DatabaseDataAccessPicker: FunctionComponent<Props> = ({databaseName, functionalRoleName, environmentName, state}) => {
+const DatabaseDataAccessPicker: FunctionComponent<Props> = ({
+  databaseName,
+  functionalRoleName,
+  environmentName,
+  state
+}) => {
   const dispatch = useAppDispatch()
   const theme = useTheme()
 
   const setState = (newState: DataAccessLevel | null) => {
-    dispatch(setDatabaseAccess({database: databaseName, role: functionalRoleName, level: newState, environment: environmentName}))
+    dispatch(setDatabaseAccess({
+      database: databaseName,
+      role: functionalRoleName,
+      level: newState,
+      environment: environmentName
+    }))
   }
 
   const handleClick = () => {
-    if(state === DataAccessLevel.ReadWrite) {
+    if (state === DataAccessLevel.Full) {
       setState(null)
-    } else if(state === undefined) {
+    } else if (state === undefined) {
       setState(DataAccessLevel.Read)
     } else {
       setState(state + 1)
@@ -48,7 +58,7 @@ const DatabaseDataAccessPicker: FunctionComponent<Props> = ({databaseName, funct
   switch (state) {
   case undefined:
     return (
-      <TableCell onClick={handleClick} >
+      <TableCell onClick={handleClick}>
         &nbsp;
       </TableCell>
     )
@@ -65,7 +75,11 @@ const DatabaseDataAccessPicker: FunctionComponent<Props> = ({databaseName, funct
       </TableCell>
     )
   case DataAccessLevel.Full:
-    throw new Error('Full access on databases is unsupported')
+    return (
+      <TableCell onClick={handleClick} sx={{backgroundColor: theme.palette.warning.main}}>
+        Full
+      </TableCell>
+    )
   }
 }
 

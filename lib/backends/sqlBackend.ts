@@ -1,10 +1,8 @@
 import {Backend} from './backend'
 import {SchemaGrant} from '../grants/schemaGrant'
-import {DatabaseGrant} from '../grants/databaseGrant'
 import {
   Grant,
   isDatabaseGrant,
-  isDatabaseSchemaObjectsGrant, isDatabaseSchemataGrant,
   isSchemaGrant,
   isSchemaObjectGrant,
   isVirtualWarehouseGrant
@@ -38,17 +36,8 @@ export class SQLBackend extends Backend {
       return sql + ';'
     }
 
-    if (isDatabaseSchemataGrant(grant)) {
-      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} SCHEMAS IN DATABASE "${grant.database.name}" TO ROLE "${accessRoleName}";`
-    }
-
     if (isDatabaseGrant(grant)) {
       return `GRANT ${grant.privilege} ON DATABASE "${grant.database.name}" TO ROLE "${accessRoleName}";`
-    }
-
-    if (isDatabaseSchemaObjectsGrant(grant)) {
-      const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
-      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN DATABASE "${grant.database.name}" TO ROLE "${accessRoleName}";`
     }
 
     if (isVirtualWarehouseGrant(grant)) {

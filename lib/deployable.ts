@@ -87,13 +87,15 @@ export abstract class Deployable {
       const databaseAccessRoles = database.accessRoles(this.namingConvention)
       const databaseReadAccessRole = databaseAccessRoles.find((dar) => dar.accessLevel === DataAccessLevel.Read)
       const databaseReadWriteAccessRole = databaseAccessRoles.find((dar) => dar.accessLevel === DataAccessLevel.ReadWrite)
+      const databaseFullAccessRole = databaseAccessRoles.find((dar) => dar.accessLevel === DataAccessLevel.Full)
 
-      if (!databaseReadAccessRole || !databaseReadWriteAccessRole) {
+      if (!databaseReadAccessRole || !databaseReadWriteAccessRole || !databaseFullAccessRole) {
         throw new Error('Missing database access role')
       }
 
       roleMap.set(databaseReadAccessRole, [])
       roleMap.set(databaseReadWriteAccessRole, [])
+      roleMap.set(databaseFullAccessRole, [])
 
       for (const schema of database.schemata) {
         for (const schemaAccessRole of schema.accessRoles(this.namingConvention)) {
@@ -101,6 +103,8 @@ export abstract class Deployable {
             roleMap.get(databaseReadAccessRole)?.push(schemaAccessRole)
           } else if (schemaAccessRole.accessLevel === DataAccessLevel.ReadWrite) {
             roleMap.get(databaseReadWriteAccessRole)?.push(schemaAccessRole)
+          } else if (schemaAccessRole.accessLevel === DataAccessLevel.Full) {
+            roleMap.get(databaseFullAccessRole)?.push(schemaAccessRole)
           }
         }
       }
