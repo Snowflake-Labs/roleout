@@ -26,7 +26,7 @@ enum BackendType {
 const ProjectDeploy: FunctionComponent<Record<string, unknown>> = () => {
   const state: RootState = useSelector<RootState, RootState>(identity)
 
-  const [selectedBackend, setSelectedBackend] = useState<BackendType>(BackendType.Terraform)
+  const [selectedBackend, setSelectedBackend] = useState<BackendType>(BackendType.SQL)
   const [deploymentPreview, setDeploymentPreview] = useState(new Map<string, string>())
   const [tabIndex, setTabIndex] = useState(0)
 

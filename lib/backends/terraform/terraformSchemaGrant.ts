@@ -69,6 +69,7 @@ export class TerraformSchemaGrant extends TerraformPrivilegesGrant {
   }
 
   static fromSchemaGrant(grant: SchemaGrant, dependsOn: TerraformResource[] = []): TerraformSchemaGrant {
+    if(!grant.schema) throw new Error('Missing schema')
     return new TerraformSchemaGrant(
       TerraformDatabase.fromDatabase(grant.schema.database),
       TerraformSchema.fromSchema(grant.schema),

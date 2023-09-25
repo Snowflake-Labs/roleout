@@ -2,10 +2,11 @@ import YAML, {isMap, isSeq, YAMLMap, YAMLSeq} from 'yaml'
 import {Database, DatabaseOptions, defaultDatabaseOptions} from './objects/database'
 import {defaultSchemaOptions, Schema, SchemaOptions} from './objects/schema'
 import {
-  defaultVirtualWarehouseOptions, parseVirtualWarehouseSize,
+  defaultVirtualWarehouseOptions,
+  parseVirtualWarehouseSize,
   VirtualWarehouse,
   VirtualWarehouseOptions,
-  VirtualWarehouseSize, VirtualWarehouseType
+  VirtualWarehouseType
 } from './objects/virtualWarehouse'
 import {FunctionalRole} from './roles/functionalRole'
 import {DataAccessLevel, parseDataAccessLevel} from './access/dataAccessLevel'
@@ -15,7 +16,7 @@ import {Environment} from './environment'
 import {Deployable} from './deployable'
 import {parseSchemaObjectGroupAccessLevel, SchemaObjectGroupAccessLevel} from './access/schemaObjectGroupAccessLevel'
 import {Table} from './objects/table'
-import {find, includes} from 'lodash'
+import {find} from 'lodash'
 import {SchemaObjectGroup} from './schemaObjectGroup'
 import {View} from './objects/view'
 
@@ -84,9 +85,9 @@ export class Project extends Deployable {
 
   mergeDatabases(databases: Database[]): Project {
     const mergeSchemata = (existingSchemata: Schema[], newSchemata: Schema[]): Schema[] => {
-      for(const newSchema of newSchemata) {
+      for (const newSchema of newSchemata) {
         const existingSchema = find(existingSchemata, s => s.name === newSchema.name)
-        if(!existingSchema) {
+        if (!existingSchema) {
           existingSchemata.push(newSchema)
           continue
         }
@@ -149,9 +150,26 @@ export class Project extends Deployable {
     }
 
     // Databases
-    const schemaAccesses: { databaseName: string, schemaName: string, functionalRoleName: string, environmentName: string | undefined, level: DataAccessLevel }[] = []
+    const databaseAccesses: {
+      databaseName: string,
+      functionalRoleName: string,
+      environmentName: string | undefined,
+      level: DataAccessLevel
+    }[] = []
+    const schemaAccesses: {
+      databaseName: string,
+      schemaName: string,
+      functionalRoleName: string,
+      environmentName: string | undefined,
+      level: DataAccessLevel
+    }[] = []
     const databaseOptions: { databaseName: string, options: DatabaseOptions, environmentName: string }[] = []
-    const schemaOptions: { databaseName: string, schemaName: string, options: SchemaOptions, environmentName: string }[] = []
+    const schemaOptions: {
+      databaseName: string,
+      schemaName: string,
+      options: SchemaOptions,
+      environmentName: string
+    }[] = []
     if (projectMap.has('databases')) {
       for (const databaseMap of (projectMap.get('databases') as YAMLSeq<YAMLMap>).items) {
         const databaseName = databaseMap.get('name') as string
@@ -222,7 +240,58 @@ export class Project extends Deployable {
           }
           const newSchema = new Schema(schemaName, newDatabase, newSchemaOptions)
 
-          // Access
+          // Database Access
+          if (databaseMap.get('access')) {
+            for (const accessMap of (databaseMap.get('access') as YAMLSeq<YAMLMap>).items) {
+              const functionalRoleName = accessMap.get('role') as string
+              const functionalRole = project.findFunctionalRole(functionalRoleName) // throws error if non-existent functional role
+              const levelStr = accessMap.get('level') as string
+              const level = parseDataAccessLevel(levelStr)
+
+              if (project.environments.length > 0) {
+                const environmentName = accessMap.has('env') ? accessMap.get('env') as string : undefined
+                if (!environmentName) {
+                  // apply to all envs
+                  for (const environment of project.environments) {
+                    const envFunctionalRoleName = renderName('functionalRole', project.namingConvention, {
+                      env: environment.name,
+                      name: functionalRoleName
+                    })
+                    const envDatabaseName = renderName('database', project.namingConvention, {
+                      env: environment.name,
+                      name: databaseName
+                    })
+                    databaseAccesses.push({
+                      databaseName: envDatabaseName,
+                      functionalRoleName: envFunctionalRoleName,
+                      environmentName: environment.name,
+                      level
+                    })
+                  }
+                } else {
+                  const envFunctionalRoleName = renderName('functionalRole', project.namingConvention, {
+                    env: environmentName,
+                    name: functionalRoleName
+                  })
+                  const envDatabaseName = renderName('database', project.namingConvention, {
+                    env: environmentName,
+                    name: databaseName
+                  })
+                  databaseAccesses.push({
+                    databaseName: envDatabaseName,
+                    functionalRoleName: envFunctionalRoleName,
+                    environmentName,
+                    level
+                  })
+                }
+              } else {
+                newDatabase.access.set(functionalRole, level)
+              }
+            }
+
+          }
+
+          // Schema Access
           if (schemaMap.get('access')) {
             for (const accessMap of (schemaMap.get('access') as YAMLSeq<YAMLMap>).items) {
               const functionalRoleName = accessMap.get('role') as string
@@ -291,7 +360,12 @@ export class Project extends Deployable {
     }
 
     // Schema Object Groups
-    const schemaObjectGroupAccesses: { schemaObjectGroupName: string, functionalRoleName: string, environmentName: string | undefined, level: SchemaObjectGroupAccessLevel }[] = []
+    const schemaObjectGroupAccesses: {
+      schemaObjectGroupName: string,
+      functionalRoleName: string,
+      environmentName: string | undefined,
+      level: SchemaObjectGroupAccessLevel
+    }[] = []
     if (projectMap.has('schemaObjectGroups')) {
       for (const schemaObjectGroupMap of (projectMap.get('schemaObjectGroups') as YAMLSeq<YAMLMap>).items) {
         const schemaObjectGroupName = schemaObjectGroupMap.get('name') as string
@@ -355,8 +429,17 @@ export class Project extends Deployable {
     }
 
     // Virtual Warehouses
-    const virtualWarehouseAccesses: { virtualWarehouseName: string, functionalRoleName: string, environmentName: string | undefined, level: VirtualWarehouseAccessLevel }[] = []
-    const virtualWarehouseOptions: { virtualWarehouseName: string, options: VirtualWarehouseOptions, environmentName: string }[] = []
+    const virtualWarehouseAccesses: {
+      virtualWarehouseName: string,
+      functionalRoleName: string,
+      environmentName: string | undefined,
+      level: VirtualWarehouseAccessLevel
+    }[] = []
+    const virtualWarehouseOptions: {
+      virtualWarehouseName: string,
+      options: VirtualWarehouseOptions,
+      environmentName: string
+    }[] = []
     if (projectMap.has('virtualWarehouses')) {
       for (const virtualWarehouseMap of (projectMap.get('virtualWarehouses') as YAMLSeq<YAMLMap>).items) {
         const virtualWarehouseName = virtualWarehouseMap.get('name') as string
@@ -506,6 +589,16 @@ export class Project extends Deployable {
           name: fr.name
         })))
 
+      // Database Access
+      for (const access of databaseAccesses.filter(a => a.environmentName === environment.name)) {
+        const database = environment.databases.find(db => db.name === access.databaseName)
+        if (!database) throw new ProjectFileError(`Unexpected database name '${access.databaseName}'`)
+        const functionalRole = environment.functionalRoles.find(fr => fr.name === access.functionalRoleName)
+        if (!functionalRole) throw new ProjectFileError(`Unexpected functional role name '${access.functionalRoleName}'`)
+        database.access.set(functionalRole, access.level)
+      }
+
+      // Schema Access
       for (const access of schemaAccesses.filter(a => a.environmentName === environment.name)) {
         const database = environment.databases.find(db => db.name === access.databaseName)
         if (!database) throw new ProjectFileError(`Unexpected database name '${access.databaseName}'`)

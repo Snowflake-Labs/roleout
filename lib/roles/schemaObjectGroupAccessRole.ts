@@ -13,6 +13,7 @@ import {SchemaObjectGroup} from '../schemaObjectGroup'
 import {flatten, uniq} from 'lodash'
 import {TableGrant} from '../grants/tableGrant'
 import {ViewGrant} from '../grants/viewGrant'
+import compact from 'lodash/compact'
 
 export class SchemaObjectGroupAccessRole implements AccessRole {
   schemaObjectGroup: SchemaObjectGroup
@@ -47,7 +48,7 @@ export class SchemaObjectGroupAccessRole implements AccessRole {
     ).map(schema =>
       new SchemaGrant(schema, Privilege.USAGE, this),
     )
-    const databaseUsageGrants: Grant[] = uniq(schemaUsageGrants.map(g => g.schema.database)).map(db =>
+    const databaseUsageGrants: Grant[] = uniq(compact(schemaUsageGrants.map(g => g.schema?.database))).map(db =>
       new DatabaseGrant(db, Privilege.USAGE, this),
     )
     const tableReadGrants = this.schemaObjectGroup.tables.map(table =>

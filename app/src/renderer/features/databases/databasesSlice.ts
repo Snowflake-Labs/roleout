@@ -40,15 +40,16 @@ const initialState: DatabaseState = []
 type AddSchemaAction = PayloadAction<{ database: string, schema: string, environments: Environment[], optionsSet?: OptionsSet<SchemaOptions> }>
 type RemoveSchemaAction = PayloadAction<{ database: string, schema: string }>
 type RenameSchemaAction = PayloadAction<{ database: string, schema: string, newName: string }>
-type DatabaseAccessAction = PayloadAction<{ database: string, role: string, level: DataAccessLevel | null }>
+type DatabaseAccessAction = PayloadAction<{ database: string, role: string, level: DataAccessLevel | null, environment?: string }>
 type SetSchemaOptionsAction = PayloadAction<{ database: string, schema: string, options: SchemaOptions }>
 type SetSchemaEnvironmentOptionsAction = PayloadAction<{ database: string, schema: string, environmentOptions: EnvironmentOptions<SchemaOptions> }>
 type SchemaAccessAction = PayloadAction<{ database: string, schema: string, role: string, level: DataAccessLevel | null, environment?: string }>
 
 export const databaseFactory = (name: string, _state: Draft<DatabaseState>, environments: Environment[], optionsSet?: OptionsSet<DatabaseOptions>): Draft<Database> => {
-  if (optionsSet) return {name, schemata: [], ...optionsSet}
+  if (optionsSet) return {name, access: {}, schemata: [], ...optionsSet}
   return {
     name,
+    access: {},
     schemata: [],
     options: defaultDatabaseOptions,
     environmentOptions: environments ? defaultEnvironmentsOptions(environments, defaultDatabaseOptions) : {}
@@ -74,9 +75,6 @@ export const databasesSlice = createSlice({
     renameDatabase: crudRename(),
     setDatabaseOptions: crudSetOptions<Database, DatabaseOptions>(),
     setDatabaseEnvironmentOptions: crudSetEnvironmentOptions<Database, DatabaseOptions>(),
-    setDatabaseAccess: (_state, _action: DatabaseAccessAction) => {
-      throw new Error('Not implemented')
-    },
     addSchema: (state, action: AddSchemaAction) => {
       const database = find(state, db => db.name === action.payload.database)
       if (!database) throw new NoSuchDatabaseError(action.payload.database)
@@ -110,6 +108,25 @@ export const databasesSlice = createSlice({
       if (database) {
         const schema = find(database.schemata, s => s.name === action.payload.schema)
         if (schema) schema.environmentOptions = castDraft(action.payload.environmentOptions)
+      }
+    },
+    setDatabaseAccess: (state, action: DatabaseAccessAction) => {
+      const payload = action.payload
+
+      const database = find(state, db => db.name === payload.database)
+      if (!database) throw new NoSuchDatabaseError(payload.database)
+
+      if (!database.access[payload.role]) database.access[payload.role] = []
+
+      if (payload.level === null) {
+        remove(database.access[payload.role], a => a.environment === payload.environment)
+      } else {
+        const access = database.access[payload.role]?.find(a => a.environment === action.payload.environment)
+        if (access) {
+          access.level = payload.level
+        } else {
+          database.access[payload.role].push({level: payload.level, environment: payload.environment})
+        }
       }
     },
     setSchemaAccess: (state, action: SchemaAccessAction) => {
@@ -146,13 +163,19 @@ export const databasesSlice = createSlice({
         }
       }
     })
-      // when an environment is renamed we must rename it in all the schema access objects
+      // when an environment is renamed we must rename it in all the database and schema access objects
       // and transfer environment options
       .addCase(updateEnvironment, (state: Draft<DatabaseState>, action) => {
         const environmentName = action.payload.name
         for (const database of state) {
           database.environmentOptions[action.payload.newName] = database.environmentOptions[environmentName]
           delete database.environmentOptions[environmentName]
+          for (const [, access] of Object.entries(database.access)) {
+            for (const entry of access) {
+              if (entry.environment === environmentName) entry.environment = action.payload.newName
+            }
+          }
+
           for (const schema of database.schemata) {
             schema.environmentOptions[action.payload.newName] = schema.environmentOptions[environmentName]
             delete schema.environmentOptions[environmentName]
@@ -164,11 +187,15 @@ export const databasesSlice = createSlice({
           }
         }
       })
-      // when an environment is removed we must remove the corresponding the schema access objects
+      // when an environment is removed we must remove the corresponding the database and schema access objects
       // and remove environment options
       .addCase(removeEnvironment, (state: Draft<DatabaseState>, action) => {
         for (const database of state) {
           delete database.environmentOptions[action.payload]
+          for (const [, access] of Object.entries(database.access)) {
+            remove(access, a => a.environment === action.payload)
+          }
+
           for (const schema of database.schemata) {
             delete schema.environmentOptions[action.payload]
             for (const [, access] of Object.entries(schema.access)) {
@@ -177,9 +204,14 @@ export const databasesSlice = createSlice({
           }
         }
       })
-      // when a functional role is renamed we must rename it in all the schema access objects
+      // when a functional role is renamed we must rename it in all the database and schema access objects
       .addCase(updateFunctionalRole, (state: Draft<DatabaseState>, action) => {
         for (const database of state) {
+          if (action.payload.name in database.access) {
+            database.access[action.payload.newName] = database.access[action.payload.name]
+            delete database.access[action.payload.name]
+          }
+
           for (const schema of database.schemata) {
             if (action.payload.name in schema.access) {
               schema.access[action.payload.newName] = schema.access[action.payload.name]
@@ -188,9 +220,10 @@ export const databasesSlice = createSlice({
           }
         }
       })
-      // when a functional role is deleted we must remove the corresponding access
+      // when a functional role is deleted we must remove the corresponding database and schema access
       .addCase(removeFunctionalRole, (state: Draft<DatabaseState>, action) => {
         for (const database of state) {
+          if (action.payload in database.access) delete database.access[action.payload]
           for (const schema of database.schemata) {
             if (action.payload in schema.access) delete schema.access[action.payload]
           }
@@ -205,12 +238,12 @@ export const {
   renameDatabase,
   setDatabaseOptions,
   setDatabaseEnvironmentOptions,
-  setDatabaseAccess,
   addSchema,
   removeSchema,
   renameSchema,
   setSchemaOptions,
   setSchemaEnvironmentOptions,
+  setDatabaseAccess,
   setSchemaAccess
 } = databasesSlice.actions
 

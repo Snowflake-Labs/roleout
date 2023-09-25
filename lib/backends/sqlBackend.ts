@@ -1,7 +1,12 @@
 import {Backend} from './backend'
 import {SchemaGrant} from '../grants/schemaGrant'
-import {DatabaseGrant} from '../grants/databaseGrant'
-import {Grant} from '../grants/grant'
+import {
+  Grant,
+  isDatabaseGrant,
+  isSchemaGrant,
+  isSchemaObjectGrant,
+  isVirtualWarehouseGrant
+} from '../grants/grant'
 import {SchemaObjectGrant} from '../grants/schemaObjectGrant'
 import {VirtualWarehouseGrant} from '../grants/virtualWarehouseGrant'
 import {Privilege} from '../privilege'
@@ -21,21 +26,21 @@ export class SQLBackend extends Backend {
       return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${copyCurrentGrants};`
     }
 
-    if (grant.type === 'SchemaObjectGrant') {
+    if (isSchemaObjectGrant(grant)) {
       return schemaObjectGrantSQL(grant as SchemaObjectGrant)
     }
 
-    if (grant instanceof SchemaGrant) {
+    if (isSchemaGrant(grant)) {
       const sql = `GRANT ${grant.privilege} ON SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"`
       if (grant.privilege === Privilege.OWNERSHIP) return sql + ' REVOKE CURRENT GRANTS;'
       return sql + ';'
     }
 
-    if (grant instanceof DatabaseGrant) {
+    if (isDatabaseGrant(grant)) {
       return `GRANT ${grant.privilege} ON DATABASE "${grant.database.name}" TO ROLE "${accessRoleName}";`
     }
 
-    if (grant instanceof VirtualWarehouseGrant) {
+    if (isVirtualWarehouseGrant(grant)) {
       return `GRANT ${grant.privilege} ON WAREHOUSE "${grant.virtualWarehouse.name}" TO ROLE "${accessRoleName}";`
     }
 
@@ -212,8 +217,8 @@ Foreach-Object {
         const ownerGrant: SchemaGrant | VirtualWarehouseGrant | undefined = (role.grants.find(isSchemaOwnerGrant) as SchemaGrant) || (role.grants.find(isVirtualWarehouseOwnerGrant) as VirtualWarehouseGrant) || undefined
         if (ownerGrant) {
           let ownedObjectName = ''
-          if (ownerGrant instanceof SchemaGrant) ownedObjectName = ownerGrant.schema.name
-          if (ownerGrant instanceof VirtualWarehouseGrant) ownedObjectName = ownerGrant.virtualWarehouse.name
+          if (isSchemaGrant(ownerGrant) && ownerGrant.schema) ownedObjectName = ownerGrant.schema.name
+          if (isVirtualWarehouseGrant(ownerGrant)) ownedObjectName = ownerGrant.virtualWarehouse.name
           ownerRoles.push(role)
           statements.push(`-- Create ${ownedObjectName} owner access role`)
           statements.push('USE ROLE USERADMIN;')
@@ -257,6 +262,20 @@ Foreach-Object {
         }
       }
 
+      statements.push('\n')
+
+      // grant access roles to other access roles
+      const accessRoleToAccessRoleMap = deployable.accessRoleToAccessRoleMap()
+      if (accessRoleToAccessRoleMap.size > 0) {
+        statements.push('-- Grant Access Roles to Other Access Roles')
+        statements.push('USE ROLE SECURITYADMIN;')
+      }
+      for (const [toAccessRole, accessRoles] of accessRoleToAccessRoleMap) {
+        for (const accessRole of accessRoles) {
+          statements.push(`GRANT ROLE "${accessRole.name}" TO ROLE "${toAccessRole.name}";`)
+        }
+      }
+      
       return statements.join('\n')
     }
 
@@ -311,6 +330,10 @@ Foreach-Object {
 
       // drop all schema ARS
       for (const database of deployable.databases) {
+        for (const accessRole of database.accessRoles(deployable.namingConvention)) {
+          statements.push(`DROP ROLE IF EXISTS "${accessRole.name}";`)
+        }
+
         for (const schema of database.schemata) {
           for (const accessRole of schema.accessRoles(deployable.namingConvention)) {
             statements.push(`DROP ROLE IF EXISTS "${accessRole.name}";`)
