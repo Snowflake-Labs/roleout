@@ -74,7 +74,7 @@ const SchemaDataAccessPicker: FunctionComponent<Props> = ({
   case DataAccessLevel.Read:
     return (
       <TableCell onClick={handleClick}
-        sx={{backgroundColor: grayedOut ? theme.palette.grey.A400 : theme.palette.warning.main, textDecoration: grayedOut ? 'line-through' : 'none'}}>
+        sx={{backgroundColor: grayedOut ? theme.palette.grey.A400 : theme.palette.primary.main, textDecoration: grayedOut ? 'line-through' : 'none'}}>
         Read
       </TableCell>
     )

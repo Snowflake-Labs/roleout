@@ -247,9 +247,6 @@ export class Project extends Deployable {
               const functionalRole = project.findFunctionalRole(functionalRoleName) // throws error if non-existent functional role
               const levelStr = accessMap.get('level') as string
               const level = parseDataAccessLevel(levelStr)
-              if (level === DataAccessLevel.Full) {
-                throw new Error('Full access on databases is not supported.')
-              }
 
               if (project.environments.length > 0) {
                 const environmentName = accessMap.has('env') ? accessMap.get('env') as string : undefined
