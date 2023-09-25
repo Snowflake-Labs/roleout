@@ -4,6 +4,9 @@ project:
     functionalRole: '{{env}}_{{name}}_ROLE'
   databases:
     - name: PROD_DB
+      access:
+        - role: AUDITOR
+          level: Read
       options:
         dataRetentionTimeInDays: 90
       schemata:
@@ -19,7 +22,7 @@ project:
           options:
             transient: true
             managedAccess: false
-            dataRetentionTimeInDays: 10
+            dataRetentionTimeInDays: 1
           access:
             - role: DATA_ANALYST
               level: Read
@@ -80,3 +83,4 @@ project:
     - name: DATA_ANALYST
     - name: DATA_SCIENTIST
     - name: ELT_TOOL
+    - name: AUDITOR

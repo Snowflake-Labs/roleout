@@ -6,25 +6,30 @@ import {NamingConvention} from './namingConvention'
 import {DeploymentOptions} from './backends/deploymentOptions'
 import {SchemaObjectGroup} from './schemaObjectGroup'
 import {find} from 'lodash'
-import {ProjectFileError} from './project'
 import {Schema} from './objects/schema'
+import {DataAccessLevel} from './access/dataAccessLevel'
 
-abstract class DeployableError extends Error {}
+abstract class DeployableError extends Error {
+}
+
 export class UndefinedObjectError extends DeployableError {
   constructor(objectType: string, name: string) {
     super(`${objectType} '${name}' is not defined in this project`)
   }
 }
+
 export class UndefinedRoleError extends UndefinedObjectError {
   constructor(name: string) {
     super('Role', name)
   }
 }
+
 export class UndefinedDatabaseError extends UndefinedObjectError {
   constructor(name: string) {
     super('Database', name)
   }
 }
+
 export class UndefinedSchemaError extends UndefinedObjectError {
   constructor(name: string) {
     super('Schema', name)
@@ -53,6 +58,7 @@ export abstract class Deployable {
     let accessRoles: AccessRole[] = []
 
     for (const database of this.databases) {
+      accessRoles = accessRoles.concat(database.accessRoles(this.namingConvention))
       for (const schema of database.schemata) {
         accessRoles = accessRoles.concat(
           schema.accessRoles(this.namingConvention)
@@ -60,7 +66,7 @@ export abstract class Deployable {
       }
     }
 
-    for(const schemaObjectGroup of this.schemaObjectGroups) {
+    for (const schemaObjectGroup of this.schemaObjectGroups) {
       accessRoles = accessRoles.concat(schemaObjectGroup.accessRoles(this.namingConvention))
     }
 
@@ -71,6 +77,42 @@ export abstract class Deployable {
     return accessRoles
   }
 
+  /*
+   * Grant access role one-or-more other access roles
+   */
+  accessRoleToAccessRoleMap(): Map<AccessRole, AccessRole[]> {
+    const roleMap = new Map<AccessRole, AccessRole[]>()
+
+    for (const database of this.databases) {
+      const databaseAccessRoles = database.accessRoles(this.namingConvention)
+      const databaseReadAccessRole = databaseAccessRoles.find((dar) => dar.accessLevel === DataAccessLevel.Read)
+      const databaseReadWriteAccessRole = databaseAccessRoles.find((dar) => dar.accessLevel === DataAccessLevel.ReadWrite)
+      const databaseFullAccessRole = databaseAccessRoles.find((dar) => dar.accessLevel === DataAccessLevel.Full)
+
+      if (!databaseReadAccessRole || !databaseReadWriteAccessRole || !databaseFullAccessRole) {
+        throw new Error('Missing database access role')
+      }
+
+      roleMap.set(databaseReadAccessRole, [])
+      roleMap.set(databaseReadWriteAccessRole, [])
+      roleMap.set(databaseFullAccessRole, [])
+
+      for (const schema of database.schemata) {
+        for (const schemaAccessRole of schema.accessRoles(this.namingConvention)) {
+          if (schemaAccessRole.accessLevel === DataAccessLevel.Read) {
+            roleMap.get(databaseReadAccessRole)?.push(schemaAccessRole)
+          } else if (schemaAccessRole.accessLevel === DataAccessLevel.ReadWrite) {
+            roleMap.get(databaseReadWriteAccessRole)?.push(schemaAccessRole)
+          } else if (schemaAccessRole.accessLevel === DataAccessLevel.Full) {
+            roleMap.get(databaseFullAccessRole)?.push(schemaAccessRole)
+          }
+        }
+      }
+    }
+
+    return roleMap
+  }
+
   functionalToAccessRoleMap(): Map<string, AccessRole[]> {
     const roleMap: Map<string, AccessRole[]> = new Map<string, AccessRole[]>()
 
@@ -79,6 +121,17 @@ export abstract class Deployable {
     }
 
     for (const database of this.databases) {
+      const databaseAccessRoles = database.accessRoles(this.namingConvention)
+      for (const [functionalRole, level] of database.access) {
+        const accessRole = databaseAccessRoles.find((dar) => dar.accessLevel === level)
+        if (undefined === accessRole) {
+          throw new Error(
+            `Could not find access role on database '${database.name}' for functional role '${functionalRole.name}'`
+          )
+        }
+        roleMap.get(functionalRole.name)?.push(accessRole)
+      }
+
       for (const schema of database.schemata) {
         const schemaAccessRoles = schema.accessRoles(this.namingConvention)
 
@@ -96,10 +149,10 @@ export abstract class Deployable {
       }
     }
 
-    for(const schemaObjectGroup of this.schemaObjectGroups) {
+    for (const schemaObjectGroup of this.schemaObjectGroups) {
       const schemaObjectGroupAccessRoles = schemaObjectGroup.accessRoles(this.namingConvention)
 
-      for(const [functionalRole, level] of schemaObjectGroup.access) {
+      for (const [functionalRole, level] of schemaObjectGroup.access) {
         const accessRole = schemaObjectGroupAccessRoles.find(sogar => sogar.accessLevel === level)
 
         if (undefined === accessRole) {
@@ -161,9 +214,9 @@ export abstract class Deployable {
 
   findSchema(databaseName: string, schemaName: string): Schema {
     const database = find(this.databases, db => db.name === databaseName)
-    if(!database) throw new UndefinedDatabaseError(databaseName)
+    if (!database) throw new UndefinedDatabaseError(databaseName)
     const schema = find(database.schemata, s => s.name === schemaName)
-    if(!schema) throw new UndefinedSchemaError(schemaName)
+    if (!schema) throw new UndefinedSchemaError(schemaName)
     return schema
   }
 }

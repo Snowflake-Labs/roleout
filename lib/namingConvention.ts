@@ -21,7 +21,7 @@ export const defaultNamingConvention: NamingConvention = {
   schema: '{{name}}',
   functionalRole: '{{env}}_{{name}}_FR',
   virtualWarehouse: '{{env}}_{{name}}_WH',
-  databaseAccessRole: '{{env}}_{{database}}_{{levelShort}}_AR',
+  databaseAccessRole: '{{database}}_{{levelShort}}_AR',
   schemaAccessRole: '{{database}}_{{schema}}_{{levelShort}}_AR',
   schemaObjectGroupAccessRole: '{{identifier}}_{{levelShort}}_AR',
   virtualWarehouseAccessRole: '{{name}}_{{levelShort}}_AR',

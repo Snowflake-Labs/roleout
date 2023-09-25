@@ -41,6 +41,7 @@ export const stateToRoleoutYAML = (state: RootState) => {
     for (const draftDatabase of draft) {
       const newDatabase = {
         name: draftDatabase.name,
+        access: [] as any[],
         schemata: [] as any[],
         options: undefined as any
       }
@@ -54,6 +55,17 @@ export const stateToRoleoutYAML = (state: RootState) => {
         }
       } else if (JSON.stringify(draftDatabase.options) !== JSON.stringify(defaultDatabaseOptions)) {
         newDatabase.options = draftDatabase.options
+      }
+
+      // Database Access
+      for (const [role, access] of Object.entries(draftDatabase.access)) {
+        for (const a of access) {
+          if ((environmentsEnabled && a.environment) || !a.environment) newDatabase.access.push({
+            role: role,
+            level: DataAccessLevel[a.level],
+            env: a.environment
+          })
+        }
       }
 
       // Schemata

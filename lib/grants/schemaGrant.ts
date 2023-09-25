@@ -2,6 +2,7 @@ import { Schema } from '../objects/schema'
 import { Role } from '../roles/role'
 import {Grant, GrantKind, GrantType} from './grant'
 import { Privilege } from '../privilege'
+import {Database} from '../objects/database'
 
 export class SchemaGrant implements Grant {
   schema: Schema

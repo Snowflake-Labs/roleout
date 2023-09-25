@@ -7,9 +7,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
 import {styled} from '@mui/material/styles'
-import DataAccessPicker from '../../../features/databases/dataAccessPicker'
+import SchemaDataAccessPicker from '../../../features/databases/SchemaDataAccessPicker'
 import {useAppSelector} from '../../hooks'
-import {max, range} from 'lodash'
+import {max} from 'lodash'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import {Box, Select, Typography, useTheme} from '@mui/material'
@@ -20,6 +20,7 @@ import FormControl from '@mui/material/FormControl'
 import {SelectChangeEvent} from '@mui/material/Select'
 import SchemaObjectGroupAccessPicker from '../../../features/schemaObjectGroups/schemaObjectGroupAccessPicker'
 import {selectSchemaObjectGroups} from '../../../features/schemaObjectGroups/schemaObjectGroupsSlice'
+import DatabaseDataAccessPicker from '../../../features/databases/databaseDataAccessPicker'
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -104,8 +105,11 @@ const ProjectAccess = () => {
       <React.Fragment key={database.name}>
         <TableRow>
           <TableCell>{database.name}</TableCell>
-          {range(functionalRoles.length + 1).map(i => (
-            <TableCell key={i}></TableCell>
+          <TableCell></TableCell>
+          {functionalRoles.map((functionalRole, i) => (
+            <DatabaseDataAccessPicker key={functionalRole.name} databaseName={database.name}
+              functionalRoleName={functionalRole.name} environmentName={environment?.name}
+              state={database.access[functionalRole.name]?.find(a => a.environment === environment?.name)?.level}/>
           ))}
         </TableRow>
         {database.schemata.map((schema, i) => (
@@ -114,8 +118,9 @@ const ProjectAccess = () => {
               {i === 0 && <TableCell rowSpan={database.schemata.length}></TableCell>}
               <TableCell colSpan={1}>{schema.name}</TableCell>
               {functionalRoles.map(functionalRole => (
-                <DataAccessPicker key={functionalRole.name} databaseName={database.name} schemaName={schema.name}
+                <SchemaDataAccessPicker key={functionalRole.name} databaseName={database.name} schemaName={schema.name}
                   functionalRoleName={functionalRole.name} environmentName={environment?.name}
+                  databaseState={database.access[functionalRole.name]?.find(a => a.environment === environment?.name)?.level}
                   state={schema.access[functionalRole.name]?.find(a => a.environment === environment?.name)?.level}/>
               ))}
             </TableRow>

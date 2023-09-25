@@ -6,7 +6,12 @@ import projectReducer, {
   setEnvironmentsEnabled,
   setName, setSchemaObjectGroupsEnabled
 } from '../features/project/projectSlice'
-import databasesReducer, {addDatabase, addSchema, setSchemaAccess} from '../features/databases/databasesSlice'
+import databasesReducer, {
+  addDatabase,
+  addSchema,
+  setDatabaseAccess,
+  setSchemaAccess
+} from '../features/databases/databasesSlice'
 import schemaObjectGroupsReducer, {
   addSchemaObjectGroup, addTableToSchemaObjectGroup, addViewToSchemaObjectGroup,
   setSchemaObjectGroupAccess
@@ -103,6 +108,35 @@ export const loadRoleoutYAML = (contents: string, dispatch: AppDispatch) => {
         name: databaseName,
         environments, ...objectOptions(databaseMap, environments, Project.getDatabaseOptionsFromYAML, defaultDatabaseOptions)
       }))
+
+      // Database access
+      if (databaseMap.get('access')) {
+        for (const accessMap of (databaseMap.get('access') as YAMLSeq<YAMLMap>).items) {
+          const functionalRoleName = accessMap.get('role') as string
+          const levelStr = accessMap.get('level') as string
+          const level = parseDataAccessLevel(levelStr)
+          const environmentName = accessMap.has('env') ? accessMap.get('env') as string : undefined
+
+          // undefined environment name in YAML means apply to all environments
+          if (!environmentName && environments.length > 0) {
+            for (const environment of environments) {
+              dispatch(setDatabaseAccess({
+                database: databaseName,
+                role: functionalRoleName,
+                environment: environment.name,
+                level
+              }))
+            }
+          } else {
+            dispatch(setDatabaseAccess({
+              database: databaseName,
+              role: functionalRoleName,
+              environment: environmentName,
+              level
+            }))
+          }
+        }
+      }
 
       // Schemata
       for (const schemaMap of (databaseMap.get('schemata') as YAMLSeq<YAMLMap>).items) {
