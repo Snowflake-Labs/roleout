@@ -1,8 +1,11 @@
-import {TerraformPrivilegesGrant} from './terraformPrivilegesGrant'
-import {GrantKind} from '../../grants/grant'
+import {
+  OnAccountObject,
+  onAccountObjectResourceBlock, OnSchema,
+  onSchemaResourceBlock,
+  TerraformPrivilegesGrant
+} from './terraformPrivilegesGrant'
 import {NamingConvention} from '../../namingConvention'
 import {TerraformBackend} from '../terraformBackend'
-import {TerraformDatabase} from './terraformDatabase'
 import {TerraformSchema} from './terraformSchema'
 import {SchemaGrant} from '../../grants/schemaGrant'
 import Mustache from 'mustache'
@@ -15,6 +18,7 @@ import {Privilege} from '../../privilege'
 
 export type Props = {
   allPrivileges?: boolean
+  future?: boolean
   privileges?: Privilege[]
   withGrantOption?: boolean
   dependsOn?: TerraformResource[]
@@ -30,53 +34,53 @@ export class TerraformSchemaGrant extends TerraformPrivilegesGrant {
     this.props = props
   }
 
-  resourceName(namingConvention: NamingConvention): string {
-    return Mustache.render(namingConvention.terraformGrantResourceName, {
-      database: standardizeIdentifierForResource(this.database.name),
-      databaseLower: standardizeIdentifierForResource(this.database.name).toLowerCase(),
-      schema: standardizeIdentifierForResource(this.schema.name),
-      schemaLower: standardizeIdentifierForResource(this.schema.name).toLowerCase(),
-      privilege: this.privilege,
-      privilegeLower: this.privilege.toLowerCase(),
-      kind: 'schema',
-      kindLower: 'schema',
-      future: this.onFuture,
-      onAll: this.onAll
-    })
+  resourceID(): string {
+    return ''
   }
 
-  resourceID(): string {
-    // database_name|schema_name|privilege|with_grant_option|on_future|on_all|roles|shares
-    return `${this.database.name}|${this.schema.name}|${this.privilege}|false|${this.onFuture}|${this.onAll}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
+  resourceName(namingConvention: NamingConvention): string {
+    const standardDatabaseName = standardizeIdentifierForResource(this.schema.database.name)
+    const standardSchemaName = standardizeIdentifierForResource(this.schema.name)
+    const standardRoleName = standardizeIdentifierForResource(this.role.name)
+    return Mustache.render(namingConvention.terraformGrantResourceName, {
+      database: standardDatabaseName,
+      databaseLower: standardDatabaseName.toLowerCase(),
+      schema: standardSchemaName,
+      schemaLower: standardSchemaName.toLowerCase(),
+      role: standardRoleName,
+      roleLower: standardRoleName.toLowerCase(),
+      kind: 'SCHEMA',
+      kindLower: 'schema',
+      future: false,
+      allPrivileges: false
+    })
   }
 
   resourceBlock(namingConvention: NamingConvention): string {
     const spacing = TerraformBackend.SPACING
-    const dependencies = this.toTerraformRoles.map(r => `snowflake_role_grants.role_${r.resourceName().toLowerCase()}_grants`)
-      .concat(this.dependsOn.map(r => `${r.resourceType()}.${r.resourceName(namingConvention)}`))
+    const onSchema: OnSchema = {
+      allSchemasInDatabase: undefined, // currently unsupported
+      futureSchemasInDatabase: undefined, // currently unsupported
+      schema: this.schema
+    }
+    const onSchemaBlock = onSchemaResourceBlock(onSchema, 1)
+    const roleName = 'resourceName' in this.role ? `snowflake_role.${this.role.resourceName()}.name` : `"${this.role.name}"`
 
     return compact([
       `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
-      spacing + `database_name = snowflake_database.${this.database.resourceName()}.name`,
-      spacing + `schema_name = snowflake_schema.${this.schema.resourceName()}.name\n`,
-      spacing + `privilege = "${this.privilege}"`,
-      spacing + `roles = [${this.roleAndRoleResourceStrings().join(', ')}]\n`,
-      this.dependsOn.length > 0 ? spacing + `depends_on = [${dependencies.join(', ')}]\n` : null,
-      spacing + 'with_grant_option = false',
-      spacing + 'enable_multiple_grants = true',
-      '}',
+      spacing + `role_name = ${roleName}`,
+      onSchemaBlock,
+      this.props.privileges ? spacing + `privileges = [${this.props.privileges.map(p => `"${p}"`).join(', ')}]` : null,
+      this.props.allPrivileges ? spacing + 'all_privileges = true' : null,
+      this.props.withGrantOption !== undefined ? spacing + `with_grant_options = ${this.props.withGrantOption}` : null,
+      '}'
     ]).join('\n')
   }
 
-  static fromSchemaGrant(grant: SchemaGrant, dependsOn: TerraformResource[] = []): TerraformSchemaGrant {
-    if(!grant.schema) throw new Error('Missing schema')
-    return new TerraformSchemaGrant(
-      TerraformDatabase.fromDatabase(grant.schema.database),
-      TerraformSchema.fromSchema(grant.schema),
-      grant.privilege,
-      [],
-      [TerraformRole.fromRole(grant.role)],
+  static fromSchemaGrant(grant: SchemaGrant, dependsOn?: TerraformResource[]): TerraformSchemaGrant {
+    return new TerraformSchemaGrant(grant.role, TerraformSchema.fromSchema(grant.schema), {
+      privileges: grant.privileges,
       dependsOn
-    )
+    })
   }
 }

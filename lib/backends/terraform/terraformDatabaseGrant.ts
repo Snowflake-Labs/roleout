@@ -1,4 +1,4 @@
-import {OnAccountObject, onAccountObjectResourceBlock, TerraformPrivilegesGrant} from './terraformPrivilegesGrant'
+import {OnAccountObject} from './terraformPrivilegesGrant'
 import {NamingConvention} from '../../namingConvention'
 import {TerraformDatabase} from './terraformDatabase'
 import {DatabaseGrant} from '../../grants/databaseGrant'
@@ -8,25 +8,14 @@ import {TerraformRole} from './terraformRole'
 import {Role} from '../../roles/role'
 import {TerraformResource} from './terraformResource'
 import {AccountObjectType} from '../../objects/objects'
-import {Privilege} from '../../privilege'
-import {TerraformBackend} from '../terraformBackend'
-import compact from 'lodash/compact'
+import {OnAccountObjectProps, TerraformAccountObjectGrant} from './terraformAccountObjectGrant'
 
-export type Props = {
-  allPrivileges?: boolean
-  privileges?: Privilege[]
-  withGrantOption?: boolean
-  dependsOn?: TerraformResource[]
-}
-
-export class TerraformDatabaseGrant extends TerraformPrivilegesGrant {
+export class TerraformDatabaseGrant extends TerraformAccountObjectGrant {
   database: TerraformDatabase
-  props: Props
 
-  constructor(role: Role | TerraformRole, database: TerraformDatabase, props: Props) {
-    super(role)
+  constructor(role: Role | TerraformRole, database: TerraformDatabase, props: OnAccountObjectProps) {
+    super(role, props)
     this.database = database
-    this.props = props
   }
 
   resourceID(): string {
@@ -42,36 +31,22 @@ export class TerraformDatabaseGrant extends TerraformPrivilegesGrant {
       role: standardRoleName,
       roleLower: standardRoleName.toLowerCase(),
       schema: false,
-      kind: 'database',
+      kind: 'DATABASE',
       kindLower: 'database',
       future: false,
+      allPrivileges: false
     })
   }
 
-  resourceBlock(namingConvention: NamingConvention): string {
-    const spacing = TerraformBackend.SPACING
-    const onAccountObject: OnAccountObject = {
+  onAccountObject(): OnAccountObject  {
+    return {
       object: this.database,
       objectType: AccountObjectType.DATABASE
     }
-
-    const onAccountBlock = onAccountObjectResourceBlock(onAccountObject, 1)
-    const roleName = 'resourceName' in this.role ? `snowflake_role.${this.role.resourceName()}.name` : `"${this.role.name}"`
-
-    return compact([
-      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
-      spacing + `role_name = ${roleName}`,
-      onAccountBlock,
-      this.props.privileges ? spacing + `privileges = [${this.props.privileges.map(p => `"${p}"`).join(', ')}]` : null,
-      this.props.allPrivileges ? spacing + 'all_privileges = true' : null,
-      this.props.withGrantOption !== undefined ? spacing + `with_grant_options = ${this.props.withGrantOption}` : null,
-      '}'
-    ]).join('\n')
   }
-
   static fromDatabaseGrant(grant: DatabaseGrant, dependsOn?: TerraformResource[]): TerraformDatabaseGrant {
     return new TerraformDatabaseGrant(grant.role, TerraformDatabase.fromDatabase(grant.database), {
-      privileges: [grant.privilege],
+      privileges: grant.privileges,
       dependsOn
     })
   }

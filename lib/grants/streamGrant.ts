@@ -9,7 +9,7 @@ export class StreamGrant extends SchemaObjectGrant {
   schema: Schema
   stream?: Stream
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'stream'
@@ -17,7 +17,7 @@ export class StreamGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     stream?: Stream,
     dependsOn?: Grant[]
@@ -26,7 +26,7 @@ export class StreamGrant extends SchemaObjectGrant {
     this.schema = schema
     this.stream = stream
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

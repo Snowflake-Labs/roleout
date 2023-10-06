@@ -13,17 +13,15 @@ import {compact} from 'lodash'
 import {TerraformResource} from './terraformResource'
 import {NO_SHARES_IN_ID_RESOURCES} from './terraformVersion'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
+import {Privilege} from '../../privilege'
 
 export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
-  [immerable] = true
-
   kind: SchemaObjectGrantKind
   objectName?: string
   database: TerraformDatabase
   schema: TerraformSchema
-  privilege: string
-  toRoles: Role[]
-  toTerraformRoles: TerraformRole[]
+  privileges: Privilege[]
+  role: Role | TerraformRole
   onFuture: boolean
   dependsOn: TerraformResource[]
 
@@ -31,21 +29,18 @@ export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
     kind: SchemaObjectGrantKind,
     database: TerraformDatabase,
     schema: TerraformSchema,
-    privilege: string,
-    toRoles: Role[],
-    toTerraformRoles: TerraformRole[],
+    privileges: Privilege[],
+    role: Role | TerraformRole,
     onFuture: boolean,
     dependsOn: TerraformResource[],
     objectName?: string
   ) {
-    super()
+    super(role)
     this.kind = kind
     this.objectName = objectName
     this.database = database
     this.schema = schema
-    this.privilege = privilege
-    this.toRoles = toRoles
-    this.toTerraformRoles = toTerraformRoles
+    this.privileges = privileges
     this.onFuture = onFuture
     this.dependsOn = dependsOn
   }
@@ -156,7 +151,7 @@ export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
       grant.kind,
       TerraformDatabase.fromDatabase(grant.schema.database),
       TerraformSchema.fromSchema(grant.schema),
-      grant.privilege,
+      grant.privileges,
       [],
       [TerraformRole.fromRole(grant.role)],
       grant.future,

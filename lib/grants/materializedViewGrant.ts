@@ -10,7 +10,7 @@ export class MaterializedViewGrant extends SchemaObjectGrant {
   schema: Schema
   materializedView?: View
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'materialized_view'
@@ -18,7 +18,7 @@ export class MaterializedViewGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     materializedView?: MaterializedView,
     dependsOn?: Grant[]
@@ -27,7 +27,7 @@ export class MaterializedViewGrant extends SchemaObjectGrant {
     this.schema = schema
     this.materializedView = materializedView
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

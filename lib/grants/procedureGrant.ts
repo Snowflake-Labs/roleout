@@ -9,7 +9,7 @@ export class ProcedureGrant extends SchemaObjectGrant {
   schema: Schema
   procedure?: Procedure
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'procedure'
@@ -17,7 +17,7 @@ export class ProcedureGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     procedure?: Procedure,
     dependsOn?: Grant[]
@@ -26,7 +26,7 @@ export class ProcedureGrant extends SchemaObjectGrant {
     this.schema = schema
     this.procedure = procedure
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

@@ -9,7 +9,7 @@ export type GrantType = 'DatabaseSchemaObjectsGrant' | 'DatabaseSchemataGrant' |
 export type GrantKind = SchemaObjectGrantKind | 'schema' | 'database' | 'virtual_warehouse'
 
 export interface Grant {
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   type: GrantType
   kind: GrantKind

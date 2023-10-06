@@ -9,7 +9,7 @@ export class ViewGrant extends SchemaObjectGrant {
   schema: Schema
   view?: View
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'view'
@@ -17,7 +17,7 @@ export class ViewGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     view?: View,
     dependsOn?: Grant[]
@@ -26,7 +26,7 @@ export class ViewGrant extends SchemaObjectGrant {
     this.schema = schema
     this.view = view
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

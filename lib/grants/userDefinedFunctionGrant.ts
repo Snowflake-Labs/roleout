@@ -9,7 +9,7 @@ export class UserDefinedFunctionGrant extends SchemaObjectGrant {
   schema: Schema
   func?: UserDefinedFunction
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'function'
@@ -17,7 +17,7 @@ export class UserDefinedFunctionGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     func?: UserDefinedFunction,
     dependsOn?: Grant[]
@@ -26,7 +26,7 @@ export class UserDefinedFunctionGrant extends SchemaObjectGrant {
     this.schema = schema
     this.func = func
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

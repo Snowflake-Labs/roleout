@@ -9,7 +9,7 @@ export class FileFormatGrant extends SchemaObjectGrant {
   schema: Schema
   fileFormat?: FileFormat
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'file_format'
@@ -17,7 +17,7 @@ export class FileFormatGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     fileFormat?: FileFormat,
     dependsOn?: Grant[]
@@ -26,7 +26,7 @@ export class FileFormatGrant extends SchemaObjectGrant {
     this.schema = schema
     this.fileFormat = fileFormat
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

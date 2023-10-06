@@ -9,7 +9,7 @@ export class SequenceGrant extends SchemaObjectGrant {
   schema: Schema
   sequence?: Sequence
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'sequence'
@@ -17,7 +17,7 @@ export class SequenceGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     sequence?: Sequence,
     dependsOn?: Grant[]
@@ -26,7 +26,7 @@ export class SequenceGrant extends SchemaObjectGrant {
     this.schema = schema
     this.sequence = sequence
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

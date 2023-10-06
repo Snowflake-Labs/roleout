@@ -107,7 +107,7 @@ provider "snowflake" {
     const onAllOwnershipLookup: Record<string, Record<string, Record<string, TerraformSchemaObjectGrant>>> = {}
     const allGrants: Grant[] = flatten(deployable.accessRoles().flatMap(ar => ar.grants))
     for (const grant of allGrants) {
-      if (isSchemaObjectGrant(grant) && grant.privilege === Privilege.OWNERSHIP && !grant.future) {
+      if (isSchemaObjectGrant(grant) && grant.privileges === Privilege.OWNERSHIP && !grant.future) {
         set(onAllOwnershipLookup, [grant.schema.database.name, grant.schema.name, grant.kind], TerraformSchemaObjectGrant.fromSchemaObjectGrant(grant))
       }
     }
@@ -125,7 +125,7 @@ provider "snowflake" {
       // all schema object grants must depend on the on_all ownership grants on the same object kind
       for (const grant of accessRole.grants) {
         const dependsOn: TerraformResource[] = [ownershipRole]
-        if (isSchemaObjectGrant(grant) && !(grant.privilege === Privilege.OWNERSHIP && !grant.future)) {
+        if (isSchemaObjectGrant(grant) && !(grant.privileges === Privilege.OWNERSHIP && !grant.future)) {
           const onAllOwnershipGrant = onAllOwnershipLookup[grant.schema.database.name][grant.schema.name][grant.kind]
           if (!onAllOwnershipGrant) throw new Error(`No on_all ownership grant for ${grant.schema.database.name}.${grant.schema.name} ${grant.kind}s`)
           dependsOn.push(onAllOwnershipGrant)

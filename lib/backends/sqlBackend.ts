@@ -21,9 +21,9 @@ export class SQLBackend extends Backend {
   private static generateGrantSQL(grant: Grant, accessRoleName: string): string {
     function schemaObjectGrantSQL(grant: SchemaObjectGrant): string {
       const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
-      const copyCurrentGrants = grant.privilege === Privilege.OWNERSHIP && !grant.future ? ' COPY CURRENT GRANTS' : ''
-      if (grant.objectName()) return `GRANT ${grant.privilege} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
-      return `GRANT ${grant.privilege} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${copyCurrentGrants};`
+      const copyCurrentGrants = grant.privileges === Privilege.OWNERSHIP && !grant.future ? ' COPY CURRENT GRANTS' : ''
+      if (grant.objectName()) return `GRANT ${grant.privileges} ON ${grant.kind.toUpperCase()} "${grant.schema.database.name}"."${grant.schema.name}"."${grant.objectName()}" TO ROLE "${accessRoleName}";`
+      return `GRANT ${grant.privileges} ON ${grant.future ? 'FUTURE' : 'ALL'} ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"${copyCurrentGrants};`
     }
 
     if (isSchemaObjectGrant(grant)) {
@@ -31,17 +31,17 @@ export class SQLBackend extends Backend {
     }
 
     if (isSchemaGrant(grant)) {
-      const sql = `GRANT ${grant.privilege} ON SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"`
-      if (grant.privilege === Privilege.OWNERSHIP) return sql + ' REVOKE CURRENT GRANTS;'
+      const sql = `GRANT ${grant.privileges} ON SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" TO ROLE "${accessRoleName}"`
+      if (grant.privileges === Privilege.OWNERSHIP) return sql + ' REVOKE CURRENT GRANTS;'
       return sql + ';'
     }
 
     if (isDatabaseGrant(grant)) {
-      return `GRANT ${grant.privilege} ON DATABASE "${grant.database.name}" TO ROLE "${accessRoleName}";`
+      return `GRANT ${grant.privileges} ON DATABASE "${grant.database.name}" TO ROLE "${accessRoleName}";`
     }
 
     if (isVirtualWarehouseGrant(grant)) {
-      return `GRANT ${grant.privilege} ON WAREHOUSE "${grant.virtualWarehouse.name}" TO ROLE "${accessRoleName}";`
+      return `GRANT ${grant.privileges} ON WAREHOUSE "${grant.virtualWarehouse.name}" TO ROLE "${accessRoleName}";`
     }
 
     throw new Error(`Unhandled grant type ${grant.constructor}`)
@@ -210,8 +210,8 @@ Foreach-Object {
       if (options?.environmentName) statements.push(`--\n-- ${options?.environmentName} Environment\n--\n`)
 
       // The access role that owns the schema needs to be created and granted ownership before all other access roles
-      const isSchemaOwnerGrant = (grant: Grant): boolean => grant instanceof SchemaGrant && grant.privilege === Privilege.OWNERSHIP
-      const isVirtualWarehouseOwnerGrant = (grant: Grant): boolean => grant instanceof VirtualWarehouseGrant && grant.privilege === Privilege.OWNERSHIP
+      const isSchemaOwnerGrant = (grant: Grant): boolean => grant instanceof SchemaGrant && grant.privileges === Privilege.OWNERSHIP
+      const isVirtualWarehouseOwnerGrant = (grant: Grant): boolean => grant instanceof VirtualWarehouseGrant && grant.privileges === Privilege.OWNERSHIP
       const ownerRoles: AccessRole[] = []
       for (const role of deployable.accessRoles()) {
         const ownerGrant: SchemaGrant | VirtualWarehouseGrant | undefined = (role.grants.find(isSchemaOwnerGrant) as SchemaGrant) || (role.grants.find(isVirtualWarehouseOwnerGrant) as VirtualWarehouseGrant) || undefined

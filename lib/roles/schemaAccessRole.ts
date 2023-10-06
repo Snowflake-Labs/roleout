@@ -46,88 +46,86 @@ export class SchemaAccessRole implements AccessRole {
   private buildGrants(namingConvention: NamingConvention): Grant[] {
     // all other grants depend on the schema ownership being set
     let schemaOwnerGrant: SchemaGrant
-    if(this.accessLevel === DataAccessLevel.Full) {
-      schemaOwnerGrant = new SchemaGrant(this.schema, Privilege.OWNERSHIP, this)
-    } else  {
-      schemaOwnerGrant = new SchemaGrant(this.schema, Privilege.OWNERSHIP, new SchemaAccessRole(this.schema, DataAccessLevel.Full, namingConvention))
+    if (this.accessLevel === DataAccessLevel.Full) {
+      schemaOwnerGrant = new SchemaGrant(this.schema, [Privilege.OWNERSHIP], this)
+    } else {
+      schemaOwnerGrant = new SchemaGrant(this.schema, [Privilege.OWNERSHIP], new SchemaAccessRole(this.schema, DataAccessLevel.Full, namingConvention))
     }
 
-    // stages must have READ granted before WRITE
-    const stageGrantDependencies = [
-      new StageGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new StageGrant(this.schema, true, Privilege.READ, this, undefined, [schemaOwnerGrant]),
-    ]
-
     const readGrants = () => [
-      new DatabaseGrant(this.schema.database, Privilege.USAGE, this),
-      new SchemaGrant(this.schema, Privilege.USAGE, this),
-      new TableGrant(this.schema, false, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
-      new TableGrant(this.schema, true, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
-      new ViewGrant(this.schema, false, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
-      new ViewGrant(this.schema, true, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
-      new SequenceGrant(this.schema, false, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new SequenceGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new StageGrant(this.schema, false, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new StageGrant(this.schema, false, Privilege.READ, this, undefined, [schemaOwnerGrant]),
-      new StageGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new StageGrant(this.schema, true, Privilege.READ, this, undefined, [schemaOwnerGrant]),
-      new FileFormatGrant(this.schema, false, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new FileFormatGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new StreamGrant(this.schema, false, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
-      new StreamGrant(this.schema, true, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
-      new ProcedureGrant(this.schema, false, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new ProcedureGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new UserDefinedFunctionGrant(this.schema, false, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new UserDefinedFunctionGrant(this.schema, true, Privilege.USAGE, this, undefined, [schemaOwnerGrant]),
-      new MaterializedViewGrant(this.schema, false, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
-      new MaterializedViewGrant(this.schema, true, Privilege.SELECT, this, undefined, [schemaOwnerGrant]),
+      new DatabaseGrant(this.schema.database, [Privilege.USAGE], this),
+      new SchemaGrant(this.schema, [Privilege.USAGE], this),
+      new TableGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+      new TableGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+      new ViewGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+      new ViewGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+      new SequenceGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new SequenceGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new StageGrant(this.schema, false, [Privilege.USAGE, Privilege.READ], this, undefined, [schemaOwnerGrant]),
+      new StageGrant(this.schema, true, [Privilege.USAGE, Privilege.READ], this, undefined, [schemaOwnerGrant]),
+      new FileFormatGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new FileFormatGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new StreamGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+      new StreamGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+      new ProcedureGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new ProcedureGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new UserDefinedFunctionGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new UserDefinedFunctionGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+      new MaterializedViewGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+      new MaterializedViewGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
     ]
 
     const readWriteGrants = () =>
-      readGrants().concat([
-        new TableGrant(this.schema, false, Privilege.INSERT, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, false, Privilege.UPDATE, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, false, Privilege.DELETE, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, false, Privilege.REFERENCES, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, true, Privilege.INSERT, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, true, Privilege.UPDATE, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, true, Privilege.DELETE, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, true, Privilege.REFERENCES, this, undefined, [schemaOwnerGrant]),
-        new StageGrant(this.schema, true, Privilege.WRITE, this, undefined, stageGrantDependencies),
-        new StageGrant(this.schema, false, Privilege.WRITE, this, undefined, [schemaOwnerGrant]),
-        new TaskGrant(this.schema, false, Privilege.MONITOR, this, undefined, [schemaOwnerGrant]),
-        new TaskGrant(this.schema, false, Privilege.OPERATE, this, undefined, [schemaOwnerGrant]),
-        new TaskGrant(this.schema, true, Privilege.MONITOR, this, undefined, [schemaOwnerGrant]),
-        new TaskGrant(this.schema, true, Privilege.OPERATE, this, undefined, [schemaOwnerGrant]),
-      ])
+      [
+        new DatabaseGrant(this.schema.database, [Privilege.USAGE], this),
+        new SchemaGrant(this.schema, [Privilege.USAGE], this),
+        new TableGrant(this.schema, false, [Privilege.SELECT, Privilege.INSERT, Privilege.UPDATE, Privilege.DELETE, Privilege.REFERENCES], this, undefined, [schemaOwnerGrant]),
+        new TableGrant(this.schema, true, [Privilege.SELECT, Privilege.INSERT, Privilege.UPDATE, Privilege.DELETE, Privilege.REFERENCES], this, undefined, [schemaOwnerGrant]),
+        new ViewGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+        new ViewGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+        new SequenceGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new SequenceGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new StageGrant(this.schema, false, [Privilege.USAGE, Privilege.READ, Privilege.WRITE], this, undefined, [schemaOwnerGrant]),
+        new StageGrant(this.schema, true, [Privilege.USAGE, Privilege.READ, Privilege.WRITE], this, undefined, [schemaOwnerGrant]),
+        new FileFormatGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new FileFormatGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new StreamGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+        new StreamGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+        new ProcedureGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new ProcedureGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new UserDefinedFunctionGrant(this.schema, false, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new UserDefinedFunctionGrant(this.schema, true, [Privilege.USAGE], this, undefined, [schemaOwnerGrant]),
+        new MaterializedViewGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+        new MaterializedViewGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
+        new TaskGrant(this.schema, false, [Privilege.MONITOR, Privilege.OPERATE], this, undefined, [schemaOwnerGrant]),
+        new TaskGrant(this.schema, true, [Privilege.MONITOR, Privilege.OPERATE], this, undefined, [schemaOwnerGrant]),
+      ]
 
-    const fullGrants = () => {
-      return [
+    const fullGrants = () =>
+      [
         schemaOwnerGrant,
-        new DatabaseGrant(this.schema.database, Privilege.USAGE, this),
-        new SchemaGrant(this.schema, Privilege.USAGE, this),
-        new TableGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new TableGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new ViewGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new ViewGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new SequenceGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new SequenceGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new StageGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new StageGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new FileFormatGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new FileFormatGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new StreamGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new StreamGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new ProcedureGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new ProcedureGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new UserDefinedFunctionGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new UserDefinedFunctionGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new MaterializedViewGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new MaterializedViewGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new TaskGrant(this.schema, false, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-        new TaskGrant(this.schema, true, Privilege.OWNERSHIP, this, undefined, [schemaOwnerGrant]),
-      ].concat(readWriteGrants())
-    }
+        new DatabaseGrant(this.schema.database, [Privilege.USAGE], this),
+        new TableGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new TableGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new ViewGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new ViewGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new SequenceGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new SequenceGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new StageGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new StageGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new FileFormatGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new FileFormatGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new StreamGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new StreamGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new ProcedureGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new ProcedureGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new UserDefinedFunctionGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new UserDefinedFunctionGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new MaterializedViewGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new MaterializedViewGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new TaskGrant(this.schema, false, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+        new TaskGrant(this.schema, true, [Privilege.OWNERSHIP], this, undefined, [schemaOwnerGrant]),
+      ]
 
     switch (this.accessLevel) {
     case DataAccessLevel.Read:

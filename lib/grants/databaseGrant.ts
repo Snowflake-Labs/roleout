@@ -5,14 +5,14 @@ import { Privilege } from '../privilege'
 
 export class DatabaseGrant implements Grant {
   database: Database
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   type: GrantType = 'DatabaseGrant'
   kind: GrantKind = 'database'
 
-  constructor(database: Database, privilege: Privilege, role: Role) {
+  constructor(database: Database, privileges: Privilege[], role: Role) {
     this.database = database
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
   }
 }

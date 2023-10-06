@@ -29,9 +29,9 @@ export const defaultNamingConvention: NamingConvention = {
   terraformGrantResourceName:
     'grant_{{#allPrivileges}}all_{{/allPrivileges}}privileges_on_{{#future}}future_{{/future}}{{databaseLower}}_{{#schema}}_{{schemaLower}}_{{/schema}}{{kindLower}}_to_role_{{role}}',
   terraformGrantVirtualWarehouseResourceName:
-    'grant_{{#allPrivileges}}all_{{/allPrivileges}}privileges_on_warehouse_{{virtualWarehouseLower}}',
-  terraformGrantRoleResourceName: 'role_{{roleLower}}_grants',
-  terraformRoleOwnershipGrantResourceName: 'role_{{roleLower}}_ownership_grant',
+    'grant_{{#allPrivileges}}all_{{/allPrivileges}}privileges_on_warehouse_{{virtualWarehouseLower}}_to_role_{{role}}',
+  terraformGrantRoleResourceName: 'role_{{role}}_grants',
+  terraformRoleOwnershipGrantResourceName: 'role_{{role}}_ownership_grant',
 }
 
 export const renderName = (template: keyof NamingConvention, namingConvention: NamingConvention, view: any) => {

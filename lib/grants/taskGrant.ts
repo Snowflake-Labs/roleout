@@ -9,7 +9,7 @@ export class TaskGrant extends SchemaObjectGrant {
   schema: Schema
   task?: Task
   future: boolean
-  privilege: Privilege
+  privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
   kind: SchemaObjectGrantKind = 'task'
@@ -17,7 +17,7 @@ export class TaskGrant extends SchemaObjectGrant {
   constructor(
     schema: Schema,
     future: boolean,
-    privilege: Privilege,
+    privileges: Privilege[],
     role: Role,
     task?: Task,
     dependsOn?: Grant[]
@@ -26,7 +26,7 @@ export class TaskGrant extends SchemaObjectGrant {
     this.schema = schema
     this.task = task
     this.future = future
-    this.privilege = privilege
+    this.privileges = privileges
     this.role = role
     this.dependsOn = dependsOn
   }

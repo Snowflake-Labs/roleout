@@ -182,11 +182,11 @@ async function revokeFutureGrants(program: Command, opts: RevokeFutureGrantsOpts
     let grants: SchemaObjectGrant[] = accessRoles.flatMap(ar => ar.grants).filter(g => isSchemaObjectGrant(g) && g.future) as SchemaObjectGrant[]
 
     // optionally filter to only ownership grants
-    if(opts.ownershipOnly) grants = grants.filter(g => g.privilege === Privilege.OWNERSHIP)
+    if(opts.ownershipOnly) grants = grants.filter(g => g.privileges === Privilege.OWNERSHIP)
 
     const statements = grants.map(grant => {
       const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
-      return `REVOKE ${grant.privilege} ON FUTURE ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" FROM ROLE "${grant.role.name}";`
+      return `REVOKE ${grant.privileges} ON FUTURE ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" FROM ROLE "${grant.role.name}";`
     })
     statements.unshift('USE ROLE SECURITYADMIN;')
 
