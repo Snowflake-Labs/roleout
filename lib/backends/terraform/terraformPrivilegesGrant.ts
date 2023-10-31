@@ -2,7 +2,7 @@ import {TerraformResource} from './terraformResource'
 import {NamingConvention} from '../../namingConvention'
 import {Role} from '../../roles/role'
 import {TerraformRole} from './terraformRole'
-import {SchemaObjectType, SnowflakeObjectType} from '../../objects/objects'
+import {SchemaObjectType, SchemaObjectTypePlural, SnowflakeObjectType} from '../../objects/objects'
 import {TerraformDatabase} from './terraformDatabase'
 import {TerraformVirtualWarehouse} from './terraformVirtualWarehouse'
 import {TerraformSchema} from './terraformSchema'
@@ -23,14 +23,16 @@ export type OnSchema = {
 }
 
 export type OnSchemaObjectAll = {
-  objectType: SchemaObjectType
-  inDatabase: TerraformDatabase
-  inSchema: TerraformSchema
+  objectTypePlural: SchemaObjectTypePlural
+  inDatabase?: TerraformDatabase
+  inSchema?: TerraformSchema
 }
 
 export type OnSchemaObjectFuture = OnSchemaObjectAll
 
 export type OnSchemaObject = {
+  objectType?: SchemaObjectType
+  objectName?: string
   all?: OnSchemaObjectAll
   future?: OnSchemaObjectFuture
 }
@@ -53,25 +55,45 @@ export function onSchemaResourceBlock(onSchema: OnSchema, indents: number): stri
     'on_schema {',
     onSchema.allSchemasInDatabase ? `all_schemas_in_database = snowflake_database.${onSchema.allSchemasInDatabase.resourceName()}.name` : null,
     onSchema.futureSchemasInDatabase ? `future_schemas_in_database = snowflake_database.${onSchema.futureSchemasInDatabase.resourceName()}.name` : null,
-    onSchema.schema ? spacing + `schema_name = ${onSchema.schema.qualifiedName()}` : null,
+    onSchema.schema ? spacing + `schema_name = "${onSchema.schema.qualifiedName()}"` : null,
     '}'
   ]).map(line => indentation + line).join('\n')
 }
 
-
-/*
-export type Props = {
-  allPrivileges?: boolean
-  onAccount?: boolean
-  onAccountObject?: OnAccountObject
-  onSchema?: OnSchema
-  onSchemaObject?: OnSchemaObject
-  privileges?: Privilege[]
-  withGrantOption?: boolean
-  dependsOn?: TerraformResource[]
+export function onSchemaObjectResourceBlock(onSchemaObject: OnSchemaObject, indents: number): string {
+  const spacing = TerraformBackend.SPACING
+  const indentation = spacing.repeat(indents)
+  return compact([
+    'on_schema_object {',
+    onSchemaObject.all ? onSchemaObjectAllResourceBlock(onSchemaObject.all, indents + 1) : null,
+    '}'
+  ]).map(line => indentation + line).join('\n')
 }
 
- */
+export function onSchemaObjectAllResourceBlock(onSchemaObjectAll: OnSchemaObjectAll, indents: number): string {
+  const spacing = TerraformBackend.SPACING
+  const indentation = spacing.repeat(indents)
+  return compact([
+    'all {',
+    spacing + `object_type_plural = "${onSchemaObjectAll.objectTypePlural}"`,
+    onSchemaObjectAll.inSchema ? spacing + `in_schema = "${onSchemaObjectAll.inSchema.qualifiedName()}"` : null,
+    onSchemaObjectAll.inDatabase ? spacing + `in_database = "${onSchemaObjectAll.inDatabase.name}"` : null,
+    '}'
+  ]).map(line => indentation + line).join('\n')
+}
+
+export function onSchemaObjectFutureResourceBlock(onSchemaObjectFuture: OnSchemaObjectFuture, indents: number): string {
+  const spacing = TerraformBackend.SPACING
+  const indentation = spacing.repeat(indents)
+  return compact([
+    'future {',
+    spacing + `object_type_plural = "${onSchemaObjectFuture.objectTypePlural}"`,
+    onSchemaObjectFuture.inSchema ? spacing + `in_schema = "${onSchemaObjectFuture.inSchema.qualifiedName()}"` : null,
+    onSchemaObjectFuture.inDatabase ? spacing + `in_database = "${onSchemaObjectFuture.inDatabase.name}"` : null,
+    '}'
+  ]).map(line => indentation + line).join('\n')
+}
+
 
 export abstract class TerraformPrivilegesGrant implements TerraformResource {
   role: TerraformRole | Role

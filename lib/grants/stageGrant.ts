@@ -1,9 +1,10 @@
-import { Stage } from '../objects/stage'
-import { Schema } from '../objects/schema'
-import { Role } from '../roles/role'
-import {SchemaObjectGrant, SchemaObjectGrantKind} from './schemaObjectGrant'
-import { Privilege } from '../privilege'
+import {Stage} from '../objects/stage'
+import {Schema} from '../objects/schema'
+import {Role} from '../roles/role'
+import {SchemaObjectGrant} from './schemaObjectGrant'
+import {Privilege} from '../privilege'
 import {Grant} from './grant'
+import {SchemaObjectType} from '../objects/objects'
 
 export class StageGrant extends SchemaObjectGrant {
   schema: Schema
@@ -12,7 +13,7 @@ export class StageGrant extends SchemaObjectGrant {
   privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
-  kind: SchemaObjectGrantKind = 'stage'
+  objectType = SchemaObjectType.STAGE
 
   constructor(
     schema: Schema,

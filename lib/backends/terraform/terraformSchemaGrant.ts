@@ -49,7 +49,7 @@ export class TerraformSchemaGrant extends TerraformPrivilegesGrant {
       schemaLower: standardSchemaName.toLowerCase(),
       role: standardRoleName,
       roleLower: standardRoleName.toLowerCase(),
-      kind: 'SCHEMA',
+      kind: 'schema',
       kindLower: 'schema',
       future: false,
       allPrivileges: false

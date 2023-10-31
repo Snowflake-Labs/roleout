@@ -1,14 +1,15 @@
-import { Database } from '../objects/database'
-import { Role } from '../roles/role'
-import {Grant, GrantKind, GrantType} from './grant'
-import { Privilege } from '../privilege'
+import {Database} from '../objects/database'
+import {Role} from '../roles/role'
+import {Grant, GrantType} from './grant'
+import {Privilege} from '../privilege'
+import {AccountObjectType} from '../objects/objects'
 
 export class DatabaseGrant implements Grant {
   database: Database
   privileges: Privilege[]
   role: Role
   type: GrantType = 'DatabaseGrant'
-  kind: GrantKind = 'database'
+  objectType = AccountObjectType.DATABASE
 
   constructor(database: Database, privileges: Privilege[], role: Role) {
     this.database = database

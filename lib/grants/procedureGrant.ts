@@ -1,9 +1,10 @@
-import { Procedure } from '../objects/procedure'
-import { Schema } from '../objects/schema'
-import { Role } from '../roles/role'
-import { Privilege } from '../privilege'
-import {SchemaObjectGrant, SchemaObjectGrantKind} from './schemaObjectGrant'
+import {Procedure} from '../objects/procedure'
+import {Schema} from '../objects/schema'
+import {Role} from '../roles/role'
+import {Privilege} from '../privilege'
+import {SchemaObjectGrant} from './schemaObjectGrant'
 import {Grant} from './grant'
+import {SchemaObjectType} from '../objects/objects'
 
 export class ProcedureGrant extends SchemaObjectGrant {
   schema: Schema
@@ -12,7 +13,7 @@ export class ProcedureGrant extends SchemaObjectGrant {
   privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
-  kind: SchemaObjectGrantKind = 'procedure'
+  objectType = SchemaObjectType.PROCEDURE
 
   constructor(
     schema: Schema,

@@ -65,7 +65,7 @@ describe('Project', () => {
       }
 
       // Functional Roles
-      expect(project.functionalRoles.map(fr => fr.name)).toEqual(['DATA_ANALYST', 'DATA_SCIENTIST', 'ELT_TOOL'])
+      expect(project.functionalRoles.map(fr => fr.name)).toEqual(['DATA_ANALYST', 'DATA_SCIENTIST', 'ELT_TOOL', 'AUDITOR'])
 
       // Naming Convention
       expect(project.namingConvention.functionalRole).toEqual('{{env}}_{{name}}_ROLE')

@@ -36,13 +36,13 @@ export class VirtualWarehouseAccessRole implements AccessRole {
 
   private buildGrants(): Grant[] {
     const monitorGrants = [
-      new VirtualWarehouseGrant(this.virtualWarehouse, Privilege.MONITOR, this),
+      new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.MONITOR], this),
     ]
 
-    const usageGrants = [new VirtualWarehouseGrant(this.virtualWarehouse, Privilege.USAGE, this)]
+    const usageGrants = [new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.USAGE], this)]
 
     const fullGrants = [
-      new VirtualWarehouseGrant(this.virtualWarehouse, Privilege.OWNERSHIP, this),
+      new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.OWNERSHIP], this),
     ]
 
     switch (this.accessLevel) {

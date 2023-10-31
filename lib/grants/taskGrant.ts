@@ -1,9 +1,10 @@
-import { Task } from '../objects/task'
-import { Schema } from '../objects/schema'
-import { Role } from '../roles/role'
-import { Privilege } from '../privilege'
-import {SchemaObjectGrant, SchemaObjectGrantKind} from './schemaObjectGrant'
+import {Task} from '../objects/task'
+import {Schema} from '../objects/schema'
+import {Role} from '../roles/role'
+import {Privilege} from '../privilege'
+import {SchemaObjectGrant} from './schemaObjectGrant'
 import {Grant} from './grant'
+import {SchemaObjectType} from '../objects/objects'
 
 export class TaskGrant extends SchemaObjectGrant {
   schema: Schema
@@ -12,7 +13,7 @@ export class TaskGrant extends SchemaObjectGrant {
   privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
-  kind: SchemaObjectGrantKind = 'task'
+  objectType = SchemaObjectType.TASK
 
   constructor(
     schema: Schema,

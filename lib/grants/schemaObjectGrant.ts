@@ -2,9 +2,7 @@ import {Schema} from '../objects/schema'
 import {Role} from '../roles/role'
 import {Privilege} from '../privilege'
 import {Grant, GrantType} from './grant'
-
-export const SchemaObjectGrantKinds = ['file_format', 'function', 'materialized_view', 'procedure', 'sequence', 'stage', 'stream', 'table', 'task', 'view']
-export type SchemaObjectGrantKind = typeof SchemaObjectGrantKinds[number]
+import {SchemaObjectType} from '../objects/objects'
 
 export abstract class SchemaObjectGrant implements Grant {
   abstract schema: Schema
@@ -13,7 +11,7 @@ export abstract class SchemaObjectGrant implements Grant {
   abstract role: Role
   abstract dependsOn?: Grant[]
   type: GrantType = 'SchemaObjectGrant'
-  abstract kind: SchemaObjectGrantKind
+  abstract objectType: SchemaObjectType
 
   abstract objectName(): string | undefined
 }

@@ -1,9 +1,10 @@
-import { Sequence } from '../objects/sequence'
-import { Schema } from '../objects/schema'
-import { Role } from '../roles/role'
-import {SchemaObjectGrant, SchemaObjectGrantKind} from './schemaObjectGrant'
-import { Privilege } from '../privilege'
+import {Sequence} from '../objects/sequence'
+import {Schema} from '../objects/schema'
+import {Role} from '../roles/role'
+import {SchemaObjectGrant} from './schemaObjectGrant'
+import {Privilege} from '../privilege'
 import {Grant} from './grant'
+import {SchemaObjectType} from '../objects/objects'
 
 export class SequenceGrant extends SchemaObjectGrant {
   schema: Schema
@@ -12,7 +13,7 @@ export class SequenceGrant extends SchemaObjectGrant {
   privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
-  kind: SchemaObjectGrantKind = 'sequence'
+  objectType = SchemaObjectType.SEQUENCE
 
   constructor(
     schema: Schema,

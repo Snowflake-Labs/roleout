@@ -2,9 +2,10 @@ import {View} from '../objects/view'
 import {Schema} from '../objects/schema'
 import {Role} from '../roles/role'
 import {Privilege} from '../privilege'
-import {SchemaObjectGrant, SchemaObjectGrantKind} from './schemaObjectGrant'
+import {SchemaObjectGrant} from './schemaObjectGrant'
 import {Grant} from './grant'
 import {MaterializedView} from '../objects/materializedView'
+import {SchemaObjectType} from '../objects/objects'
 
 export class MaterializedViewGrant extends SchemaObjectGrant {
   schema: Schema
@@ -13,7 +14,7 @@ export class MaterializedViewGrant extends SchemaObjectGrant {
   privileges: Privilege[]
   role: Role
   dependsOn?: Grant[]
-  kind: SchemaObjectGrantKind = 'materialized_view'
+  objectType = SchemaObjectType.MATERIALIZED_VIEW
 
   constructor(
     schema: Schema,

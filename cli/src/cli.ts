@@ -185,7 +185,7 @@ async function revokeFutureGrants(program: Command, opts: RevokeFutureGrantsOpts
     if(opts.ownershipOnly) grants = grants.filter(g => g.privileges === Privilege.OWNERSHIP)
 
     const statements = grants.map(grant => {
-      const keyword = grant.kind.replace('_', ' ').toUpperCase() + 'S'
+      const keyword = grant.objectType.replace('_', ' ').toUpperCase() + 'S'
       return `REVOKE ${grant.privileges} ON FUTURE ${keyword} IN SCHEMA "${grant.schema.database.name}"."${grant.schema.name}" FROM ROLE "${grant.role.name}";`
     })
     statements.unshift('USE ROLE SECURITYADMIN;')

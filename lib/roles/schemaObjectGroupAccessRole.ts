@@ -46,21 +46,19 @@ export class SchemaObjectGroupAccessRole implements AccessRole {
     const schemaUsageGrants: SchemaGrant[] = uniq(
       this.schemaObjectGroup.tables.map(t => t.schema).concat(this.schemaObjectGroup.views.map(v => v.schema))
     ).map(schema =>
-      new SchemaGrant(schema, Privilege.USAGE, this),
+      new SchemaGrant(schema, [Privilege.USAGE], this),
     )
     const databaseUsageGrants: Grant[] = uniq(compact(schemaUsageGrants.map(g => g.schema?.database))).map(db =>
-      new DatabaseGrant(db, Privilege.USAGE, this),
+      new DatabaseGrant(db, [Privilege.USAGE], this),
     )
     const tableReadGrants = this.schemaObjectGroup.tables.map(table =>
-      new TableGrant(table.schema, false, Privilege.SELECT, this, table)
+      new TableGrant(table.schema, false, [Privilege.SELECT], this, table)
     )
     const tableWriteGrants = flatten(this.schemaObjectGroup.tables.map(table =>
-      [Privilege.INSERT, Privilege.UPDATE, Privilege.DELETE].map(p =>
-        new TableGrant(table.schema, false, p, this, table),
-      )
+      new TableGrant(table.schema, false, [Privilege.INSERT, Privilege.UPDATE, Privilege.DELETE], this, table),
     ))
     const viewReadGrants = this.schemaObjectGroup.views.map(view =>
-      new ViewGrant(view.schema, false, Privilege.SELECT, this, view)
+      new ViewGrant(view.schema, false, [Privilege.SELECT], this, view)
     )
 
     const readGrants = () => flatten(

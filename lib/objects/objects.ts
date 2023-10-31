@@ -5,6 +5,7 @@ export enum AccountObjectType {
   RESOURCE_MONITOR = 'RESOURCE MONITOR',
   WAREHOUSE = 'WAREHOUSE',
   DATABASE = 'DATABASE',
+  SCHEMA = 'SCHEMA',
   INTEGRATION = 'INTEGRATION',
   FAILOVER_GROUP = 'FAILOVER GROUP',
   REPLICATION_GROUP = 'REPLICATION GROUP'
@@ -12,6 +13,7 @@ export enum AccountObjectType {
 
 export enum SchemaObjectType {
   ALERT = 'ALERT',
+  DYNAMIC_TABLE = 'DYNAMIC TABLE',
   EVENT_TABLE = 'EVENT TABLE',
   FILE_FORMAT = 'FILE FORMAT',
   FUNCTION = 'FUNCTION',
@@ -33,9 +35,38 @@ export enum SchemaObjectType {
   MATERIALIZED_VIEW = 'MATERIALIZED VIEW'
 }
 
-export function pluralize(objectType: SnowflakeObjectType): string {
+export enum SchemaObjectTypePlural {
+  ALERTS = 'ALERTS',
+  DYNAMIC_TABLES = 'DYNAMIC TABLES',
+  EVENT_TABLES = 'EVENT TABLES',
+  FILE_FORMATS = 'FILE FORMATS',
+  FUNCTIONS = 'FUNCTIONS',
+  PROCEDURES = 'PROCEDURES',
+  SECRETS = 'SECRETS',
+  SEQUENCES = 'SEQUENCES',
+  PIPES = 'PIPES',
+  MASKING_POLICIES = 'MASKING POLICIES',
+  PASSWORD_POLICIES = 'PASSWORD POLICIES',
+  ROW_ACCESS_POLICIES = 'ROW ACCESS POLICIES',
+  SESSION_POLICIES = 'SESSION POLICIES',
+  TAGS = 'TAGS',
+  STAGES = 'STAGES',
+  STREAMS = 'STREAMS',
+  TABLES = 'TABLES',
+  EXTERNAL_TABLES = 'EXTERNAL TABLES',
+  TASKS = 'TASKS',
+  VIEWS = 'VIEWS',
+  MATERIALIZED_VIEWS = 'MATERIALIZED VIEWS'
+}
+
+export function pluralize(objectType: SchemaObjectType): SchemaObjectTypePlural {
+  let plural = ''
   if(objectType.includes('POLICY')) {
-    return objectType.replace('POLICY', 'POLICIES')
+    plural = objectType.replace('POLICY', 'POLICIES')
+  } else {
+    plural = objectType + 'S'
   }
-  return objectType + 'S'
+  plural = plural.replace(/\s/gi, '_')
+
+  return SchemaObjectTypePlural[plural as keyof typeof SchemaObjectTypePlural]
 }

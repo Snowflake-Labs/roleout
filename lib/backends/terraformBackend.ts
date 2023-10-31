@@ -1,12 +1,11 @@
 import {Backend} from './backend'
 import {SchemaGrant} from '../grants/schemaGrant'
 import {DatabaseGrant} from '../grants/databaseGrant'
-import {Grant, GrantKind, isSchemaObjectGrant} from '../grants/grant'
-import {SchemaObjectGrant, SchemaObjectGrantKinds} from '../grants/schemaObjectGrant'
+import {Grant, isSchemaObjectGrant} from '../grants/grant'
+import {SchemaObjectGrant} from '../grants/schemaObjectGrant'
 import {VirtualWarehouseGrant} from '../grants/virtualWarehouseGrant'
 import {Deployable} from '../deployable'
 import {DeploymentOptions} from './deploymentOptions'
-import produce from 'immer'
 import compact from 'lodash/compact'
 import {Privilege} from '../privilege'
 import {TerraformResource} from './terraform/terraformResource'
@@ -24,6 +23,7 @@ import {Role} from '../roles/role'
 import {TERRAFORM_VERSION} from './terraform/terraformVersion'
 import {TerraformRoleOwnershipGrant} from './terraform/terraformRoleOwnershipGrant'
 import {flatten, set} from 'lodash'
+import {SchemaObjectType} from '../objects/objects'
 
 
 export class TerraformBackend extends Backend {
@@ -75,40 +75,14 @@ provider "snowflake" {
   }
 
   rbacResources(deployable: Deployable, environmentManagerRole: Role): (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformPrivilegesGrant)[] {
-    // Reduce multiple grants on the same object into 1 Terraform grant resource
-    function reduceGrants(grantMap: Map<GrantKind, TerraformPrivilegesGrant[]>) {
-      let reducedGrants: TerraformPrivilegesGrant[] = []
-      for (const grants of grantMap.values()) {
-        if (grants.length > 0) {
-          // build a map of all the grants that differ only in their role
-          const uniqueGrantMap: Map<string, TerraformPrivilegesGrant[]> = new Map()
-          for (const grant of grants) {
-            if (!uniqueGrantMap.has(grant.uniqueKey())) uniqueGrantMap.set(grant.uniqueKey(), [])
-            uniqueGrantMap.get(grant.uniqueKey())?.push(grant)
-          }
-          for (const reduceableGrants of uniqueGrantMap.values()) {
-            reducedGrants = reducedGrants.concat(
-              reduceableGrants.reduce((prev, curr) => {
-                return produce(prev, draft => {
-                  draft.toRoles = draft.toRoles.concat(curr.toRoles)
-                  draft.toTerraformRoles = draft.toTerraformRoles.concat(curr.toTerraformRoles)
-                })
-              }))
-          }
-        }
-      }
-      return reducedGrants
-    }
-
     let resources: (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformPrivilegesGrant)[] = []
-    const grantMap: Map<GrantKind, TerraformPrivilegesGrant[]> = new Map()
 
     // build a data structure of database -> schema -> kind = on_all ownership grant
     const onAllOwnershipLookup: Record<string, Record<string, Record<string, TerraformSchemaObjectGrant>>> = {}
     const allGrants: Grant[] = flatten(deployable.accessRoles().flatMap(ar => ar.grants))
     for (const grant of allGrants) {
-      if (isSchemaObjectGrant(grant) && grant.privileges === Privilege.OWNERSHIP && !grant.future) {
-        set(onAllOwnershipLookup, [grant.schema.database.name, grant.schema.name, grant.kind], TerraformSchemaObjectGrant.fromSchemaObjectGrant(grant))
+      if (isSchemaObjectGrant(grant) && grant.privileges.includes(Privilege.OWNERSHIP) && !grant.future) {
+        set(onAllOwnershipLookup, [grant.schema.database.name, grant.schema.name, grant.objectType], TerraformSchemaObjectGrant.fromSchemaObjectGrant(grant))
       }
     }
 
@@ -125,20 +99,15 @@ provider "snowflake" {
       // all schema object grants must depend on the on_all ownership grants on the same object kind
       for (const grant of accessRole.grants) {
         const dependsOn: TerraformResource[] = [ownershipRole]
-        if (isSchemaObjectGrant(grant) && !(grant.privileges === Privilege.OWNERSHIP && !grant.future)) {
-          const onAllOwnershipGrant = onAllOwnershipLookup[grant.schema.database.name][grant.schema.name][grant.kind]
-          if (!onAllOwnershipGrant) throw new Error(`No on_all ownership grant for ${grant.schema.database.name}.${grant.schema.name} ${grant.kind}s`)
+        if (isSchemaObjectGrant(grant) && !(grant.privileges.includes(Privilege.OWNERSHIP) && !grant.future)) {
+          const onAllOwnershipGrant = onAllOwnershipLookup[grant.schema.database.name][grant.schema.name][grant.objectType]
+          if (!onAllOwnershipGrant) throw new Error(`No on_all ownership grant for ${grant.schema.database.name}.${grant.schema.name} ${grant.objectType}s`)
           dependsOn.push(onAllOwnershipGrant)
         }
 
-        const resource = TerraformBackend.generateGrantResource(grant, dependsOn)
-        if (resource) {
-          if (!grantMap.has(resource.kind)) grantMap.set(resource.kind, [])
-          grantMap.get(resource.kind)?.push(resource)
-        }
+        resources.push(TerraformBackend.generateGrantResource(grant, dependsOn))
       }
     }
-    resources = resources.concat(reduceGrants(grantMap))
 
     // grant access roles to functional roles and manager role
     const accessRoleMap = deployable.accessToFunctionalRoleMap()
@@ -169,7 +138,10 @@ provider "snowflake" {
       // environment manager must be granted to sysadmin before taking ownership of the database, or else ACCOUNTADMIN
       // will not have indirect ownership of the database and will be unable to create schemas
       for (const database of deployable.databases) {
-        resources.push(new TerraformDatabaseGrant(database, Privilege.OWNERSHIP, [], [terraformEnvironmentManagerRole], [grantEnvManagerToSysadmin]))
+        resources.push(new TerraformDatabaseGrant(terraformEnvironmentManagerRole, TerraformDatabase.fromDatabase(database), {
+          privileges: [Privilege.OWNERSHIP],
+          dependsOn: [grantEnvManagerToSysadmin]
+        }))
       }
     }
 
@@ -191,19 +163,19 @@ provider "snowflake" {
     ]))
   }
 
-  private static generateGrantResource(grant: Grant, dependsOn: TerraformResource[] = []): TerraformPrivilegesGrant | null {
-    if (SchemaObjectGrantKinds.includes(grant.kind))
+  private static generateGrantResource(grant: Grant, dependsOn: TerraformResource[] = []): TerraformPrivilegesGrant {
+    if (grant.type === 'SchemaObjectGrant')
       return TerraformSchemaObjectGrant.fromSchemaObjectGrant(grant as SchemaObjectGrant, dependsOn)
 
-    switch (grant.kind) {
-    case 'schema':
+    switch (grant.type) {
+    case 'SchemaGrant':
       return TerraformSchemaGrant.fromSchemaGrant(grant as SchemaGrant, dependsOn)
-    case 'database':
+    case 'DatabaseGrant':
       return TerraformDatabaseGrant.fromDatabaseGrant(grant as DatabaseGrant, dependsOn)
-    case 'virtual_warehouse':
+    case 'VirtualWarehouseGrant':
       return TerraformVirtualWarehouseGrant.fromVirtualWarehouseGrant(grant as VirtualWarehouseGrant, dependsOn)
     default:
-      throw new Error(`Unhandled grant kind ${grant.kind}`)
+      throw new Error(`Unhandled grant kind ${grant.type}`)
     }
   }
 }

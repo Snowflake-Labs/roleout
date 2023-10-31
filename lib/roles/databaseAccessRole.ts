@@ -20,7 +20,7 @@ export class DatabaseAccessRole implements AccessRole {
   ) {
     this.database = database
     this.accessLevel = level
-    this.grants = [new DatabaseGrant(this.database, Privilege.USAGE, this)]
+    this.grants = [new DatabaseGrant(this.database, [Privilege.USAGE], this)]
     this.name = this.generateName(namingConvention)
   }
 

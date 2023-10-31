@@ -1,166 +1,119 @@
-import {immerable} from 'immer'
-import {TerraformPrivilegesGrant} from './terraformPrivilegesGrant'
-import {SchemaObjectGrant, SchemaObjectGrantKind} from '../../grants/schemaObjectGrant'
+import {
+  OnSchemaObject,
+  OnSchemaObjectAll,
+  OnSchemaObjectFuture,
+  onSchemaObjectResourceBlock,
+  TerraformPrivilegesGrant
+} from './terraformPrivilegesGrant'
+import {SchemaObjectGrant} from '../../grants/schemaObjectGrant'
 import {NamingConvention} from '../../namingConvention'
 import {TerraformBackend} from '../terraformBackend'
-import {TerraformDatabase} from './terraformDatabase'
 import {TerraformSchema} from './terraformSchema'
 import Mustache from 'mustache'
 import {TerraformRole} from './terraformRole'
 import {Role} from '../../roles/role'
 import {terraformGrantFromGrant} from './helpers'
-import {compact} from 'lodash'
 import {TerraformResource} from './terraformResource'
-import {NO_SHARES_IN_ID_RESOURCES} from './terraformVersion'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
 import {Privilege} from '../../privilege'
+import {pluralize, SchemaObjectType} from '../../objects/objects'
+import {compact} from 'lodash'
 
+export type Props = {
+  objectType: SchemaObjectType
+  allPrivileges?: boolean
+  all?: boolean
+  future?: boolean
+  privileges?: Privilege[]
+  withGrantOption?: boolean
+  dependsOn?: TerraformResource[]
+}
+
+/**
+ * Grants to all objects of given type in schema
+ */
 export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
-  kind: SchemaObjectGrantKind
-  objectName?: string
-  database: TerraformDatabase
   schema: TerraformSchema
-  privileges: Privilege[]
-  role: Role | TerraformRole
-  onFuture: boolean
-  dependsOn: TerraformResource[]
+  props: Props
 
   constructor(
-    kind: SchemaObjectGrantKind,
-    database: TerraformDatabase,
-    schema: TerraformSchema,
-    privileges: Privilege[],
     role: Role | TerraformRole,
-    onFuture: boolean,
-    dependsOn: TerraformResource[],
-    objectName?: string
+    schema: TerraformSchema,
+    props: Props
   ) {
     super(role)
-    this.kind = kind
-    this.objectName = objectName
-    this.database = database
     this.schema = schema
-    this.privileges = privileges
-    this.onFuture = onFuture
-    this.dependsOn = dependsOn
-  }
-
-  uniqueKey(): string {
-    return compact([
-      this.kind,
-      this.database.name,
-      this.schema.name,
-      this.objectName,
-      this.privilege,
-      this.onFuture ? 'future' : 'current'
-    ]).join('|')
-  }
-
-  resourceType(): string {
-    return `snowflake_${this.kind}_grant`
+    this.props = props
   }
 
   resourceName(namingConvention: NamingConvention): string {
+    const standardDatabaseName = standardizeIdentifierForResource(this.schema.database.name)
+    const standardSchemaName = standardizeIdentifierForResource(this.schema.name)
+    const standardRoleName = standardizeIdentifierForResource(this.role.name)
+    const standardObjectType = this.props.objectType.replace(/\s/gi, '_')
     return Mustache.render(namingConvention.terraformGrantResourceName, {
-      database: standardizeIdentifierForResource(this.database.name),
-      databaseLower: standardizeIdentifierForResource(this.database.name).toLowerCase(),
-      schema: standardizeIdentifierForResource(this.schema.name),
-      schemaLower: standardizeIdentifierForResource(this.schema.name).toLowerCase(),
-      privilege: this.privilege,
-      privilegeLower: this.privilege.toLowerCase(),
-      kind: this.kind + 's',
-      kindLower: this.kind.toLowerCase() + 's',
-      future: this.onFuture,
-      objectName: this.objectName
+      database: standardDatabaseName,
+      databaseLower: standardDatabaseName.toLowerCase(),
+      schema: standardSchemaName,
+      schemaLower: standardSchemaName.toLowerCase(),
+      role: standardRoleName,
+      roleLower: standardRoleName.toLowerCase(),
+      objectType: standardObjectType,
+      objectTypeLower: standardObjectType.toLowerCase(),
+      future: this.props.future,
+      allPrivileges: this.props.allPrivileges
     })
   }
 
   resourceID(): string {
-    // format is role_name (string) | privileges (comma-delimited string) | all_privileges (bool) |with_grant_option (bool) | on_account (bool) | on_account_object (bool) | on_schema (bool) | on_schema_object (bool) | all (bool) | future (bool) | object_type (string) | object_name (string) | object_type_plural (string) | in_schema (bool) | schema_name (string) | in_database (bool) | database_name (string)
-    if (['function', 'procedure'].includes(this.kind)) {
-      //database_name|schema_name|object_name|argument_data_types|privilege|with_grant_option|on_future|roles
-      //FIXME this can't currently actually grant on a specific procedure/function because we don't collect argument types
-      return `${this.database.name}|${this.schema.name}|${this.objectName || ''}||${this.privilege}|false|${this.onFuture}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
-    }
-
-    if (NO_SHARES_IN_ID_RESOURCES.includes(this.kind)) {
-      // no shares and on_all
-      //database_name|schema_name|object_name|privilege|with_grant_option|on_future|on_all|roles
-      return `${this.database.name}|${this.schema.name}|${this.objectName || ''}|${this.privilege}|false|${this.onFuture}|${this.onAll()}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}`
-    }
-
-    // shares and on_all
-    // database_name|schema_name|object_name|privilege|with_grant_option|on_future|on_all|roles|shares
-    return `${this.database.name}|${this.schema.name}|${this.objectName || ''}|${this.privilege}|false|${this.onFuture}|${this.onAll()}|${this.toRoles.map(r => r.name).concat(this.toTerraformRoles.map(tr => tr.name)).join(',')}|`
+    return ''
   }
 
   resourceBlock(namingConvention: NamingConvention): string {
     const spacing = TerraformBackend.SPACING
 
-    const roles = this.roleAndRoleResourceStrings().join(', ')
-    const dependsOn = this.dependsOn.map(r => `${r.resourceType()}.${r.resourceName(namingConvention)}`).join(', ')
+    const onSchemaObjectAll: OnSchemaObjectAll | undefined = this.props.all ? {
+      objectTypePlural: pluralize(this.props.objectType),
+      inSchema: this.schema
+    } : undefined
 
-    // future grant on all
-    if (this.onFuture) return compact([
-      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
-      spacing + `database_name = snowflake_database.${this.database.resourceName()}.name`,
-      spacing + `schema_name = snowflake_schema.${this.schema.resourceName()}.name\n`,
-      spacing + `privilege = "${this.privilege}"`,
-      spacing + `roles = [${roles}]\n`,
-      spacing + 'on_future = true',
-      spacing + 'with_grant_option = false',
-      spacing + 'enable_multiple_grants = true',
-      dependsOn.length > 0 ? spacing + `depends_on = [${dependsOn}]` : null,
-      '}',
-    ]).join('\n')
+    const onSchemaObjectFuture: OnSchemaObjectFuture | undefined = this.props.future ? {
+      objectTypePlural: pluralize(this.props.objectType),
+      inSchema: this.schema
+    } : undefined
 
-    // current grant on single object
-    if (this.objectName) return compact([
-      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
-      spacing + `database_name = snowflake_database.${this.database.resourceName()}.name`,
-      spacing + `schema_name = snowflake_schema.${this.schema.resourceName()}.name`,
-      spacing + `${this.kind}_name = "${this.objectName}"`,
-      spacing + `privilege = "${this.privilege}"`,
-      spacing + `roles = [${roles}]\n`,
-      spacing + 'with_grant_option = false',
-      spacing + 'enable_multiple_grants = true',
-      dependsOn.length > 0 ? spacing + `depends_on = [${dependsOn}]` : null,
-      '}',
-    ]).join('\n')
+    const onSchemaObject: OnSchemaObject = {
+      objectType: this.props.objectType,
+      all: onSchemaObjectAll,
+      future: onSchemaObjectFuture
+    }
 
-    // current grant on all
+    const onSchemaObjectBlock = onSchemaObjectResourceBlock(onSchemaObject,1)
+
+    const roleName = 'resourceName' in this.role ? `snowflake_role.${this.role.resourceName()}.name` : `"${this.role.name}"`
+
     return compact([
       `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
-      spacing + `database_name = snowflake_database.${this.database.resourceName()}.name`,
-      spacing + `schema_name = snowflake_schema.${this.schema.resourceName()}.name`,
-      spacing + `privilege = "${this.privilege}"`,
-      spacing + `roles = [${roles}]`,
-      spacing + 'enable_multiple_grants = true',
-      spacing + 'on_all = true',
-      dependsOn.length > 0 ? spacing + `depends_on = [${dependsOn}]` : null,
+      spacing + `role_name = ${roleName}`,
+      this.props.privileges ? spacing + `privileges = [${this.props.privileges.map(p => `"${p}"`).join(', ')}]` : null,
+      onSchemaObjectBlock,
+      this.props.allPrivileges ? spacing + 'all_privileges = true' : null,
+      this.props.withGrantOption !== undefined ? spacing + `with_grant_options = ${this.props.withGrantOption}` : null,
       '}'
     ]).join('\n')
   }
 
-  onAll(): boolean {
-    return !this.onFuture && !this.objectName
-  }
 
   static fromSchemaObjectGrant(grant: SchemaObjectGrant, dependsOn: TerraformResource[] = []): TerraformSchemaObjectGrant {
     return new TerraformSchemaObjectGrant(
-      grant.kind,
-      TerraformDatabase.fromDatabase(grant.schema.database),
+      grant.role,
       TerraformSchema.fromSchema(grant.schema),
-      grant.privileges,
-      [],
-      [TerraformRole.fromRole(grant.role)],
-      grant.future,
-      grant.dependsOn ? grant.dependsOn.map(sog => terraformGrantFromGrant(sog)).concat(dependsOn) : dependsOn,
-      grant.objectName()
+      {
+        privileges: grant.privileges,
+        future: grant.future,
+        dependsOn: grant.dependsOn ? grant.dependsOn.map(sog => terraformGrantFromGrant(sog)).concat(dependsOn) : dependsOn,
+        objectType: grant.objectType
+      }
     )
   }
-}
-
-export function isTerraformSchemaObjectGrant(obj: TerraformResource): obj is TerraformSchemaObjectGrant {
-  return (obj as TerraformSchemaObjectGrant).kind !== undefined
 }
