@@ -43,7 +43,7 @@ export function onAccountObjectResourceBlock(obj: OnAccountObject, indents: numb
   return [
     'on_account_object {',
     spacing + `object_type = "${obj.objectType}"`,
-    spacing + `object_name = ${obj.object.resourceName}`,
+    spacing + `object_name = "${obj.object.name}"`, // TODO is regular name correct here or should it be standardized?
     '}'
   ].map(line => indentation + line).join('\n')
 }
@@ -55,7 +55,7 @@ export function onSchemaResourceBlock(onSchema: OnSchema, indents: number): stri
     'on_schema {',
     onSchema.allSchemasInDatabase ? `all_schemas_in_database = snowflake_database.${onSchema.allSchemasInDatabase.resourceName()}.name` : null,
     onSchema.futureSchemasInDatabase ? `future_schemas_in_database = snowflake_database.${onSchema.futureSchemasInDatabase.resourceName()}.name` : null,
-    onSchema.schema ? spacing + `schema_name = "${onSchema.schema.qualifiedName()}"` : null,
+    onSchema.schema ? spacing + `schema_name = ${JSON.stringify(onSchema.schema.qualifiedName())}` : null,
     '}'
   ]).map(line => indentation + line).join('\n')
 }
@@ -64,10 +64,11 @@ export function onSchemaObjectResourceBlock(onSchemaObject: OnSchemaObject, inde
   const spacing = TerraformBackend.SPACING
   const indentation = spacing.repeat(indents)
   return compact([
-    'on_schema_object {',
+    indentation + 'on_schema_object {',
     onSchemaObject.all ? onSchemaObjectAllResourceBlock(onSchemaObject.all, indents + 1) : null,
-    '}'
-  ]).map(line => indentation + line).join('\n')
+    onSchemaObject.future ? onSchemaObjectFutureResourceBlock(onSchemaObject.future, indents + 1) : null,
+    indentation + '}'
+  ]).join('\n')
 }
 
 export function onSchemaObjectAllResourceBlock(onSchemaObjectAll: OnSchemaObjectAll, indents: number): string {
@@ -76,7 +77,7 @@ export function onSchemaObjectAllResourceBlock(onSchemaObjectAll: OnSchemaObject
   return compact([
     'all {',
     spacing + `object_type_plural = "${onSchemaObjectAll.objectTypePlural}"`,
-    onSchemaObjectAll.inSchema ? spacing + `in_schema = "${onSchemaObjectAll.inSchema.qualifiedName()}"` : null,
+    onSchemaObjectAll.inSchema ? spacing + `in_schema = ${JSON.stringify(onSchemaObjectAll.inSchema.qualifiedName())}` : null,
     onSchemaObjectAll.inDatabase ? spacing + `in_database = "${onSchemaObjectAll.inDatabase.name}"` : null,
     '}'
   ]).map(line => indentation + line).join('\n')
@@ -88,7 +89,7 @@ export function onSchemaObjectFutureResourceBlock(onSchemaObjectFuture: OnSchema
   return compact([
     'future {',
     spacing + `object_type_plural = "${onSchemaObjectFuture.objectTypePlural}"`,
-    onSchemaObjectFuture.inSchema ? spacing + `in_schema = "${onSchemaObjectFuture.inSchema.qualifiedName()}"` : null,
+    onSchemaObjectFuture.inSchema ? spacing + `in_schema = ${JSON.stringify(onSchemaObjectFuture.inSchema.qualifiedName())}` : null,
     onSchemaObjectFuture.inDatabase ? spacing + `in_database = "${onSchemaObjectFuture.inDatabase.name}"` : null,
     '}'
   ]).map(line => indentation + line).join('\n')
@@ -102,13 +103,15 @@ export abstract class TerraformPrivilegesGrant implements TerraformResource {
     this.role = role
   }
 
-  resourceType(): string {
-    return 'snowflake_grant_privileges_to_role'
-  }
+  resourceType ='snowflake_grant_privileges_to_role'
 
   abstract resourceID(): string
 
   abstract resourceBlock(namingConvention: NamingConvention): string
 
   abstract resourceName(namingConvention: NamingConvention): string
+}
+
+export function isTerraformPrivilegesGrant(obj: TerraformResource): obj is TerraformPrivilegesGrant {
+  return 'resourceType' in obj && obj.resourceType === 'snowflake_grant_privileges_to_role'
 }

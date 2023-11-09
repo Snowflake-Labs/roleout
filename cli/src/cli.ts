@@ -20,10 +20,10 @@ import {
   getConnectionOptionsFromEnv,
   SnowflakeConnector
 } from 'roleout-lib/build/snowflakeConnector'
-import {isTerraformGrant} from 'lib/backends/terraform/terraformPrivilegesGrant'
 import {isSchemaObjectGrant} from 'roleout-lib/build/grants/grant'
 import {Privilege} from 'roleout-lib/build/privilege'
 import {AccessRole} from 'roleout-lib/build/roles/accessRole'
+import {isTerraformPrivilegesGrant} from 'roleout-lib/build/backends/terraform/terraformPrivilegesGrant'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const exec = util.promisify(require('child_process').exec)
@@ -64,7 +64,7 @@ async function deployTerraform(program: Command, opts: DeployOpts) {
 
 async function importTerraform(program: Command, opts: ImportOpts) {
   function importCommand(resource: TerraformResource, namingConvention: NamingConvention): string {
-    return `terraform import ${resource.resourceType()}."${resource.resourceName(namingConvention)}" "${resource.resourceID()}"`
+    return `terraform import ${resource.resourceType}."${resource.resourceName(namingConvention)}" "${resource.resourceID()}"`
   }
 
   const contents = await fs.readFile(opts.config)
@@ -91,7 +91,7 @@ async function importTerraform(program: Command, opts: ImportOpts) {
     ].flat()
   }
 
-  if(!opts.grants) resources = resources.filter(r => !isTerraformGrant(r))
+  if(!opts.grants) resources = resources.filter(r => !isTerraformPrivilegesGrant(r))
 
   console.log(`${resources.length} resources`)
 
@@ -182,7 +182,7 @@ async function revokeFutureGrants(program: Command, opts: RevokeFutureGrantsOpts
     let grants: SchemaObjectGrant[] = accessRoles.flatMap(ar => ar.grants).filter(g => isSchemaObjectGrant(g) && g.future) as SchemaObjectGrant[]
 
     // optionally filter to only ownership grants
-    if(opts.ownershipOnly) grants = grants.filter(g => g.privileges === Privilege.OWNERSHIP)
+    if(opts.ownershipOnly) grants = grants.filter(g => g.privileges.includes(Privilege.OWNERSHIP))
 
     const statements = grants.map(grant => {
       const keyword = grant.objectType.replace('_', ' ').toUpperCase() + 'S'

@@ -16,9 +16,7 @@ export class TerraformRoleOwnershipGrant implements TerraformResource {
     this.toRole = toRole
   }
 
-  resourceType(): string {
-    return 'snowflake_role_ownership_grant'
-  }
+  resourceType = 'snowflake_role_ownership_grant'
 
   resourceName(namingConvention: NamingConvention): string {
     return Mustache.render(namingConvention.terraformRoleOwnershipGrantResourceName, {
@@ -34,7 +32,7 @@ export class TerraformRoleOwnershipGrant implements TerraformResource {
   resourceBlock(namingConvention: NamingConvention): string {
     const spacing = TerraformBackend.SPACING
     return flatten(compact([
-      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
+      `resource ${this.resourceType} ${this.resourceName(namingConvention)} {`,
       spacing + `on_role_name = snowflake_role.${this.onRole.resourceName()}.name`,
       spacing + `to_role_name = "${this.toRole.name}"`,
       spacing + 'revert_ownership_to_role_name = "SYSADMIN"',

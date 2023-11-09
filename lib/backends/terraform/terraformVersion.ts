@@ -1,1 +1,1 @@
-export const TERRAFORM_VERSION = '0.75.0'
+export const TERRAFORM_VERSION = '0.73.0'

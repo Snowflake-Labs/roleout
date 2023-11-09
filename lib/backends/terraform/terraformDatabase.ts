@@ -15,9 +15,7 @@ export class TerraformDatabase implements TerraformResource, DatabaseOptions {
     this.dataRetentionTimeInDays = dataRetentionTimeInDays
   }
 
-  resourceType(): string {
-    return 'snowflake_database'
-  }
+  resourceType = 'snowflake_database'
 
   resourceName(): string {
     return standardizeIdentifierForResource(this.name)
@@ -31,7 +29,7 @@ export class TerraformDatabase implements TerraformResource, DatabaseOptions {
     const spacing = TerraformBackend.SPACING
 
     return compact([
-      `resource ${this.resourceType()} ${this.resourceName()} {`,
+      `resource ${this.resourceType} ${this.resourceName()} {`,
       spacing + `name = "${this.name}"`,
       this.transient !== undefined ? spacing + `is_transient = ${this.transient}` : null,
       this.dataRetentionTimeInDays !== undefined ? spacing + `data_retention_time_in_days = ${this.dataRetentionTimeInDays}` : null,
@@ -45,6 +43,6 @@ export class TerraformDatabase implements TerraformResource, DatabaseOptions {
 }
 
 export function isTerraformDatabase(obj: Database | TerraformDatabase): obj is TerraformDatabase {
-  return 'resourceType' in obj && obj.resourceType() === 'snowflake_database'
+  return 'resourceType' in obj && obj.resourceType === 'snowflake_database'
 }
 

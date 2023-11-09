@@ -54,7 +54,7 @@ export class SchemaAccessRole implements AccessRole {
 
     const readGrants = () => [
       new DatabaseGrant(this.schema.database, [Privilege.USAGE], this),
-      new SchemaGrant(this.schema, [Privilege.USAGE], this),
+      new SchemaGrant(this.schema, [Privilege.USAGE], this, [schemaOwnerGrant]),
       new TableGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
       new TableGrant(this.schema, true, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
       new ViewGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),
@@ -78,7 +78,7 @@ export class SchemaAccessRole implements AccessRole {
     const readWriteGrants = () =>
       [
         new DatabaseGrant(this.schema.database, [Privilege.USAGE], this),
-        new SchemaGrant(this.schema, [Privilege.USAGE], this),
+        new SchemaGrant(this.schema, [Privilege.USAGE], this, [schemaOwnerGrant]),
         new TableGrant(this.schema, false, [Privilege.SELECT, Privilege.INSERT, Privilege.UPDATE, Privilege.DELETE, Privilege.REFERENCES], this, undefined, [schemaOwnerGrant]),
         new TableGrant(this.schema, true, [Privilege.SELECT, Privilege.INSERT, Privilege.UPDATE, Privilege.DELETE, Privilege.REFERENCES], this, undefined, [schemaOwnerGrant]),
         new ViewGrant(this.schema, false, [Privilege.SELECT], this, undefined, [schemaOwnerGrant]),

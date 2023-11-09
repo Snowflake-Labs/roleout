@@ -9,6 +9,7 @@ import {TerraformResource} from './terraformResource'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
 import {AccountObjectType} from '../../objects/objects'
 import {OnAccountObjectProps, TerraformAccountObjectGrant} from './terraformAccountObjectGrant'
+import {terraformGrantFromGrant} from './helpers'
 
 export class TerraformVirtualWarehouseGrant extends TerraformAccountObjectGrant {
   virtualWarehouse: TerraformVirtualWarehouse
@@ -16,7 +17,8 @@ export class TerraformVirtualWarehouseGrant extends TerraformAccountObjectGrant 
   constructor(role: Role | TerraformRole, virtualWarehouse: TerraformVirtualWarehouse, props: OnAccountObjectProps) {
     super(role, props)
     this.virtualWarehouse = virtualWarehouse
-    this.props = props
+    this.props.dependsOn ||= []
+    this.props.dependsOn.push(this.virtualWarehouse)
   }
 
   resourceID(): string {
@@ -47,7 +49,7 @@ export class TerraformVirtualWarehouseGrant extends TerraformAccountObjectGrant 
   static fromVirtualWarehouseGrant(grant: VirtualWarehouseGrant, dependsOn: TerraformResource[] = []): TerraformVirtualWarehouseGrant {
     return new TerraformVirtualWarehouseGrant(grant.role, TerraformVirtualWarehouse.fromVirtualWarehouse(grant.virtualWarehouse), {
       privileges: grant.privileges,
-      dependsOn
+      dependsOn: grant.dependsOn ? grant.dependsOn.map(sog => terraformGrantFromGrant(sog)).concat(dependsOn) : dependsOn,
     })
   }
 }

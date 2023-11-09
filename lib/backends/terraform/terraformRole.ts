@@ -10,9 +10,7 @@ export class TerraformRole implements TerraformResource {
     this.name = name
   }
 
-  resourceType(): string {
-    return 'snowflake_role'
-  }
+  resourceType = 'snowflake_role'
 
   resourceName(): string {
     return standardizeIdentifierForResource(this.name)
@@ -26,7 +24,7 @@ export class TerraformRole implements TerraformResource {
     const spacing = TerraformBackend.SPACING
 
     return [
-      `resource ${this.resourceType()} ${this.resourceName()} {`,
+      `resource ${this.resourceType} ${this.resourceName()} {`,
       spacing + `name = "${this.name}"`,
       '}',
     ].join('\n')
@@ -37,3 +35,6 @@ export class TerraformRole implements TerraformResource {
   }
 }
 
+export function isTerraformRole(role: Role | TerraformRole): role is TerraformRole {
+  return 'resourceType' in role && role.resourceType === 'snowflake_role'
+}

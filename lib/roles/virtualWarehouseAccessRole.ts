@@ -23,7 +23,7 @@ export class VirtualWarehouseAccessRole implements AccessRole {
   ) {
     this.virtualWarehouse = virtualWarehouse
     this.accessLevel = accessLevel
-    this.grants = this.buildGrants()
+    this.grants = this.buildGrants(namingConvention)
     this.name = this.generateName(namingConvention)
   }
 
@@ -34,12 +34,19 @@ export class VirtualWarehouseAccessRole implements AccessRole {
     })
   }
 
-  private buildGrants(): Grant[] {
-    const monitorGrants = [
-      new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.MONITOR], this),
-    ]
+  private buildGrants(namingConvention: NamingConvention): Grant[] {
+    // all other grants depend on the virtual warehouse ownership being set
+    let virtualWarehouseOwnerGrant: VirtualWarehouseGrant
+    if (this.accessLevel === VirtualWarehouseAccessLevel.Full) {
+      virtualWarehouseOwnerGrant = new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.OWNERSHIP], this)
+    } else {
+      virtualWarehouseOwnerGrant = new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.OWNERSHIP], new VirtualWarehouseAccessRole(this.virtualWarehouse, VirtualWarehouseAccessLevel.Full, namingConvention))
+    }
+    const usageGrants = [new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.USAGE], this, [virtualWarehouseOwnerGrant])]
 
-    const usageGrants = [new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.USAGE], this)]
+    const monitorGrants = [
+      new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.USAGE, Privilege.MONITOR], this, [virtualWarehouseOwnerGrant]),
+    ]
 
     const fullGrants = [
       new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.OWNERSHIP], this),
@@ -49,7 +56,7 @@ export class VirtualWarehouseAccessRole implements AccessRole {
     case VirtualWarehouseAccessLevel.Usage:
       return usageGrants
     case VirtualWarehouseAccessLevel.UsageMonitor:
-      return usageGrants.concat(monitorGrants)
+      return monitorGrants
     case VirtualWarehouseAccessLevel.Full:
       return fullGrants
     }

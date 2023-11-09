@@ -44,7 +44,8 @@ export class TerraformDatabaseGrant extends TerraformAccountObjectGrant {
       objectType: AccountObjectType.DATABASE
     }
   }
-  static fromDatabaseGrant(grant: DatabaseGrant, dependsOn?: TerraformResource[]): TerraformDatabaseGrant {
+
+  static fromDatabaseGrant(grant: DatabaseGrant, dependsOn: TerraformResource[]): TerraformDatabaseGrant {
     return new TerraformDatabaseGrant(grant.role, TerraformDatabase.fromDatabase(grant.database), {
       privileges: grant.privileges,
       dependsOn

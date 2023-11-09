@@ -15,6 +15,7 @@ import {TerraformResource} from './terraformResource'
 import {compact} from 'lodash'
 import standardizeIdentifierForResource from './standardizeIdentifierForResource'
 import {Privilege} from '../../privilege'
+import {terraformGrantFromGrant} from './helpers'
 
 export type Props = {
   allPrivileges?: boolean
@@ -32,6 +33,8 @@ export class TerraformSchemaGrant extends TerraformPrivilegesGrant {
     super(role)
     this.schema = schema
     this.props = props
+    this.props.dependsOn ||= []
+    this.props.dependsOn.push(this.schema)
   }
 
   resourceID(): string {
@@ -67,20 +70,25 @@ export class TerraformSchemaGrant extends TerraformPrivilegesGrant {
     const roleName = 'resourceName' in this.role ? `snowflake_role.${this.role.resourceName()}.name` : `"${this.role.name}"`
 
     return compact([
-      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
+      `resource ${this.resourceType} ${this.resourceName(namingConvention)} {`,
       spacing + `role_name = ${roleName}`,
       onSchemaBlock,
       this.props.privileges ? spacing + `privileges = [${this.props.privileges.map(p => `"${p}"`).join(', ')}]` : null,
       this.props.allPrivileges ? spacing + 'all_privileges = true' : null,
       this.props.withGrantOption !== undefined ? spacing + `with_grant_options = ${this.props.withGrantOption}` : null,
+      this.props.dependsOn ? spacing + `depends_on = [${this.props.dependsOn.map(r => r.resourceType + '.' + r.resourceName(namingConvention)).join(', ')}]` : null,
       '}'
     ]).join('\n')
   }
 
-  static fromSchemaGrant(grant: SchemaGrant, dependsOn?: TerraformResource[]): TerraformSchemaGrant {
+  toString(): string {
+    return `${this.resourceType} ${this.props.privileges ? this.props.privileges.join(',') : ''} on ${this.schema.database.name}.${this.schema.name} to ${this.role.name}`
+  }
+
+  static fromSchemaGrant(grant: SchemaGrant, dependsOn: TerraformResource[]): TerraformSchemaGrant {
     return new TerraformSchemaGrant(grant.role, TerraformSchema.fromSchema(grant.schema), {
       privileges: grant.privileges,
-      dependsOn
+      dependsOn: grant.dependsOn ? grant.dependsOn.map(sog => terraformGrantFromGrant(sog)).concat(dependsOn) : dependsOn,
     })
   }
 }

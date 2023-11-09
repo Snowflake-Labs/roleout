@@ -23,8 +23,6 @@ import {Role} from '../roles/role'
 import {TERRAFORM_VERSION} from './terraform/terraformVersion'
 import {TerraformRoleOwnershipGrant} from './terraform/terraformRoleOwnershipGrant'
 import {flatten, set} from 'lodash'
-import {SchemaObjectType} from '../objects/objects'
-
 
 export class TerraformBackend extends Backend {
   static INDENT_SPACES = 2
@@ -77,7 +75,41 @@ provider "snowflake" {
   rbacResources(deployable: Deployable, environmentManagerRole: Role): (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformPrivilegesGrant)[] {
     let resources: (TerraformRole | TerraformRoleGrants | TerraformRoleOwnershipGrant | TerraformPrivilegesGrant)[] = []
 
-    // build a data structure of database -> schema -> kind = on_all ownership grant
+    /**
+     * Database ownership grants
+     */
+    const databaseOwnershipLookup: Record<string, TerraformDatabaseGrant> = {}
+
+    let databaseOwnerRole: Role | TerraformRole = environmentManagerRole
+    let databaseGrantDependsOn: TerraformResource[] = []
+    if (environmentManagerRole.name != 'SYSADMIN') {
+      // environment manager role owns databases
+      // environment manager must be granted to sysadmin before taking ownership of the database, or else ACCOUNTADMIN
+      // will not have indirect ownership of the database and will be unable to create schemas
+      const terraformEnvironmentManagerRole = TerraformRole.fromRole(environmentManagerRole)
+      const grantEnvManagerToSysadmin = new TerraformRoleGrants(terraformEnvironmentManagerRole, [new Role('SYSADMIN')], [])
+      resources = resources.concat([
+        terraformEnvironmentManagerRole,
+        grantEnvManagerToSysadmin
+      ])
+      databaseOwnerRole = terraformEnvironmentManagerRole
+      databaseGrantDependsOn = [grantEnvManagerToSysadmin]
+    }
+
+    for (const database of deployable.databases) {
+      const terraformDatabase = TerraformDatabase.fromDatabase(database)
+      const dependsOn = databaseGrantDependsOn.concat([terraformDatabase])
+      const grant = new TerraformDatabaseGrant(databaseOwnerRole, terraformDatabase, {
+        privileges: [Privilege.OWNERSHIP],
+        dependsOn
+      })
+      resources.push(grant)
+      set(databaseOwnershipLookup, database.name, grant)
+    }
+
+    /**
+     * Build a data structure of database -> schema -> kind = on_all ownership grant
+     */
     const onAllOwnershipLookup: Record<string, Record<string, Record<string, TerraformSchemaObjectGrant>>> = {}
     const allGrants: Grant[] = flatten(deployable.accessRoles().flatMap(ar => ar.grants))
     for (const grant of allGrants) {
@@ -97,19 +129,27 @@ provider "snowflake" {
 
       // grant privileges to access role
       // all schema object grants must depend on the on_all ownership grants on the same object kind
+      // all schema object grants must depend on the database ownership grants on the same object kind
       for (const grant of accessRole.grants) {
         const dependsOn: TerraformResource[] = [ownershipRole]
         if (isSchemaObjectGrant(grant) && !(grant.privileges.includes(Privilege.OWNERSHIP) && !grant.future)) {
           const onAllOwnershipGrant = onAllOwnershipLookup[grant.schema.database.name][grant.schema.name][grant.objectType]
           if (!onAllOwnershipGrant) throw new Error(`No on_all ownership grant for ${grant.schema.database.name}.${grant.schema.name} ${grant.objectType}s`)
           dependsOn.push(onAllOwnershipGrant)
+          const databaseOwnershipGrant = databaseOwnershipLookup[grant.schema.database.name]
+          if (!databaseOwnershipGrant) throw new Error(`No database ownership grant for ${grant.schema.database.name}.${grant.schema.name} ${grant.objectType}s`)
+          dependsOn.push(databaseOwnershipGrant)
         }
 
-        resources.push(TerraformBackend.generateGrantResource(grant, dependsOn))
+        const grantResource = TerraformBackend.generateGrantResource(grant, dependsOn)
+        resources.push(grantResource)
       }
     }
 
-    // grant access roles to functional roles and manager role
+
+    /**
+     * Grant access roles to functional roles and manager role
+     */
     const accessRoleMap = deployable.accessToFunctionalRoleMap()
     for (const accessRole of deployable.accessRoles()) {
       const grantRoles: Role[] = []
@@ -124,25 +164,6 @@ provider "snowflake" {
         new TerraformRoleGrants(
           new TerraformRole(accessRole.name), grantRoles, grantTerraformRoles)
       )
-    }
-
-    if (environmentManagerRole.name != 'SYSADMIN') {
-      const terraformEnvironmentManagerRole = TerraformRole.fromRole(environmentManagerRole)
-      const grantEnvManagerToSysadmin = new TerraformRoleGrants(terraformEnvironmentManagerRole, [new Role('SYSADMIN')], [])
-      resources = resources.concat([
-        terraformEnvironmentManagerRole,
-        grantEnvManagerToSysadmin
-      ])
-
-      // environment manager role owns databases
-      // environment manager must be granted to sysadmin before taking ownership of the database, or else ACCOUNTADMIN
-      // will not have indirect ownership of the database and will be unable to create schemas
-      for (const database of deployable.databases) {
-        resources.push(new TerraformDatabaseGrant(terraformEnvironmentManagerRole, TerraformDatabase.fromDatabase(database), {
-          privileges: [Privilege.OWNERSHIP],
-          dependsOn: [grantEnvManagerToSysadmin]
-        }))
-      }
     }
 
     return resources

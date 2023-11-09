@@ -10,7 +10,7 @@ import {NamingConvention} from '../../namingConvention'
 import {TerraformBackend} from '../terraformBackend'
 import {TerraformSchema} from './terraformSchema'
 import Mustache from 'mustache'
-import {TerraformRole} from './terraformRole'
+import {isTerraformRole, TerraformRole} from './terraformRole'
 import {Role} from '../../roles/role'
 import {terraformGrantFromGrant} from './helpers'
 import {TerraformResource} from './terraformResource'
@@ -44,6 +44,9 @@ export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
     super(role)
     this.schema = schema
     this.props = props
+    this.props.dependsOn ||= []
+    this.props.dependsOn.push(this.schema)
+    if(isTerraformRole(role)) this.props.dependsOn.push(role)
   }
 
   resourceName(namingConvention: NamingConvention): string {
@@ -93,16 +96,20 @@ export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
     const roleName = 'resourceName' in this.role ? `snowflake_role.${this.role.resourceName()}.name` : `"${this.role.name}"`
 
     return compact([
-      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
+      `resource ${this.resourceType} ${this.resourceName(namingConvention)} {`,
       spacing + `role_name = ${roleName}`,
       this.props.privileges ? spacing + `privileges = [${this.props.privileges.map(p => `"${p}"`).join(', ')}]` : null,
       onSchemaObjectBlock,
       this.props.allPrivileges ? spacing + 'all_privileges = true' : null,
       this.props.withGrantOption !== undefined ? spacing + `with_grant_options = ${this.props.withGrantOption}` : null,
+      this.props.dependsOn ? spacing + `depends_on = [${this.props.dependsOn.map(r => r.resourceType + '.' + r.resourceName(namingConvention)).join(', ')}]` : null,
       '}'
     ]).join('\n')
   }
 
+  toString(): string {
+    return `${this.resourceType} ${this.props.privileges ? this.props.privileges.join(',') : ''} on ${this.schema.database.name}.${this.schema.name} ${this.props.objectType} to ${this.role.name}`
+  }
 
   static fromSchemaObjectGrant(grant: SchemaObjectGrant, dependsOn: TerraformResource[] = []): TerraformSchemaObjectGrant {
     return new TerraformSchemaObjectGrant(
@@ -110,6 +117,7 @@ export class TerraformSchemaObjectGrant extends TerraformPrivilegesGrant {
       TerraformSchema.fromSchema(grant.schema),
       {
         privileges: grant.privileges,
+        all: !grant.future && grant.objectName() === undefined,
         future: grant.future,
         dependsOn: grant.dependsOn ? grant.dependsOn.map(sog => terraformGrantFromGrant(sog)).concat(dependsOn) : dependsOn,
         objectType: grant.objectType

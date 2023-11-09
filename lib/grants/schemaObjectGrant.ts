@@ -14,5 +14,9 @@ export abstract class SchemaObjectGrant implements Grant {
   abstract objectType: SchemaObjectType
 
   abstract objectName(): string | undefined
+
+  toString(): string {
+    return `${this.schema.database.name}.${this.schema.name} ${this.future ? 'future' : ''} ${this.privileges.map(p => p.toString())} on ${this.objectType} to role ${this.role.name}`
+  }
 }
 

@@ -10,10 +10,12 @@ export class SchemaGrant implements Grant {
   role: Role
   type: GrantType = 'SchemaGrant'
   objectType = AccountObjectType.SCHEMA
+  dependsOn?: Grant[]
 
-  constructor(schema: Schema, privileges: Privilege[], role: Role) {
+  constructor(schema: Schema, privileges: Privilege[], role: Role, dependsOn?: Grant[]) {
     this.schema = schema
     this.privileges = privileges
     this.role = role
+    this.dependsOn = dependsOn
   }
 }

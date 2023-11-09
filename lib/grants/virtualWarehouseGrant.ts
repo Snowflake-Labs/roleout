@@ -10,14 +10,17 @@ export class VirtualWarehouseGrant implements Grant {
   role: Role
   type: GrantType = 'VirtualWarehouseGrant'
   objectType = AccountObjectType.WAREHOUSE
+  dependsOn?: Grant[]
 
   constructor(
     virtualWarehouse: VirtualWarehouse,
     privileges: Privilege[],
-    role: Role
+    role: Role,
+    dependsOn?: Grant[]
   ) {
     this.virtualWarehouse = virtualWarehouse
     this.privileges = privileges
     this.role = role
+    this.dependsOn = dependsOn
   }
 }

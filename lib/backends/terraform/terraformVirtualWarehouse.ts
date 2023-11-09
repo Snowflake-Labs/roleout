@@ -41,9 +41,7 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
     this.initiallySuspended = initiallySuspended
   }
 
-  resourceType(): string {
-    return 'snowflake_warehouse'
-  }
+  resourceType = 'snowflake_warehouse'
 
   resourceName(): string {
     return standardizeIdentifierForResource(this.name)
@@ -57,7 +55,7 @@ export class TerraformVirtualWarehouse implements TerraformResource, VirtualWare
     const spacing = TerraformBackend.SPACING
 
     return compact([
-      `resource ${this.resourceType()} ${this.resourceName()} {`,
+      `resource ${this.resourceType} ${this.resourceName()} {`,
       spacing + `name = "${this.name}"`,
       spacing + `warehouse_size = "${this.size}"`,
       spacing + `max_cluster_count = ${this.maxClusterCount}`,

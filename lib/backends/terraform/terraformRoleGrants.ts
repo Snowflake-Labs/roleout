@@ -20,9 +20,7 @@ export class TerraformRoleGrants implements TerraformResource {
     this.dependsOn = dependsOn
   }
 
-  resourceType(): string {
-    return 'snowflake_role_grants'
-  }
+  resourceType = 'snowflake_role_grants'
 
   resourceName(namingConvention: NamingConvention): string {
     return Mustache.render(namingConvention.terraformGrantRoleResourceName, {
@@ -39,13 +37,13 @@ export class TerraformRoleGrants implements TerraformResource {
   resourceBlock(namingConvention: NamingConvention): string {
     const spacing = TerraformBackend.SPACING
     return flatten(compact([
-      `resource ${this.resourceType()} ${this.resourceName(namingConvention)} {`,
+      `resource ${this.resourceType} ${this.resourceName(namingConvention)} {`,
       spacing + `role_name = snowflake_role.${this.fromRole.resourceName()}.name\n`,
       spacing + 'enable_multiple_grants = true',
       spacing + 'roles = [',
       this.roleAndRoleResourceStrings().map((rn) => spacing.repeat(2) + `${rn},`),
       spacing + ']',
-      this.dependsOn.length > 0 ? spacing + 'depends_on = [' + this.dependsOn.map(r => `${r.resourceType()}.${r.resourceName(namingConvention)}`).join(', ') + ']' : null,
+      this.dependsOn.length > 0 ? spacing + 'depends_on = [' + this.dependsOn.map(r => `${r.resourceType}.${r.resourceName(namingConvention)}`).join(', ') + ']' : null,
       '}'
     ]))
       .join('\n')
