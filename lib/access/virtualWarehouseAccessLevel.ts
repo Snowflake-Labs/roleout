@@ -3,6 +3,7 @@ import {UndefinedAccessLevelError} from './undefinedAccessLevelError'
 export enum VirtualWarehouseAccessLevel {
   Usage,
   UsageMonitor,
+  Monitor,
   Full,
 }
 
@@ -21,6 +22,8 @@ export function virtualWarehouseAccessLevelShortName(accessLevel: VirtualWarehou
     return 'U'
   case VirtualWarehouseAccessLevel.UsageMonitor:
     return 'UM'
+  case VirtualWarehouseAccessLevel.Monitor:
+    return 'M'
   case VirtualWarehouseAccessLevel.Full:
     return 'FULL'
   }

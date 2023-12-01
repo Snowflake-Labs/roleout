@@ -185,7 +185,7 @@ Foreach-Object {
               vwh.queryAccelerationMaxScaleFactor ? `QUERY_ACCELERATION_MAX_SCALE_FACTOR = ${vwh.queryAccelerationMaxScaleFactor}` : null,
               vwh.statementTimeoutInSeconds ? `STATEMENT_TIMEOUT_IN_SECONDS = ${vwh.statementTimeoutInSeconds}` : null,
               vwh.resourceMonitor ? `RESOURCE_MONITOR = ${vwh.resourceMonitor}` : null,
-              `WAREHOUSE_TYPE = ${vwh.type};\n`
+              `WAREHOUSE_TYPE = "${vwh.type}";\n`
             ])).join('\n')
         )
       ).join('\n')

@@ -38,6 +38,7 @@ export class TerraformSchema implements TerraformResource, SchemaOptions {
 
     return compact([
       `resource ${this.resourceType} ${this.resourceName()} {`,
+      spacing + 'provider = snowflake.sysadmin',
       spacing + `database = snowflake_database.${this.database.resourceName()}.name`,
       spacing + `name = "${this.name}"`,
       spacing + `is_managed = ${this.managedAccess}`,

@@ -30,6 +30,7 @@ export class TerraformDatabase implements TerraformResource, DatabaseOptions {
 
     return compact([
       `resource ${this.resourceType} ${this.resourceName()} {`,
+      spacing + 'provider = snowflake.sysadmin',
       spacing + `name = "${this.name}"`,
       this.transient !== undefined ? spacing + `is_transient = ${this.transient}` : null,
       this.dataRetentionTimeInDays !== undefined ? spacing + `data_retention_time_in_days = ${this.dataRetentionTimeInDays}` : null,

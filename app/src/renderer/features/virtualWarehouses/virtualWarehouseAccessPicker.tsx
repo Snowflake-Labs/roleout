@@ -76,9 +76,10 @@ const VirtualWarehouseAccessPicker: FunctionComponent<Props> = ({
     return cell()
   case VirtualWarehouseAccessLevel.Usage:
     return cell('Usage', theme.palette.success.main)
-
   case VirtualWarehouseAccessLevel.UsageMonitor:
     return cell('Usage + Monitor', theme.palette.secondary.main)
+  case VirtualWarehouseAccessLevel.Monitor:
+    return cell('Monitor', theme.palette.info.main)
   case VirtualWarehouseAccessLevel.Full:
     return cell('Full', theme.palette.warning.main)
   }

@@ -159,6 +159,7 @@ export class VirtualWarehouse implements VirtualWarehouseOptions {
     return [
       VirtualWarehouseAccessLevel.Usage,
       VirtualWarehouseAccessLevel.UsageMonitor,
+      VirtualWarehouseAccessLevel.Monitor,
       VirtualWarehouseAccessLevel.Full,
     ].map((level) => new VirtualWarehouseAccessRole(this, level, namingConvention))
   }

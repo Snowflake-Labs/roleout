@@ -44,8 +44,12 @@ export class VirtualWarehouseAccessRole implements AccessRole {
     }
     const usageGrants = [new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.USAGE], this, [virtualWarehouseOwnerGrant])]
 
-    const monitorGrants = [
+    const usageMonitorGrants = [
       new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.USAGE, Privilege.MONITOR], this, [virtualWarehouseOwnerGrant]),
+    ]
+
+    const monitorGrants = [
+      new VirtualWarehouseGrant(this.virtualWarehouse, [Privilege.MONITOR], this, [virtualWarehouseOwnerGrant]),
     ]
 
     const fullGrants = [
@@ -56,6 +60,8 @@ export class VirtualWarehouseAccessRole implements AccessRole {
     case VirtualWarehouseAccessLevel.Usage:
       return usageGrants
     case VirtualWarehouseAccessLevel.UsageMonitor:
+      return usageMonitorGrants
+    case VirtualWarehouseAccessLevel.Monitor:
       return monitorGrants
     case VirtualWarehouseAccessLevel.Full:
       return fullGrants

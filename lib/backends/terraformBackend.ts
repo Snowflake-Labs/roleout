@@ -40,6 +40,11 @@ export class TerraformBackend extends Backend {
 provider "snowflake" {
   role = "ACCOUNTADMIN"
 }
+
+provider "snowflake" {
+  alias = "sysadmin"
+  role = "SYSADMIN"
+}
 `
 
   staticFiles(): Map<string, string> {
